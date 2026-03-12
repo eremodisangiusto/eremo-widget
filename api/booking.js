@@ -38,6 +38,7 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+    console.log('Beds24 response:', JSON.stringify(data));
     const bookingId = data?.[0]?.bookId || data?.bookId || ('ESG-' + Date.now());
 
     return res.status(200).json({
