@@ -41,10 +41,11 @@ export default async function handler(req, res) {
     console.log('Beds24 response:', JSON.stringify(data));
     const bookingId = data?.[0]?.bookId || data?.bookId || ('ESG-' + Date.now());
 
-    return res.status(200).json({
+   return res.status(200).json({
       success: true,
       bookingId,
       status: 'request',
+      beds24Response: data,
       checkin, checkout, guests,
       guest: { firstName, lastName, email, phone },
     });
