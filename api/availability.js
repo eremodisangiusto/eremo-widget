@@ -8,10 +8,8 @@ export default async function handler(req, res) {
   try {
     const { checkin, checkout, guests } = req.body;
 
-    // Convert YYYY-MM-DD to YYYYMMDD for Beds24
     const formatDate = (d) => d.replace(/-/g, '');
 
-    // Use getAvailabilities - no authentication needed, just propId
     const payload = {
       checkIn: formatDate(checkin),
       checkOut: formatDate(checkout),
@@ -30,10 +28,15 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Check if room is available
-    // Beds24 returns empty array or rooms with availability info
-    const rooms = Array.isArray(data) ? data : [];
-    const available = rooms.length > 0 && rooms.some(r => r.roomId == 469679);
+    // Beds24 returns { "469679": { roomsavail: 1, ... }, checkIn: ..., ... }
+    const roomData = data['469679'];
+    const roomsAvail = roomData ? Number(roomData.roomsavail) : 0;
+    const available = roomsAvail > 0;
+
+    // Calculate nights
+    const nights = Math.ceil((new Date(checkout) - new Date(checkin)) / 86400000);
+    const pricePerNight = Number(roomData?.price) || 180;
+    const totalPrice = pricePerNight * nights;
 
     return res.status(200).json({
       available,
@@ -46,8 +49,9 @@ export default async function handler(req, res) {
         name: 'Eremo di San Giusto',
         description: 'Tenuta esclusiva con trulli e lamie storiche, piscina privata, oliveto biologico. Ideale per coppie, famiglie e gruppi fino a 10 persone.',
         maxGuests: 10,
-        pricePerNight: rooms[0]?.price || 180,
-        totalPrice: (rooms[0]?.price || 180) * Math.ceil((new Date(checkout) - new Date(checkin)) / 86400000),
+        pricePerNight,
+        totalPrice,
+        nights,
       }] : [],
     });
 
