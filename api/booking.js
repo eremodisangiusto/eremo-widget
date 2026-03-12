@@ -19,6 +19,7 @@ export default async function handler(req, res) {
       data: [{
         propId: Number(process.env.BEDS24_PROP_ID),
         roomId: ROOM_ID,
+        unitId: ROOM_ID,
         firstNight: checkin.replace(/-/g, ''),
         lastNight: checkout.replace(/-/g, ''),
         numAdult: Number(guests),
