@@ -33,9 +33,7 @@ export default async function handler(req, res) {
 
     // Definizione camere — aggiorna i roomId con i tuoi ID reali di Beds24
     const rooms = [
-      { roomId: 'trullo_principale', name: 'Trullo Principale', maxGuests: 2, pricePerNight: 180, description: 'Il trullo storico con volta in pietra, vasca idromassaggio privata, vista sugli ulivi.' },
-      { roomId: 'suite_lamia',       name: 'Suite Lamia',       maxGuests: 3, pricePerNight: 220, description: 'Spazio autentico con terrazza panoramica sul paesaggio pugliese.' },
-      { roomId: 'dimora_del_gelso',  name: 'Dimora del Gelso',  maxGuests: 4, pricePerNight: 280, description: 'La dimora più spaziosa, cucina privata, ideale per famiglie.' },
+      { roomId: '469679', name: 'Eremo di San Giusto', maxGuests: 6, pricePerNight: 180, description: 'Splendida tenuta di trulli e lamie immersa negli ulivi secolari di Ostuni.' },
     ];
 
     const available = rooms
