@@ -185,7 +185,7 @@
 </div>`;
   document.body.appendChild(h);
 
-(function(){
+
   // URL del proxy Vercel
   const PROXY = "https://eremo-bookings.vercel.app";
 
@@ -419,7 +419,5 @@
       }, 300);
     }
   });
-
-})();
 
 })();
