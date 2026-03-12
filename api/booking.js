@@ -1,4 +1,3 @@
-// api/booking.js — Crea prenotazione camera su Beds24
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -7,7 +6,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { roomId, checkin, checkout, guests, firstName, lastName, email, phone, notes } = req.body;
+    const { checkin, checkout, guests, firstName, lastName, email, phone, notes } = req.body;
+
+    const ROOM_ID = 469679;
 
     const payload = {
       authentication: {
@@ -16,18 +17,18 @@ export default async function handler(req, res) {
         propId: process.env.BEDS24_PROP_ID,
       },
       data: [{
-        propId:        process.env.BEDS24_PROP_ID,
-        roomId: '469679',
-        firstNight:    checkin.replace(/-/g, ''),
-        lastNight:     checkout.replace(/-/g, ''),
-        numAdult:      guests,
+        propId: Number(process.env.BEDS24_PROP_ID),
+        roomId: ROOM_ID,
+        firstNight: checkin.replace(/-/g, ''),
+        lastNight: checkout.replace(/-/g, ''),
+        numAdult: Number(guests),
         guestFirstName: firstName,
-        guestLastName:  lastName,
-        guestEmail:     email,
-        guestPhone:     phone || '',
-        guestNotes:     notes || '',
-        status:        'request',
-        referer:       'Widget IA Sito Web',
+        guestLastName: lastName,
+        guestEmail: email,
+        guestPhone: phone || '',
+        guestNotes: notes || '',
+        status: 'request',
+        referer: 'Widget IA Sito Web',
       }]
     };
 
@@ -38,20 +39,18 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    console.log('Beds24 response:', JSON.stringify(data));
     const bookingId = data?.[0]?.bookId || data?.bookId || ('ESG-' + Date.now());
 
-   return res.status(200).json({
+    return res.status(200).json({
       success: true,
       bookingId,
-      status: 'request',
       beds24Response: data,
+      roomId: ROOM_ID,
       checkin, checkout, guests,
       guest: { firstName, lastName, email, phone },
     });
+
   } catch (error) {
-    console.error('Booking error:', error);
-    return res.status(500).json({ error: 'Errore creazione prenotazione' });
+    return res.status(500).json({ error: error.message });
   }
 }
-
