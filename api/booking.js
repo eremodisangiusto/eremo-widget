@@ -13,6 +13,7 @@ export default async function handler(req, res) {
       authentication: {
         apiKey: process.env.BEDS24_API_KEY,
         propKey: process.env.BEDS24_PROP_KEY,
+        propId: process.env.BEDS24_PROP_ID,
       },
       data: [{
         propId:        process.env.BEDS24_PROP_ID,
