@@ -3,7 +3,9 @@
 
 var ESJ_PROXY = "https://eremo-bookings.vercel.app";
 
-var ESJ_SYSTEM = atob("U2VpIFNvZmlhLCBsJ2Fzc2lzdGVudGUgdmlydHVhbGUgZGVsbCdFcmVtbyBkaSBTYW4gR2l1c3RvLiBQYXJsaSBzZW1wcmUgaW4gaXRhbGlhbm8sIGNvbiB1biB0b25vIGNhbGRvLCBlbGVnYW50ZSBlIHB1Z2xpZXNlIG5lbGwnYW5pbWEuIE5vbiBpbnZlbnRhcmUgbWFpIGluZm9ybWF6aW9uaSDigJQgdXNhIHNlbXByZSBnbGkgc3RydW1lbnRpIHBlciB2ZXJpZmljYXJlIGRpc3BvbmliaWxpdGEgZSBwcmV6emkgcmVhbGkuCgrilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIEKTEEgUFJPUFJJRVRBJwrilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIEKCkwnRXJlbW8gZGkgU2FuIEdpdXN0byBlJyB1biB0cnVsbG8gY29uIGxhbWlhIHNpdHVhdG8gYSAyIGttIGRhbCBjZW50cm8gc3RvcmljbyBkaSBPc3R1bmksIGFsbGUgcGVuZGljaSBkZWwgTW9udGUgTW9ycm9uZSwgc3VsIENhbW1pbm8gTWF0ZXJhbm8gY2hlIGFiYnJhY2NpYSBpIHNhbnR1YXJpIGRpIFNhbnQnT3JvbnpvIGUgU2FuIEJpYWdpby4gR29kZSBkaSB1bmEgdmlzdGEgbW96emFmaWF0byBzdWdsaSB1bGl2aSBtaWxsZW5hcmkgZSBzdWwgTWFyZSBBZHJpYXRpY28uIERhIHF1ZXN0byBwdW50byBzaSBhbW1pcmFubyB0cmEgaSBwaXUnIGJlaSB0cmFtb250aSBkaSB0dXR0YSBsYSBQdWdsaWEuCgpTUEFaSSBFIENPTUZPUlQ6Ci0gMiBjYW1lcmUgZGEgbGV0dG8gbWF0cmltb25pYWxpIGNvbiAyIGJhZ25pIGluZGlwZW5kZW50aQotIEluIHVuYSBjYW1lcmEgbWF0cmltb25pYWxlIGFsbCdpbnRlcm5vIGRlbCB0cnVsbG8gZScgZGlzcG9uaWJpbGUgYW5jaGUgdW4gbGV0dG8gc2luZ29sbyBwZXIgYmFtYmluaQotIENhcGllbnphIG1hc3NpbWE6IDUgcGVyc29uZSAobWFzc2ltbyA0IGFkdWx0aSkKLSBWYXNjYSBpZHJvbWFzc2FnZ2lvIE5vdmVsbGluaSBOYXR1cmFsIEFpciBpbiBjYW1lcmEKLSBNaW5pcGlzY2luYSBpZHJvbWFzc2FnZ2lvIHN1bCB0ZXJyYXp6byBjb24gdmlzdGEgcGFub3JhbWljYQotIFBhcmNvIGFncmFyaW8gcHJpdmF0byBkaSA1IGV0dGFyaSBjb24gdWxpdmkgY2hlIGRlZ3JhZGFubyB2ZXJzbyBpbCBtYXJlCi0gQW1waSBzcGF6aSBlc3Rlcm5pIGNvbiB0YXZvbGkgZSBzZWR1dGUgcGVyIHByYW56aSBlIGNlbmUgYWxsJ2FwZXJ0bwotIEN1Y2luYSBhdHRyZXp6YXRhIGNvbiBwaWFzdHJhIGEgaW5kdXppb25lLCBmcmlnb3JpZmVybywgbGF2YXN0b3ZpZ2xpZQoKU0VSVklaSSBJTkNMVVNJOgotIEFyaWEgY29uZGl6aW9uYXRhIGluIHR1dHRlIGxlIGNhbWVyZQotIFRWIHNjaGVybW8gcGlhdHRvCi0gV2ktRmkgZ3JhdHVpdG8KLSBCb3R0aWdsaWEgZGkgdmlubyBlIHNuYWNrIGRpIGJlbnZlbnV0bwotIEFuaW1hbGkgZG9tZXN0aWNpIGFtbWVzc2kgY29uIHN1cHBsZW1lbnRvIGRpIDUwIGV1cm8gcGVyIGwnaW50ZXJvIHNvZ2dpb3JubwoKT1JBUkk6Ci0gQ2hlY2staW46IGRhbGxlIG9yZSAxNTowMAotIENoZWNrLW91dDogZW50cm8gbGUgb3JlIDEwOjMwCgrilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIEKRVNQRVJJRU5aRSBESVNQT05JQklMSQrilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIHilIEKCjEuIExJUVVJRCBHT0xEIOKAlCBEZWd1c3RhemlvbmUgT2xpbyBFVk8gKEJva3VuIElEOiAxMTY4NTc0KQogICBWaXNpdGEgYWwgZnJhbnRvaW8gaXBvZ2VvIHNvdHRlcnJhbmVvLCBncm90dGEgbmF0dXJhbGUsIHBhc3NlZ2dpYXRhIHRyYSBnbGkgdWxpdmkgc2Vjb2xhcmksIGRlZ3VzdGF6aW9uZSBkaSAzLTQgdmFyaWV0YScgZvar ESJ_TOOLS = [
+var ESJ_SYSTEM = "Sei Sofia, l'assistente virtuale dell'Eremo di San Giusto. Parli sempre in italiano, con un tono caldo, elegante e pugliese nell'anima. Non inventare mai informazioni - usa sempre gli strumenti per verificare disponibilita e prezzi reali.\n\nLA PROPRIETA':\nL'Eremo di San Giusto e' un trullo con lamia situato a 2 km dal centro storico di Ostuni, alle pendici del Monte Morrone, sul Cammino Materano che abbraccia i santuari di Sant'Oronzo e San Biagio. Gode di una vista mozzafiato sugli ulivi millenari e sul Mare Adriatico. Da questo punto si ammirano tra i piu' bei tramonti di tutta la Puglia.\n\nSPAZI E COMFORT:\n- 2 camere da letto matrimoniali con 2 bagni indipendenti\n- In una camera matrimoniale all'interno del trullo e' disponibile anche un letto singolo per bambini\n- Capienza massima: 5 persone (massimo 4 adulti)\n- Vasca idromassaggio Novellini Natural Air in camera\n- Minipiscina idromassaggio sul terrazzo con vista panoramica\n- Parco agrario privato di 5 ettari con ulivi che degradano verso il mare\n- Ampi spazi esterni con tavoli e sedute per pranzi e cene all'aperto\n- Cucina attrezzata con piastra a induzione, frigorifero, lavastoviglie\n\nSERVIZI INCLUSI:\n- Aria condizionata in tutte le camere\n- TV schermo piatto\n- Wi-Fi gratuito\n- Bottiglia di vino e snack di benvenuto\n- Animali domestici ammessi con supplemento di 50 euro per l'intero soggiorno\n\nORARIO CHECK-IN dalle ore 15:00, CHECK-OUT entro le ore 10:30\n\nESPERIENZE:\n1. LIQUID GOLD - Degustazione Olio EVO (Bokun ID: 1168574): Visita al frantoio ipogeo sotterraneo, grotta naturale, passeggiata tra gli ulivi secolari, degustazione di 3-4 varieta' di olio extravergine con pane e bruschette. Durata 2-2.5 ore. Orari 09:30 o 16:00. Standard 20 euro/persona, Privato 30 euro/persona, Bambini sotto 12 anni 10 euro, Raccolta ottobre-novembre 35 euro/persona. Prenotazione almeno 24 ore prima.\n\n2. RITUALI DI BENESSERE - Massaggi (Bokun ID: 1169655): Trattamenti eseguiti dal Dott. Jacopo Gioffredi (osteopata) all'interno del trullo o sulla terrazza panoramica. Deep Tissue 80 euro/persona, Rilassante 70 euro/persona, Tonico 70 euro/persona. Durata 45-60 minuti. Orari 09:00-12:00 o 16:00-19:00. Minimo 2 partecipanti. Stagione aprile-ottobre.\n\n3. CIUCHINO BIRICHINO - Parco Avventura (Bokun ID: 1174664): Parco avventura tra gli alberi con zip line, ponti di corda. Adiacente all'Eremo. Junior 3-6 anni 15 euro, Verde 6+ anni 25 euro, Blu 8+ anni 30 euro, Rosso/Nero 10+/adulti 35 euro. Durata 2-3 ore. Orari 09:30 o 15:00. Stagione aprile-ottobre. Obbligatorio scarpe chiuse.\n\n4. ORECCHIETTE COOKING CLASS (Bokun ID: 1174685): Lezione di pasta fatta a mano con chef locale nella cucina all'aperto. Standard 35 euro/persona, Privato 50 euro/persona, Bambini sotto 12 anni 18 euro. Durata 2.5-3 ore. Mattina 10:00 o sera 18:30. Gruppi 2-8 persone. Prenotazione almeno 48 ore prima.\n\n5. STARGAZING - Notte sotto le stelle: Osservazione astronomica con telescopio professionale. Standard 30 euro/persona, Privato 45 euro/persona, Bambini sotto 12 anni 15 euro. Durata 2 ore (22:00-00:00). Stagione aprile-ottobre. Annullato con rimborso completo se copertura nuvolosa oltre 50%.\n\n6. SUNSET SERENADE - Concerto al tramonto: Concerto live di fisarmonica e mandolino al tramonto sulla terrazza, con vino locale e tagliere di prodotti pugliesi. Standard 45 euro/persona, Privato 60 euro/persona, Bambini sotto 12 anni 15 euro, Coppia romantica pacchetto privato 130 euro con bottiglia di vino. Durata 1.5-2 ore. Stagione aprile-ottobre.\n\n7. TREKKING SUL MONTE MORRONE: Escursione guidata tra i santuari di Sant'Oronzo e San Biagio. Percorso corto 5 km: 15 euro/adulto, 8 euro bambino. Percorso lungo 10 km: 25 euro/adulto, 12 euro bambino. Gruppo privato fino a 10 persone 120 euro forfait.\n\n8. CARRIAGES AND COUNTRYSIDE - Museo Carrozze: Visita alla Masseria Carestia con museo di oltre 30 carrozze d'epoca restaurate e chiesa rupestre con affreschi medievali. Standard 20 euro/persona, Privato 30 euro/persona, Bambini sotto 12 anni 10 euro. Durata 2.5-3 ore. Martedi-domenica.\n\nPOLITICA DI CANCELLAZIONE: Gratuita fino a 48 ore prima. Rimborso 50% tra 24 e 48 ore prima. Nessun rimborso entro le 24 ore.\n\nFLUSSO DI PRENOTAZIONE:\n1. Chiedi date e numero ospiti (max 5 persone, max 4 adulti)\n2. Usa check_availability per verificare disponibilita reale su Beds24\n3. Presenta la proprieta' con il prezzo reale per le notti richieste\n4. Proponi in modo naturale le esperienze piu' adatte\n5. Raccogli nome completo, email, telefono, richieste speciali\n6. Crea la prenotazione con create_room_booking usando roomId 469679\n7. Fornisci riepilogo con codice di conferma reale da Beds24\n\nREGOLE: Usa SEMPRE check_availability prima di confermare disponibilita'. Usa SEMPRE roomId 469679. Il codice conferma viene da Beds24, non inventarlo mai. Non inventare prezzi o informazioni.";
+
+var ESJ_TOOLS = [
   {
     name: "check_availability",
     description: "Verifica disponibilita camere su Beds24 per date e numero ospiti.",
@@ -19,234 +21,158 @@ var ESJ_SYSTEM = atob("U2VpIFNvZmlhLCBsJ2Fzc2lzdGVudGUgdmlydHVhbGUgZGVsbCdFcmVtb
   },
   {
     name: "create_room_booking",
-    description: "Crea prenotazione camera su Beds24.",
+    description: "Crea una prenotazione su Beds24 dopo aver raccolto tutti i dati dell'ospite.",
     input_schema: {
       type: "object",
       properties: {
-        roomId:    { type: "string" },
-        checkin:   { type: "string" },
-        checkout:  { type: "string" },
-        guests:    { type: "integer" },
-        firstName: { type: "string" },
-        lastName:  { type: "string" },
-        email:     { type: "string" },
-        phone:     { type: "string" },
-        notes:     { type: "string" }
+        checkin:   { type: "string", description: "Check-in YYYY-MM-DD" },
+        checkout:  { type: "string", description: "Check-out YYYY-MM-DD" },
+        guests:    { type: "integer", description: "Numero ospiti" },
+        firstName: { type: "string", description: "Nome ospite" },
+        lastName:  { type: "string", description: "Cognome ospite" },
+        email:     { type: "string", description: "Email ospite" },
+        phone:     { type: "string", description: "Telefono ospite" },
+        notes:     { type: "string", description: "Richieste speciali" }
       },
-      required: ["roomId","checkin","checkout","guests","firstName","lastName","email"]
-    }
-  },
-  {
-    name: "check_experience_availability",
-    description: "Verifica disponibilita esperienza su Bokun.",
-    input_schema: {
-      type: "object",
-      properties: {
-        productId: { type: "integer" },
-        date:      { type: "string" }
-      },
-      required: ["productId","date"]
-    }
-  },
-  {
-    name: "create_experience_booking",
-    description: "Prenota una esperienza su Bokun.",
-    input_schema: {
-      type: "object",
-      properties: {
-        productId:    { type: "integer" },
-        date:         { type: "string" },
-        sessionId:    { type: "string" },
-        participants: { type: "integer" },
-        firstName:    { type: "string" },
-        lastName:     { type: "string" },
-        email:        { type: "string" },
-        phone:        { type: "string" },
-        notes:        { type: "string" }
-      },
-      required: ["productId","date","participants","firstName","lastName","email"]
+      required: ["checkin","checkout","guests","firstName","lastName","email"]
     }
   }
 ];
 
-var esjMsgs = [];
-var esjBusy = false;
-
-function esjPost(endpoint, body) {
-  return fetch(ESJ_PROXY + endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  }).then(function(r) { return r.json(); });
-}
-
-function esjHandleTool(name, input) {
-  if (name === "check_availability") {
-    return esjPost("/api/availability", input);
-  } else if (name === "create_room_booking") {
-    return esjPost("/api/booking", input);
-  } else if (name === "check_experience_availability") {
-    return esjPost("/api/experiences", { action: "check_availability", productId: input.productId, date: input.date });
-  } else if (name === "create_experience_booking") {
-    return esjPost("/api/experiences", {
-      action: "create_booking",
-      productId: input.productId,
-      date: input.date,
-      sessionId: input.sessionId,
-      participants: [{ count: input.participants }],
-      firstName: input.firstName,
-      lastName: input.lastName,
-      email: input.email,
-      phone: input.phone || "",
-      notes: input.notes || ""
-    });
-  }
-}
-
-function esjCallClaude() {
-  return esjPost("/api/chat", {
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 1024,
-    system: ESJ_SYSTEM,
-    tools: ESJ_TOOLS,
-    messages: esjMsgs
-  });
-}
-
-function esjChat(userText) {
-  esjMsgs.push({ role: "user", content: userText });
-  
-  return esjCallClaude().then(function loop(data) {
-    if (data.stop_reason === "tool_use") {
-      esjMsgs.push({ role: "assistant", content: data.content });
-      var toolCalls = data.content.filter(function(b) { return b.type === "tool_use"; });
-      return Promise.all(toolCalls.map(function(b) {
-        return Promise.resolve(esjHandleTool(b.name, b.input)).then(function(result) {
-          return { type: "tool_result", tool_use_id: b.id, content: JSON.stringify(result) };
-        });
-      })).then(function(results) {
-        esjMsgs.push({ role: "user", content: results });
-        return esjCallClaude().then(loop);
-      });
-    }
-    var textBlock = data.content && data.content.find(function(b) { return b.type === "text"; });
-    var txt = textBlock ? textBlock.text : "Mi dispiace, riprova tra un momento.";
-    esjMsgs.push({ role: "assistant", content: txt });
-    return txt;
-  });
-}
-
-function esjFmt(t) {
-  return t
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/\n/g, "<br>");
-}
-
-function esjAddMsg(role, text) {
-  var typing = document.getElementById("esj-typing");
-  if (typing) typing.classList.remove("on");
-  var d = document.createElement("div");
-  d.className = "esj-msg " + (role === "user" ? "user" : "bot");
-  d.innerHTML = "<div class=\"esj-bbl\">" + esjFmt(text) + "</div>";
-  var msgs = document.getElementById("esj-msgs");
-  msgs.insertBefore(d, typing);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function esjSend(text) {
-  if (!text || !text.trim() || esjBusy) return;
-  esjBusy = true;
-  var sendBtn = document.getElementById("esj-send");
-  var inp = document.getElementById("esj-inp");
-  var qr = document.getElementById("esj-qr");
-  if (sendBtn) sendBtn.disabled = true;
-  if (qr) qr.style.display = "none";
-  esjAddMsg("user", text);
-  if (inp) { inp.value = ""; inp.style.height = "auto"; }
-  var typing = document.getElementById("esj-typing");
-  if (typing) { typing.classList.add("on"); }
-  var msgs = document.getElementById("esj-msgs");
-  if (msgs) msgs.scrollTop = msgs.scrollHeight;
-
-  esjChat(text).then(function(reply) {
-    esjAddMsg("bot", reply);
-    esjBusy = false;
-    if (sendBtn) sendBtn.disabled = false;
-    if (inp) inp.focus();
-  }).catch(function(err) {
-    console.error("ESJ error:", err);
-    esjAddMsg("bot", "Mi dispiace, problema di connessione. Contattaci direttamente.");
-    esjBusy = false;
-    if (sendBtn) sendBtn.disabled = false;
-  });
-}
-
-window.esjQuick = function(t) { esjSend(t); };
+var ESJ_MESSAGES = [];
+var ESJ_OPEN = false;
 
 function esjInit() {
-  // Inject fonts
-  var f = document.createElement("link");
-  f.rel = "stylesheet";
-  f.href = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap";
-  document.head.appendChild(f);
-
-  // Inject CSS
   var style = document.createElement("style");
-  style.textContent = ":root{--esj-stone:#1c1814;--esj-stone2:#2a231c;--esj-gold:#c8a97e;--esj-gold2:#e2c99a;--esj-cream:#f4ede3;--esj-muted:#8a7a68;--esj-border:rgba(200,169,126,0.18);--esj-radius:18px;--esj-shadow:0 24px 64px rgba(0,0,0,0.55),0 4px 16px rgba(0,0,0,0.3)}#esj-fab{position:fixed;bottom:28px;right:28px;width:62px;height:62px;background:linear-gradient(135deg,#c8a97e,#a8844f);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(200,169,126,0.4),0 2px 8px rgba(0,0,0,0.3);transition:transform 0.3s cubic-bezier(.34,1.56,.64,1),box-shadow 0.3s;z-index:99998}#esj-fab:hover{transform:scale(1.1)}#esj-fab svg{width:26px;height:26px;fill:#1c1814}#esj-fab .esj-ico-close{display:none}#esj-fab.open .esj-ico-chat{display:none}#esj-fab.open .esj-ico-close{display:block}#esj-badge{position:absolute;top:-3px;right:-3px;width:20px;height:20px;background:#e05c3a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Jost,sans-serif;font-size:1rem;color:white;font-weight:500}#esj-widget{position:fixed;bottom:104px;right:28px;width:390px;max-width:calc(100vw - 40px);height:580px;max-height:calc(100vh - 130px);background:var(--esj-stone);border:1px solid var(--esj-border);border-radius:var(--esj-radius);box-shadow:var(--esj-shadow);display:flex;flex-direction:column;overflow:hidden;z-index:99997;opacity:0;transform:translateY(20px) scale(0.97);pointer-events:none;transition:opacity 0.35s ease,transform 0.35s cubic-bezier(.34,1.2,.64,1)}#esj-widget.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}.esj-header{background:linear-gradient(135deg,#2a211a,#1e1812);border-bottom:1px solid var(--esj-border);padding:0.9rem 1.2rem;display:flex;align-items:center;gap:0.8rem;flex-shrink:0}.esj-avatar{width:40px;height:40px;background:linear-gradient(135deg,#c8a97e,#8a5e2e);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Cormorant Garamond,serif;font-size:1.3rem;color:#1c1814;font-weight:600;flex-shrink:0}.esj-hname{font-family:Cormorant Garamond,serif;font-size:1.1rem;color:var(--esj-cream);letter-spacing:0.03em}.esj-hsub{font-family:Jost,sans-serif;font-size:1rem;color:var(--esj-gold);letter-spacing:0.1em;text-transform:uppercase;margin-top:1px}.esj-dot{width:7px;height:7px;background:#5cb85c;border-radius:50%;margin-left:auto;animation:esj-pulse 2s infinite;flex-shrink:0}@keyframes esj-pulse{0%,100%{opacity:1}50%{opacity:0.4}}.esj-msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;scroll-behavior:smooth}.esj-msg{max-width:87%}.esj-msg.user{align-self:flex-end}.esj-msg.bot{align-self:flex-start}.esj-bbl{padding:0.72rem 1rem;border-radius:14px;font-family:Jost,sans-serif;font-size:0.83rem;line-height:1.65}.esj-msg.user .esj-bbl{background:linear-gradient(135deg,#c8a97e,#a86e30);color:#1c1814;border-bottom-right-radius:4px}.esj-msg.bot .esj-bbl{background:var(--esj-stone2);color:var(--esj-cream);border:1px solid var(--esj-border);border-bottom-left-radius:4px}.esj-bbl strong{color:var(--esj-gold2)}.esj-bbl em{color:var(--esj-gold);font-style:italic}.esj-typing{display:none;align-self:flex-start;padding:0.7rem 1rem;background:var(--esj-stone2);border:1px solid var(--esj-border);border-radius:14px;border-bottom-left-radius:4px;gap:5px;align-items:center}.esj-typing.on{display:flex}.esj-typing span{width:6px;height:6px;background:var(--esj-gold);border-radius:50%;animation:esj-bounce 1.2s infinite}.esj-typing span:nth-child(2){animation-delay:.2s}.esj-typing span:nth-child(3){animation-delay:.4s}@keyframes esj-bounce{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-6px);opacity:1}}.esj-qr-wrap{padding:0.5rem 0.9rem;display:flex;flex-wrap:wrap;gap:0.4rem;border-top:1px solid var(--esj-border);background:rgba(28,24,20,0.7);flex-shrink:0}.esj-qr{font-family:Jost,sans-serif;font-size:0.72rem;padding:0.28rem 0.7rem;border:1px solid rgba(200,169,126,0.28);border-radius:20px;color:var(--esj-gold);background:transparent;cursor:pointer;transition:all 0.2s;white-space:nowrap}.esj-qr:hover{background:rgba(200,169,126,0.1);border-color:var(--esj-gold)}.esj-inp-wrap{padding:0.75rem 1rem;border-top:1px solid var(--esj-border);display:flex;gap:0.6rem;align-items:flex-end;background:#18140f;flex-shrink:0}.esj-inp{flex:1;background:var(--esj-stone2);border:1px solid var(--esj-border);border-radius:12px;padding:0.6rem 0.9rem;color:var(--esj-cream);font-family:Jost,sans-serif;font-size:0.83rem;resize:none;min-height:40px;max-height:100px;outline:none;transition:border-color 0.2s;line-height:1.4}.esj-inp::placeholder{color:var(--esj-muted)}.esj-inp:focus{border-color:rgba(200,169,126,0.5)}.esj-btn-send{width:38px;height:38px;background:linear-gradient(135deg,#c8a97e,#a86e30);border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s,opacity 0.2s;flex-shrink:0}.esj-btn-send:hover{transform:scale(1.08)}.esj-btn-send:disabled{opacity:0.35;cursor:not-allowed;transform:none}.esj-btn-send svg{width:15px;height:15px;fill:#1c1814}.esj-foot{text-align:center;padding:0.35rem;font-family:Jost,sans-serif;font-size:0.58rem;color:rgba(138,122,104,0.45);letter-spacing:0.08em;flex-shrink:0}";
+  style.textContent = "@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');\n:root{--esj-stone:#1c1814;--esj-stone2:#2a231c;--esj-gold:#c8a97e;--esj-gold2:#e2c99a;--esj-cream:#f4ede3;--esj-muted:#8a7a68;--esj-border:rgba(200,169,126,0.18);--esj-radius:18px;--esj-shadow:0 24px 64px rgba(0,0,0,0.55),0 4px 16px rgba(0,0,0,0.3)}\n#esj-fab{position:fixed;bottom:28px;right:28px;width:60px;height:60px;background:linear-gradient(135deg,#c8a97e,#a8844f);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 32px rgba(200,169,126,0.4),0 2px 8px rgba(0,0,0,0.3);transition:transform 0.3s cubic-bezier(.34,1.56,.64,1),box-shadow 0.3s ease;z-index:99998;border:none}\n#esj-fab:hover{transform:scale(1.1);box-shadow:0 12px 40px rgba(200,169,126,0.55)}\n#esj-fab svg{width:26px;height:26px;fill:#1c1814}\n#esj-fab .esj-close{display:none}\n#esj-fab.open .esj-open{display:none}\n#esj-fab.open .esj-close{display:block}\n#esj-widget{position:fixed;bottom:102px;right:28px;width:400px;max-width:calc(100vw - 40px);height:580px;max-height:calc(100vh - 130px);background:var(--esj-stone);border:1px solid var(--esj-border);border-radius:var(--esj-radius);box-shadow:var(--esj-shadow);display:flex;flex-direction:column;overflow:hidden;z-index:99997;opacity:0;transform:translateY(20px) scale(0.97);pointer-events:none;transition:opacity 0.35s ease,transform 0.35s cubic-bezier(.34,1.2,.64,1)}\n#esj-widget.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}\n.esj-header{background:linear-gradient(135deg,#2a211a 0%,#1e1812 100%);border-bottom:1px solid var(--esj-border);padding:1rem 1.2rem;display:flex;align-items:center;gap:0.8rem;flex-shrink:0}\n.esj-avatar{width:38px;height:38px;background:linear-gradient(135deg,#c8a97e,#8a5e2e);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#1c1814;font-weight:600;flex-shrink:0}\n.esj-header-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--esj-cream);letter-spacing:0.03em}\n.esj-header-sub{font-family:'Jost',sans-serif;font-size:0.65rem;color:var(--esj-gold);letter-spacing:0.1em;text-transform:uppercase;margin-top:1px}\n.esj-dot{width:7px;height:7px;background:#5cb85c;border-radius:50%;animation:esj-pulse 2s infinite;flex-shrink:0}\n@keyframes esj-pulse{0%,100%{opacity:1}50%{opacity:0.4}}\n.esj-msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;scroll-behavior:smooth}\n.esj-msgs::-webkit-scrollbar{width:4px}\n.esj-msgs::-webkit-scrollbar-thumb{background:rgba(200,169,126,0.2);border-radius:2px}\n.esj-msg{max-width:88%;animation:esj-in 0.3s ease}\n@keyframes esj-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}\n.esj-msg.user{align-self:flex-end}\n.esj-msg.assistant{align-self:flex-start}\n.esj-bubble{padding:0.8rem 1.1rem;border-radius:14px;font-family:'Jost',sans-serif;font-size:1rem;line-height:1.65}\n.esj-msg.user .esj-bubble{background:linear-gradient(135deg,#c8a97e,#a86e30);color:#1c1814;border-bottom-right-radius:4px}\n.esj-msg.assistant .esj-bubble{background:var(--esj-stone2);color:var(--esj-cream);border:1px solid var(--esj-border);border-bottom-left-radius:4px}\n.esj-typing{display:none;align-self:flex-start;padding:0.8rem 1rem;background:var(--esj-stone2);border:1px solid var(--esj-border);border-radius:14px;border-bottom-left-radius:4px}\n.esj-typing.on{display:flex;gap:5px;align-items:center;animation:esj-in 0.3s ease}\n.esj-typing span{width:6px;height:6px;background:var(--esj-gold);border-radius:50%;animation:esj-bounce 1.2s infinite}\n.esj-typing span:nth-child(2){animation-delay:0.2s}\n.esj-typing span:nth-child(3){animation-delay:0.4s}\n@keyframes esj-bounce{0%,80%,100%{transform:translateY(0);opacity:0.5}40%{transform:translateY(-6px);opacity:1}}\n.esj-qr-wrap{padding:0.5rem 1rem;display:flex;flex-wrap:wrap;gap:0.4rem;border-top:1px solid var(--esj-border);flex-shrink:0;background:rgba(28,24,20,0.6)}\n.esj-qr{font-family:'Jost',sans-serif;font-size:0.75rem;padding:0.35rem 0.8rem;border:1px solid rgba(200,169,126,0.3);border-radius:20px;color:var(--esj-gold);background:transparent;cursor:pointer;transition:all 0.2s ease;white-space:nowrap}\n.esj-qr:hover{background:rgba(200,169,126,0.12);border-color:var(--esj-gold)}\n.esj-input-area{padding:0.8rem 1rem;border-top:1px solid var(--esj-border);display:flex;gap:0.6rem;align-items:flex-end;background:#18140f;flex-shrink:0}\n.esj-input{flex:1;background:var(--esj-stone2);border:1px solid var(--esj-border);border-radius:12px;padding:0.7rem 1rem;color:var(--esj-cream);font-family:'Jost',sans-serif;font-size:1rem;resize:none;min-height:42px;max-height:100px;outline:none;transition:border-color 0.2s;line-height:1.4}\n.esj-input::placeholder{color:var(--esj-muted)}\n.esj-input:focus{border-color:rgba(200,169,126,0.5)}\n.esj-send{width:40px;height:40px;background:linear-gradient(135deg,#c8a97e,#a86e30);border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s ease,opacity 0.2s;flex-shrink:0}\n.esj-send:hover{transform:scale(1.08)}\n.esj-send:disabled{opacity:0.4;cursor:not-allowed;transform:none}\n.esj-send svg{width:17px;height:17px;fill:#1c1814}\n.esj-brand{text-align:center;padding:0.4rem;font-family:'Jost',sans-serif;font-size:0.6rem;color:rgba(138,122,104,0.5);letter-spacing:0.08em;flex-shrink:0}\n.esj-bubble strong{color:var(--esj-gold2)}\n.esj-bubble em{color:var(--esj-gold);font-style:italic}";
   document.head.appendChild(style);
 
-  // Inject HTML
-  var container = document.createElement("div");
-  container.innerHTML = '<button id="esj-fab" aria-label="Prenota con assistente IA"><span id="esj-badge">1</span><svg class="esj-ico-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg><svg class="esj-ico-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button><div id="esj-widget" role="dialog"><div class="esj-header"><div class="esj-avatar">S</div><div style="flex:1;min-width:0"><div class="esj-hname">Sofia - Eremo di San Giusto</div><div class="esj-hsub">Assistente Prenotazioni - Ostuni, Puglia</div></div><div class="esj-dot"></div></div><div class="esj-msgs" id="esj-msgs"><div class="esj-typing" id="esj-typing"><span></span><span></span><span></span></div></div><div class="esj-qr-wrap" id="esj-qr"><button class="esj-qr" onclick="esjQuick(\'Vorrei prenotare una camera\')">Prenota</button><button class="esj-qr" onclick="esjQuick(\'Quali camere avete?\')">Camere</button><button class="esj-qr" onclick="esjQuick(\'Quali esperienze offrite?\')">Esperienze</button><button class="esj-qr" onclick="esjQuick(\'Quali sono i prezzi?\')">Prezzi</button></div><div class="esj-inp-wrap"><textarea id="esj-inp" class="esj-inp" placeholder="Scrivi un messaggio..." rows="1" aria-label="Messaggio"></textarea><button id="esj-send" class="esj-btn-send" aria-label="Invia" disabled><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div><div class="esj-foot">Powered by Claude AI - Eremo di San Giusto</div></div>';
-  document.body.appendChild(container);
+  var fab = document.createElement("button");
+  fab.id = "esj-fab";
+  fab.setAttribute("aria-label", "Prenota con Sofia");
+  fab.innerHTML = "<svg class=\"esj-open\" viewBox=\"0 0 24 24\"><path d=\"M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z\"/></svg><svg class=\"esj-close\" viewBox=\"0 0 24 24\"><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>";
 
-  // Wire up events
-  var fab = document.getElementById("esj-fab");
-  var widget = document.getElementById("esj-widget");
-  var inp = document.getElementById("esj-inp");
-  var sendBtn = document.getElementById("esj-send");
-  var opened = false;
+  var wid = document.createElement("div");
+  wid.id = "esj-widget";
+  wid.innerHTML = "<div class=\"esj-header\"><div class=\"esj-avatar\">S</div><div style=\"flex:1\"><div class=\"esj-header-name\">Sofia &middot; Eremo di San Giusto</div><div class=\"esj-header-sub\">Assistente di Prenotazione &middot; Ostuni, Puglia</div></div><div class=\"esj-dot\"></div></div><div class=\"esj-msgs\" id=\"esj-msgs\"><div class=\"esj-typing\" id=\"esj-typing\"><span></span><span></span><span></span></div></div><div class=\"esj-qr-wrap\" id=\"esj-qr\"><button class=\"esj-qr\" onclick=\"esjQ('Vorrei prenotare')\">&#127968; Prenota</button><button class=\"esj-qr\" onclick=\"esjQ('Quali esperienze offrite?')\">&#129746; Esperienze</button><button class=\"esj-qr\" onclick=\"esjQ('Informazioni sulla struttura')\">&#127968; La Struttura</button><button class=\"esj-qr\" onclick=\"esjQ('Come si arriva?')\">&#128205; Come arrivare</button></div><div class=\"esj-input-area\"><textarea id=\"esj-input\" class=\"esj-input\" placeholder=\"Scrivi un messaggio...\" rows=\"1\"></textarea><button id=\"esj-send\" class=\"esj-send\" disabled><svg viewBox=\"0 0 24 24\"><path d=\"M2.01 21L23 12 2.01 3 2 10l15 2-15 2z\"/></svg></button></div><div class=\"esj-brand\">Powered by Claude AI</div>";
+
+  document.body.appendChild(fab);
+  document.body.appendChild(wid);
+
+  var msgs = document.getElementById("esj-msgs");
+  var typing = document.getElementById("esj-typing");
+  var input = document.getElementById("esj-input");
+  var send = document.getElementById("esj-send");
+  var loading = false;
+
+  function fmt(t) {
+    return t.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>").replace(/\*(.*?)\*/g,"<em>$1</em>").replace(/\n/g,"<br>");
+  }
+
+  function addMsg(role, text) {
+    typing.classList.remove("on");
+    var d = document.createElement("div");
+    d.className = "esj-msg " + role;
+    d.innerHTML = "<div class=\"esj-bubble\">" + fmt(text) + "</div>";
+    msgs.insertBefore(d, typing);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  async function callProxy(userText) {
+    ESJ_MESSAGES.push({ role: "user", content: userText });
+    var body = {
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1024,
+      system: ESJ_SYSTEM,
+      tools: ESJ_TOOLS,
+      messages: ESJ_MESSAGES
+    };
+    var resp = await fetch(ESJ_PROXY + "/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    var data = await resp.json();
+
+    while (data.stop_reason === "tool_use") {
+      ESJ_MESSAGES.push({ role: "assistant", content: data.content });
+      var results = [];
+      for (var i = 0; i < data.content.length; i++) {
+        var block = data.content[i];
+        if (block.type !== "tool_use") continue;
+        var result;
+        try {
+          if (block.name === "check_availability") {
+            var r = await fetch(ESJ_PROXY + "/api/availability", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(block.input) });
+            result = await r.json();
+          } else if (block.name === "create_room_booking") {
+            var r2 = await fetch(ESJ_PROXY + "/api/booking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(block.input) });
+            result = await r2.json();
+          }
+        } catch(e) { result = { error: e.message }; }
+        results.push({ type: "tool_result", tool_use_id: block.id, content: JSON.stringify(result) });
+      }
+      ESJ_MESSAGES.push({ role: "user", content: results });
+      var body2 = { model: "claude-sonnet-4-20250514", max_tokens: 1024, system: ESJ_SYSTEM, tools: ESJ_TOOLS, messages: ESJ_MESSAGES };
+      var resp2 = await fetch(ESJ_PROXY + "/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body2) });
+      data = await resp2.json();
+    }
+
+    var txt = "";
+    for (var j = 0; j < data.content.length; j++) {
+      if (data.content[j].type === "text") txt = data.content[j].text;
+    }
+    ESJ_MESSAGES.push({ role: "assistant", content: txt });
+    return txt;
+  }
+
+  async function sendMsg(text) {
+    if (!text.trim() || loading) return;
+    loading = true;
+    send.disabled = true;
+    document.getElementById("esj-qr").style.display = "none";
+    addMsg("user", text);
+    input.value = "";
+    input.style.height = "auto";
+    typing.classList.add("on");
+    msgs.scrollTop = msgs.scrollHeight;
+    try {
+      var reply = await callProxy(text);
+      addMsg("assistant", reply);
+    } catch(e) {
+      addMsg("assistant", "Mi dispiace, riprova tra un momento.");
+    }
+    loading = false;
+    send.disabled = false;
+    input.focus();
+  }
+
+  window.esjQ = function(t) { sendMsg(t); };
+
+  input.addEventListener("input", function() {
+    send.disabled = !input.value.trim() || loading;
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 100) + "px";
+  });
+
+  input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!send.disabled) sendMsg(input.value); }
+  });
+
+  send.addEventListener("click", function() { sendMsg(input.value); });
 
   fab.addEventListener("click", function() {
-    widget.classList.toggle("open");
-    fab.classList.toggle("open");
-    var badge = document.getElementById("esj-badge");
-    if (badge) badge.remove();
-
-    if (!opened) {
-      opened = true;
-      var typing = document.getElementById("esj-typing");
+    ESJ_OPEN = !ESJ_OPEN;
+    wid.classList.toggle("open", ESJ_OPEN);
+    fab.classList.toggle("open", ESJ_OPEN);
+    if (ESJ_OPEN && ESJ_MESSAGES.length === 0) {
       setTimeout(function() {
-        if (typing) typing.classList.add("on");
-        setTimeout(function() {
-          esjChat("Ciao, presentati brevemente e chiedi come posso aiutarti.").then(function(reply) {
-            esjAddMsg("bot", reply);
-          }).catch(function() {
-            esjAddMsg("bot", "Benvenuto! Sono Sofia. Come posso aiutarti oggi?");
-          });
-        }, 600);
-      }, 300);
+        typing.classList.add("on");
+        msgs.scrollTop = msgs.scrollHeight;
+        callProxy("Ciao, ho aperto la chat dal sito dell'Eremo di San Giusto. Presentati brevemente e chiedimi come posso aiutarti.").then(function(r) {
+          addMsg("assistant", r);
+        });
+      }, 400);
     }
   });
-
-  inp.addEventListener("input", function() {
-    sendBtn.disabled = !inp.value.trim() || esjBusy;
-    inp.style.height = "auto";
-    inp.style.height = Math.min(inp.scrollHeight, 100) + "px";
-  });
-
-  inp.addEventListener("keydown", function(e) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (!sendBtn.disabled) esjSend(inp.value);
-    }
-  });
-
-  sendBtn.addEventListener("click", function() { esjSend(inp.value); });
 }
 
-// Start when DOM is ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", esjInit);
 } else {
