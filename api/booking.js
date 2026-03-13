@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         propKey: process.env.BEDS24_PROP_KEY,
       },
       roomId: '469679',
-      status: 'confirmed',
+      status: '1',
       firstNight: checkin,
       lastNight: checkout,
       numAdult: String(guests || 2),
