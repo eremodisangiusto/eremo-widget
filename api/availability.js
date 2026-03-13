@@ -28,19 +28,18 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Beds24 returns { "469679": { roomsavail: 1, ... }, checkIn: ..., ... }
+    // Beds24 returns { "469679": { roomsavail: 1, price: <TOTAL>, ... }, ... }
     const roomData = data['469679'];
     const roomsAvail = roomData ? Number(roomData.roomsavail) : 0;
     const available = roomsAvail > 0;
 
-    // Calculate nights
+    // price from Beds24 is the TOTAL for the whole stay, not per night
     const nights = Math.ceil((new Date(checkout) - new Date(checkin)) / 86400000);
-    const pricePerNight = Number(roomData?.price) || 180;
-    const totalPrice = pricePerNight * nights;
+    const totalPrice = Number(roomData?.price) || 0;
+    const pricePerNight = nights > 0 ? Math.round(totalPrice / nights) : totalPrice;
 
     return res.status(200).json({
       available,
-      beds24Response: data,
       checkin,
       checkout,
       guests,
@@ -52,6 +51,7 @@ export default async function handler(req, res) {
         pricePerNight,
         totalPrice,
         nights,
+        currency: roomData?.currency || 'EUR',
       }] : [],
     });
 
