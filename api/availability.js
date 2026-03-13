@@ -6,7 +6,21 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { checkin, checkout, guests } = req.body;
+    const { checkin: rawCheckin, checkout: rawCheckout, guests } = req.body;
+
+    function fixYear(dateStr) {
+      if (!dateStr) return dateStr;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let d = new Date(dateStr);
+      while (d < today) {
+        d.setFullYear(d.getFullYear() + 1);
+      }
+      return d.toISOString().split('T')[0];
+    }
+
+    const checkin = fixYear(rawCheckin);
+    const checkout = fixYear(rawCheckout);
 
     const formatDate = (d) => d.replace(/-/g, '');
 
