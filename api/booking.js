@@ -8,6 +8,31 @@ export default async function handler(req, res) {
   try {
     const { checkin, checkout, guests, firstName, lastName, email, phone, notes } = req.body;
 
+    const formatDate = (d) => d.replace(/-/g, '');
+
+    // Step 1: get price from Beds24
+    let totalPrice = 0;
+    try {
+      const availResp = await fetch('https://api.beds24.com/json/getAvailabilities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          checkIn: formatDate(checkin),
+          checkOut: formatDate(checkout),
+          propId: process.env.BEDS24_PROP_ID,
+          roomId: '469679',
+          numAdult: String(guests || 2),
+          numChild: '0',
+          ignoreHidden: true,
+        }),
+      });
+      const availData = await availResp.json();
+      totalPrice = Number(availData?.['469679']?.price) || 0;
+    } catch (e) {
+      console.log('Could not fetch price:', e.message);
+    }
+
+    // Step 2: create booking
     const payload = {
       authentication: {
         apiKey: process.env.BEDS24_API_KEY,
@@ -19,6 +44,8 @@ export default async function handler(req, res) {
       lastNight: checkout,
       numAdult: String(guests || 2),
       numChild: '0',
+      price: totalPrice ? String(totalPrice) : '',
+      currency: 'EUR',
       guestFirstName: firstName || '',
       guestName: lastName || '',
       guestEmail: email || '',
@@ -39,7 +66,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       bookingId,
-      beds24Response: data,
+      totalPrice,
       checkin,
       checkout,
       guests,
