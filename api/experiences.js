@@ -128,12 +128,13 @@ export default async function handler(req, res) {
       const optsResult = await bokunFetch('POST', checkoutOptsPath, apiKey, secretKey, bookingRequest);
 
       if (!optsResult.ok) {
-        return res.status(200).json({
-          success: false,
-          step: 'checkout-options',
-          error: optsResult.raw || JSON.stringify(optsResult.data),
-          bokunResponse: optsResult.data || optsResult.raw,
-        });
+  return res.status(200).json({
+    success: false,
+    step: 'checkout-options',
+    httpStatus: optsResult.status,
+    error: optsResult.raw || JSON.stringify(optsResult.data),
+    bokunResponse: optsResult.data || optsResult.raw,
+  });
       }
 
       // Step 6: get payment info from checkout options
