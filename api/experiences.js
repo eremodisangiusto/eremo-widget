@@ -48,7 +48,7 @@ export default async function handler(req, res) {
       const available = avail.length > 0;
       const session = avail[0];
 
-      return res.status(200).json({
+    return res.status(200).json({
         available,
         productId,
         date: fixedDate,
@@ -57,6 +57,7 @@ export default async function handler(req, res) {
         startTime: session?.startTime || null,
         availableSeats: session?.availableSeats || 0,
         rawCount: avail.length,
+        bokunRaw: data,
       });
     }
 
