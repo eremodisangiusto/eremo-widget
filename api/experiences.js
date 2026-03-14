@@ -40,6 +40,14 @@ function fixYear(dateStr) {
   return d.toISOString().split('T')[0];
 }
 
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -85,7 +93,7 @@ export default async function handler(req, res) {
     // ── CREATE BOOKING via shopping cart ────────────────────────────────────
     if (action === 'book' || action === 'create_booking') {
 
-      // Step 1: get availability for startTimeId
+      // Step 1: get availability for startTimeId and rateId
       const availPath = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false&currency=EUR`;
       const availResult = await bokunFetch('GET', availPath, apiKey, secretKey);
 
@@ -98,26 +106,9 @@ export default async function handler(req, res) {
         defaultRateId = session?.defaultRateId || null;
       }
 
-      // Step 2: create shopping cart
-      const cartPath = '/shopping-cart.json/session';
-      const cartResult = await bokunFetch('POST', cartPath, apiKey, secretKey, {
-        currency: 'EUR',
-        language: 'EN',
-      });
-
-      if (!cartResult.ok || !cartResult.data?.sessionId) {
-        return res.status(200).json({
-          success: false,
-          step: 'create-cart',
-          error: cartResult.raw || JSON.stringify(cartResult.data),
-          httpStatus: cartResult.status,
-        });
-      }
-
-      const sessionId = cartResult.data.sessionId;
-
-      // Step 3: add activity to cart
-      const addPath = `/shopping-cart.json/session/${sessionId}/activity`;
+      // Step 2: generate session UUID and add activity to cart
+      const sessionId = generateUUID();
+      const addPath = `/shopping-cart.json/session/${sessionId}/activity?currency=EUR&lang=EN`;
       const addPayload = {
         activityId: parseInt(productId),
         startDate: fixedDate,
@@ -134,12 +125,13 @@ export default async function handler(req, res) {
           step: 'add-to-cart',
           error: addResult.raw || JSON.stringify(addResult.data),
           httpStatus: addResult.status,
+          sessionId,
           payload: addPayload,
         });
       }
 
-      // Step 4: checkout
-      const checkoutPath = `/shopping-cart.json/session/${sessionId}/checkout`;
+      // Step 3: checkout
+      const checkoutPath = `/checkout.json/session/${sessionId}?currency=EUR&lang=EN`;
       const checkoutPayload = {
         customer: {
           firstName: firstName || '',
@@ -149,7 +141,8 @@ export default async function handler(req, res) {
         },
         paymentMethod: 'SEND_INVOICE',
         sendCustomerNotification: true,
-        externalBookingReference: 'Widget-IA-Eremo',
+        externalBookingReference: `EREMO-${Date.now()}`,
+        notes: notes || 'Prenotazione da Widget IA Eremo di San Giusto',
       };
 
       const checkoutResult = await bokunFetch('POST', checkoutPath, apiKey, secretKey, checkoutPayload);
