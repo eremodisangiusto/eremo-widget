@@ -119,7 +119,7 @@ export default async function handler(req, res) {
         activityId: parseInt(productId),
         sessionId,
         startDate: fixedDate,
-        participants: [{ count: guestCount }],
+        participants: [{ priceCategoryId: 1134529, count: guestCount }],
         customer: {
           firstName: firstName || '',
           lastName: lastName || '',
