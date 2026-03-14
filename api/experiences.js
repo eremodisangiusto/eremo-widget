@@ -114,7 +114,6 @@ export default async function handler(req, res) {
        date: fixedDate,
         pricingCategoryBookings: [{ pricingCategoryId: 1134529, count: guestCount }],
       };
-      if (startTimeId) addPayload.startTimeId = startTimeId;
       
       const addResult = await bokunFetch('POST', addPath, apiKey, secretKey, addPayload);
 
