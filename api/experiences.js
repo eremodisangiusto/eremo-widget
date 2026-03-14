@@ -52,11 +52,10 @@ export default async function handler(req, res) {
 
   try {
     const { action, productId, date, guests, firstName, lastName, email, phone, notes } = req.body;
-
     const fixedDate = fixYear(date);
     const guestCount = Number(guests) || 2;
 
-    // CHECK AVAILABILITY
+    // ── CHECK AVAILABILITY ──────────────────────────────────────────────────
     if (action === 'availability' || action === 'check_availability') {
       const path = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
       const result = await bokunFetch('GET', path, apiKey, secretKey);
@@ -76,43 +75,48 @@ export default async function handler(req, res) {
         productId, date: fixedDate, guests: guestCount,
         sessionId: session?.id || null,
         startTimeId: session?.startTimeId || null,
+        defaultRateId: session?.defaultRateId || null,
         startTime: session?.startTime || null,
-        availableSeats: session?.availableSeats || 0,
+        availableSeats: session?.availabilityCount || 0,
         rawCount: avail.length,
       });
     }
 
-    // CREATE BOOKING
+    // ── CREATE BOOKING via direct booking request ───────────────────────────
     if (action === 'book' || action === 'create_booking') {
 
-      // Step 1: get availability to find startTimeId
-      let startTimeId = null;
+      // Step 1: get availability
       const availPath = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
       const availResult = await bokunFetch('GET', availPath, apiKey, secretKey);
 
+      let startTimeId = null;
+      let defaultRateId = null;
+
       if (availResult.ok && Array.isArray(availResult.data) && availResult.data.length > 0) {
         const session = availResult.data[0];
-        startTimeId = session?.startTimeId || session?.id || null;
+        startTimeId = session?.startTimeId || null;
+        defaultRateId = session?.defaultRateId || null;
       }
 
-      // Step 2: build passengers array — one object per passenger
+      // Step 2: build passengers array
       const passengers = Array.from({ length: guestCount }, () => ({
         pricingCategoryId: 1134529, // Adults
       }));
 
       // Step 3: build activity booking request
-      const activityBookingRequest = {
+      const activityBooking = {
         activityId: parseInt(productId),
         date: fixedDate,
         passengers,
         note: notes || 'Prenotazione da Widget IA Eremo di San Giusto',
       };
 
-      if (startTimeId) activityBookingRequest.startTimeId = startTimeId;
+      if (startTimeId) activityBooking.startTimeId = startTimeId;
+      if (defaultRateId) activityBooking.rateId = defaultRateId;
 
-      // Step 4: build full booking request
+      // Step 4: direct booking request to checkout
       const bookingRequest = {
-        activityBookings: [activityBookingRequest],
+        activityBookings: [activityBooking],
         mainContactDetails: {
           firstName: firstName || '',
           lastName: lastName || '',
@@ -120,40 +124,16 @@ export default async function handler(req, res) {
           phoneNumber: phone || '',
         },
         sendNotificationToMainContact: true,
+        paymentMethod: 'SEND_INVOICE',
         externalBookingEntityName: 'Eremo di San Giusto Widget IA',
       };
 
-      // Step 5: checkout options (validate)
-      const checkoutOptsPath = '/booking.json/checkout-options';
-      const optsResult = await bokunFetch('POST', checkoutOptsPath, apiKey, secretKey, bookingRequest);
-
-      if (!optsResult.ok) {
-  return res.status(200).json({
-    success: false,
-    step: 'checkout-options',
-    httpStatus: optsResult.status,
-    error: optsResult.raw || JSON.stringify(optsResult.data),
-    bokunResponse: optsResult.data || optsResult.raw,
-  });
-      }
-
-      // Step 6: get payment info from checkout options
-      const checkoutOptions = optsResult.data;
-      const uti = checkoutOptions?.uti || null;
-      const paymentMethod = checkoutOptions?.paymentOptions?.[0]?.paymentMethod || 'FREE';
-
-      // Step 7: checkout request
       const checkoutPath = '/booking.json/checkout';
-      const checkoutPayload = {
-        ...bookingRequest,
-        paymentMethod,
-      };
-      if (uti) checkoutPayload.uti = uti;
-
-      const checkoutResult = await bokunFetch('POST', checkoutPath, apiKey, secretKey, checkoutPayload);
+      const checkoutResult = await bokunFetch('POST', checkoutPath, apiKey, secretKey, bookingRequest);
 
       const bookingId = checkoutResult.data?.booking?.confirmationCode
         || checkoutResult.data?.confirmationCode
+        || checkoutResult.data?.bookingConfirmationCode
         || checkoutResult.data?.id
         || ('BKN-' + Date.now());
 
@@ -164,6 +144,7 @@ export default async function handler(req, res) {
         date: fixedDate,
         guests: guestCount,
         guest: { firstName, lastName, email, phone },
+        httpStatus: checkoutResult.status,
         bokunResponse: checkoutResult.data || checkoutResult.raw,
       });
     }
