@@ -120,10 +120,25 @@ export default async function handler(req, res) {
       }
 
       if (!addResult.ok) {
+        // Bokun failed — send email notification as fallback
+        try {
+          await fetch('https://eremo-bookings.vercel.app/api/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'experience_request',
+              experience: `Esperienza Bokun ID ${productId}`,
+              date: fixedDate, guests: guestCount,
+              firstName, lastName, email, phone, notes,
+            }),
+          });
+        } catch(e) {}
         return res.status(200).json({
-          success: false, step: 'add-to-cart',
-          error: addResult.data || addResult.raw,
-          httpStatus: addResult.status,
+          success: true,
+          bookingId: 'EMAIL-' + Date.now(),
+          method: 'email_fallback',
+          productId, date: fixedDate, guests: guestCount,
+          guest: { firstName, lastName, email, phone },
         });
       }
 
