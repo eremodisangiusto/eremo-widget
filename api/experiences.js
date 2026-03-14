@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 function bokunHeaders(apiKey, secretKey) {
-  const date = new Date().toISOString();
+  const date = new Date().toUTCString();
   const signature = crypto.createHmac('sha1', secretKey).update(date + apiKey).digest('base64');
   return {
     'Content-Type': 'application/json;charset=UTF-8',
