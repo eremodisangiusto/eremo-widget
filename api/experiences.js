@@ -18,6 +18,22 @@ function bokunHeaders(apiKey, secretKey, method, path) {
   };
 }
 
+async function bokunFetch(method, path, apiKey, secretKey, body) {
+  const url = `https://api.bokun.io${path}`;
+  const opts = {
+    method,
+    headers: bokunHeaders(apiKey, secretKey, method, path),
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const resp = await fetch(url, opts);
+  const text = await resp.text();
+  try {
+    return { ok: resp.ok, status: resp.status, data: JSON.parse(text) };
+  } catch(e) {
+    return { ok: resp.ok, status: resp.status, data: null, raw: text };
+  }
+}
+
 function fixYear(dateStr) {
   if (!dateStr) return dateStr;
   const today = new Date();
@@ -46,13 +62,21 @@ export default async function handler(req, res) {
     // CHECK AVAILABILITY
     if (action === 'availability' || action === 'check_availability') {
       const path = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
-      const url = `https://api.bokun.io${path}`;
-      const response = await fetch(url, {
-        headers: bokunHeaders(apiKey, secretKey, 'GET', path)
-      });
-      const data = await response.json();
+      const result = await bokunFetch('GET', path, apiKey, secretKey);
 
-      const avail = Array.isArray(data) ? data : [];
+      if (!result.ok || !result.data) {
+        return res.status(200).json({
+          available: false,
+          productId,
+          date: fixedDate,
+          guests: guestCount,
+          sessionId: null,
+          error: result.raw || 'Errore Bokun',
+          httpStatus: result.status,
+        });
+      }
+
+      const avail = Array.isArray(result.data) ? result.data : [];
       const available = avail.length > 0;
       const session = avail[0];
 
@@ -65,7 +89,6 @@ export default async function handler(req, res) {
         startTime: session?.startTime || null,
         availableSeats: session?.availableSeats || 0,
         rawCount: avail.length,
-        bokunRaw: data,
       });
     }
 
@@ -73,17 +96,11 @@ export default async function handler(req, res) {
     if (action === 'book' || action === 'create_booking') {
       // Step 1: get session ID
       let sessionId = null;
-      try {
-        const availPath = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
-        const availResp = await fetch(`https://api.bokun.io${availPath}`, {
-          headers: bokunHeaders(apiKey, secretKey, 'GET', availPath)
-        });
-        const availData = await availResp.json();
-        if (Array.isArray(availData) && availData.length > 0) {
-          sessionId = availData[0].id;
-        }
-      } catch (e) {
-        console.log('Could not fetch session:', e.message);
+      const availPath = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
+      const availResult = await bokunFetch('GET', availPath, apiKey, secretKey);
+
+      if (availResult.ok && Array.isArray(availResult.data) && availResult.data.length > 0) {
+        sessionId = availResult.data[0].id;
       }
 
       if (!sessionId) {
@@ -92,13 +109,15 @@ export default async function handler(req, res) {
           error: 'Nessuna sessione disponibile per questa data',
           productId,
           date: fixedDate,
+          bokunRaw: availResult.data || availResult.raw,
         });
       }
 
       // Step 2: create booking
-      const bookingPayload = {
+      const bookPath = '/booking.json/activity-booking';
+      const bookResult = await bokunFetch('POST', bookPath, apiKey, secretKey, {
         activityId: parseInt(productId),
-        sessionId: sessionId,
+        sessionId,
         startDate: fixedDate,
         participants: [{ count: guestCount }],
         customer: {
@@ -109,25 +128,18 @@ export default async function handler(req, res) {
         },
         notes: notes || 'Prenotazione da Widget IA Eremo di San Giusto',
         paymentType: 'MANUAL',
-      };
-
-      const bookPath = '/booking.json/activity-booking';
-      const response = await fetch(`https://api.bokun.io${bookPath}`, {
-        method: 'POST',
-        headers: bokunHeaders(apiKey, secretKey, 'POST', bookPath),
-        body: JSON.stringify(bookingPayload),
       });
 
-      const data = await response.json();
+      const bookingId = bookResult.data?.confirmationCode || bookResult.data?.id || ('BKN-' + Date.now());
 
       return res.status(200).json({
-        success: true,
-        bookingId: data?.confirmationCode || data?.id || ('BKN-' + Date.now()),
+        success: bookResult.ok,
+        bookingId,
         productId,
         date: fixedDate,
         guests: guestCount,
         guest: { firstName, lastName, email, phone },
-        bokunResponse: data,
+        bokunResponse: bookResult.data || bookResult.raw,
       });
     }
 
