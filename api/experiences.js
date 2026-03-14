@@ -1,14 +1,30 @@
 import crypto from 'crypto';
 
-function bokunHeaders(apiKey, secretKey) {
-  const date = new Date().toUTCString();
-  const signature = crypto.createHmac('sha1', secretKey).update(date + apiKey).digest('base64');
+function bokunDate() {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${now.getUTCFullYear()}-${pad(now.getUTCMonth()+1)}-${pad(now.getUTCDate())} ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
+}
+
+function bokunHeaders(apiKey, secretKey, method, path) {
+  const date = bokunDate();
+  const message = date + apiKey + method.toUpperCase() + path;
+  const signature = crypto.createHmac('sha1', secretKey).update(message).digest('base64');
   return {
     'Content-Type': 'application/json;charset=UTF-8',
     'X-Bokun-Date': date,
     'X-Bokun-AccessKey': apiKey,
     'X-Bokun-Signature': signature,
   };
+}
+
+function fixYear(dateStr) {
+  if (!dateStr) return dateStr;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let d = new Date(dateStr);
+  while (d < today) d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().split('T')[0];
 }
 
 export default async function handler(req, res) {
@@ -24,31 +40,23 @@ export default async function handler(req, res) {
   try {
     const { action, productId, date, guests, firstName, lastName, email, phone, notes } = req.body;
 
-    // Fix date year if in the past
-    function fixYear(dateStr) {
-      if (!dateStr) return dateStr;
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      let d = new Date(dateStr);
-      while (d < today) d.setFullYear(d.getFullYear() + 1);
-      return d.toISOString().split('T')[0];
-    }
-
     const fixedDate = fixYear(date);
     const guestCount = Number(guests) || 2;
 
     // CHECK AVAILABILITY
     if (action === 'availability' || action === 'check_availability') {
-      const url = `https://api.bokun.io/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
-      const response = await fetch(url, { headers: bokunHeaders(apiKey, secretKey) });
+      const path = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
+      const url = `https://api.bokun.io${path}`;
+      const response = await fetch(url, {
+        headers: bokunHeaders(apiKey, secretKey, 'GET', path)
+      });
       const data = await response.json();
 
-      // Extract availability info
       const avail = Array.isArray(data) ? data : [];
       const available = avail.length > 0;
       const session = avail[0];
 
-    return res.status(200).json({
+      return res.status(200).json({
         available,
         productId,
         date: fixedDate,
@@ -66,8 +74,10 @@ export default async function handler(req, res) {
       // Step 1: get session ID
       let sessionId = null;
       try {
-        const availUrl = `https://api.bokun.io/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
-        const availResp = await fetch(availUrl, { headers: bokunHeaders(apiKey, secretKey) });
+        const availPath = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
+        const availResp = await fetch(`https://api.bokun.io${availPath}`, {
+          headers: bokunHeaders(apiKey, secretKey, 'GET', availPath)
+        });
         const availData = await availResp.json();
         if (Array.isArray(availData) && availData.length > 0) {
           sessionId = availData[0].id;
@@ -101,9 +111,10 @@ export default async function handler(req, res) {
         paymentType: 'MANUAL',
       };
 
-      const response = await fetch('https://api.bokun.io/booking.json/activity-booking', {
+      const bookPath = '/booking.json/activity-booking';
+      const response = await fetch(`https://api.bokun.io${bookPath}`, {
         method: 'POST',
-        headers: bokunHeaders(apiKey, secretKey),
+        headers: bokunHeaders(apiKey, secretKey, 'POST', bookPath),
         body: JSON.stringify(bookingPayload),
       });
 
