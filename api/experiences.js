@@ -20,10 +20,7 @@ function bokunHeaders(apiKey, secretKey, method, path) {
 
 async function bokunFetch(method, path, apiKey, secretKey, body) {
   const url = `https://api.bokun.io${path}`;
-  const opts = {
-    method,
-    headers: bokunHeaders(apiKey, secretKey, method, path),
-  };
+  const opts = { method, headers: bokunHeaders(apiKey, secretKey, method, path) };
   if (body) opts.body = JSON.stringify(body);
   const resp = await fetch(url, opts);
   const text = await resp.text();
@@ -66,25 +63,17 @@ export default async function handler(req, res) {
 
       if (!result.ok || !result.data) {
         return res.status(200).json({
-          available: false,
-          productId,
-          date: fixedDate,
-          guests: guestCount,
-          sessionId: null,
-          error: result.raw || 'Errore Bokun',
-          httpStatus: result.status,
+          available: false, productId, date: fixedDate, guests: guestCount,
+          sessionId: null, error: result.raw || 'Errore Bokun', httpStatus: result.status,
         });
       }
 
       const avail = Array.isArray(result.data) ? result.data : [];
-      const available = avail.length > 0;
       const session = avail[0];
 
       return res.status(200).json({
-        available,
-        productId,
-        date: fixedDate,
-        guests: guestCount,
+        available: avail.length > 0,
+        productId, date: fixedDate, guests: guestCount,
         sessionId: session?.id || null,
         startTime: session?.startTime || null,
         availableSeats: session?.availableSeats || 0,
@@ -92,54 +81,72 @@ export default async function handler(req, res) {
       });
     }
 
-    // CREATE BOOKING
+    // CREATE BOOKING — nuovo flusso Bokun REST
     if (action === 'book' || action === 'create_booking') {
-      // Step 1: get session ID
-      let sessionId = null;
+
+      // Step 1: get availability to find startTimeId
+      let startTimeId = null;
       const availPath = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
       const availResult = await bokunFetch('GET', availPath, apiKey, secretKey);
 
       if (availResult.ok && Array.isArray(availResult.data) && availResult.data.length > 0) {
-        sessionId = availResult.data[0].id;
+        const session = availResult.data[0];
+        // startTimeId is the session id for DATE_AND_TIME products
+        startTimeId = session?.startTimeId || session?.id || null;
       }
 
-      if (!sessionId) {
-        return res.status(200).json({
-          success: false,
-          error: 'Nessuna sessione disponibile per questa data',
-          productId,
-          date: fixedDate,
-          bokunRaw: availResult.data || availResult.raw,
-        });
-      }
-
-      // Step 2: create booking
-      const bookPath = '/booking.json/activity-booking';
-      const bookResult = await bokunFetch('POST', bookPath, apiKey, secretKey, {
+      // Step 2: build booking request
+      const activityBookingRequest = {
         activityId: parseInt(productId),
-        sessionId,
-        startDate: fixedDate,
-        participants: [{ priceCategoryId: 1134529, count: guestCount }],
-        customer: {
+        date: fixedDate,
+        passengers: Array.from({ length: guestCount }, () => ({
+          pricingCategoryId: 1134529, // Adults
+        })),
+        note: notes || 'Prenotazione da Widget IA Eremo di San Giusto',
+      };
+
+      if (startTimeId) activityBookingRequest.startTimeId = startTimeId;
+
+      const bookingRequest = {
+        activityBookings: [activityBookingRequest],
+        mainContactDetails: {
           firstName: firstName || '',
           lastName: lastName || '',
           email: email || '',
           phoneNumber: phone || '',
         },
-        notes: notes || 'Prenotazione da Widget IA Eremo di San Giusto',
-        paymentType: 'MANUAL',
-      });
+        externalBookingEntityName: 'Eremo di San Giusto Widget IA',
+      };
 
-      const bookingId = bookResult.data?.confirmationCode || bookResult.data?.id || ('BKN-' + Date.now());
+      // Step 3: get checkout options
+      const checkoutOptsPath = '/booking.json/checkout-options';
+      const optsResult = await bokunFetch('POST', checkoutOptsPath, apiKey, secretKey, bookingRequest);
+
+      if (!optsResult.ok) {
+        return res.status(200).json({
+          success: false,
+          error: 'Errore checkout options',
+          bokunResponse: optsResult.data || optsResult.raw,
+        });
+      }
+
+      // Step 4: checkout finale
+      const checkoutPath = '/booking.json/checkout';
+      const checkoutResult = await bokunFetch('POST', checkoutPath, apiKey, secretKey, bookingRequest);
+
+      const bookingId = checkoutResult.data?.confirmationCode
+        || checkoutResult.data?.bookingConfirmationCode
+        || checkoutResult.data?.id
+        || ('BKN-' + Date.now());
 
       return res.status(200).json({
-        success: bookResult.ok,
+        success: checkoutResult.ok,
         bookingId,
         productId,
         date: fixedDate,
         guests: guestCount,
         guest: { firstName, lastName, email, phone },
-        bokunResponse: bookResult.data || bookResult.raw,
+        bokunResponse: checkoutResult.data || checkoutResult.raw,
       });
     }
 
