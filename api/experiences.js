@@ -1,45 +1,3 @@
-import crypto from 'crypto';
-
-function bokunDate() {
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${now.getUTCFullYear()}-${pad(now.getUTCMonth()+1)}-${pad(now.getUTCDate())} ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
-}
-
-function bokunHeaders(apiKey, secretKey, method, path) {
-  const date = bokunDate();
-  const message = date + apiKey + method.toUpperCase() + path;
-  const signature = crypto.createHmac('sha1', secretKey).update(message).digest('base64');
-  return {
-    'Content-Type': 'application/json;charset=UTF-8',
-    'X-Bokun-Date': date,
-    'X-Bokun-AccessKey': apiKey,
-    'X-Bokun-Signature': signature,
-  };
-}
-
-async function bokunFetch(method, path, apiKey, secretKey, body) {
-  const url = `https://api.bokun.io${path}`;
-  const opts = { method, headers: bokunHeaders(apiKey, secretKey, method, path) };
-  if (body) opts.body = JSON.stringify(body);
-  const resp = await fetch(url, opts);
-  const text = await resp.text();
-  try {
-    return { ok: resp.ok, status: resp.status, data: JSON.parse(text) };
-  } catch(e) {
-    return { ok: resp.ok, status: resp.status, data: null, raw: text };
-  }
-}
-
-function fixYear(dateStr) {
-  if (!dateStr) return dateStr;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  let d = new Date(dateStr);
-  while (d < today) d.setFullYear(d.getFullYear() + 1);
-  return d.toISOString().split('T')[0];
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -47,105 +5,177 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const apiKey    = process.env.BOKUN_ACCESS_KEY;
-  const secretKey = process.env.BOKUN_SECRET_KEY;
-
   try {
     const { action, productId, date, guests, firstName, lastName, email, phone, notes } = req.body;
-    const fixedDate = fixYear(date);
+
     const guestCount = Number(guests) || 2;
+
+    // Fix date year if in the past
+    function fixYear(dateStr) {
+      if (!dateStr) return dateStr;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let d = new Date(dateStr);
+      while (d < today) d.setFullYear(d.getFullYear() + 1);
+      return d.toISOString().split('T')[0];
+    }
+
+    const fixedDate = fixYear(date);
+
+    async function wfetch(method, path, body) {
+      const url = `https://widgets.bokun.io${path}`;
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      const r = await fetch(url, opts);
+      const text = await r.text();
+      try { return { ok: r.ok, status: r.status, data: JSON.parse(text) }; }
+      catch(e) { return { ok: r.ok, status: r.status, data: null, raw: text }; }
+    }
 
     // ── CHECK AVAILABILITY ──────────────────────────────────────────────────
     if (action === 'availability' || action === 'check_availability') {
-      const path = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
-      const result = await bokunFetch('GET', path, apiKey, secretKey);
+      // Create a session first
+      const sessionRes = await wfetch('GET', `/booking/experience/create-session?productId=${productId}&currency=EUR`);
+      const sessionId = sessionRes.data?.sessionId || null;
 
-      if (!result.ok || !result.data) {
+      if (!sessionId) {
+        // Try availability without session
+        const availRes = await wfetch('GET', `/${productId}?availabilityRequired=1&currency=EUR`);
         return res.status(200).json({
-          available: false, productId, date: fixedDate, guests: guestCount,
-          sessionId: null, error: result.raw || 'Errore Bokun', httpStatus: result.status,
+          available: availRes.ok,
+          productId, date: fixedDate, guests: guestCount,
+          sessionId: null,
+          debug: availRes.data || availRes.raw,
         });
       }
 
-      const avail = Array.isArray(result.data) ? result.data : [];
-      const session = avail[0];
+      const availRes = await wfetch('GET', `/${productId}?availabilityRequired=1&currency=EUR&sessionId=${sessionId}`);
 
       return res.status(200).json({
-        available: avail.length > 0,
+        available: availRes.ok && !availRes.data?.error,
         productId, date: fixedDate, guests: guestCount,
-        sessionId: session?.id || null,
-        startTimeId: session?.startTimeId || null,
-        defaultRateId: session?.defaultRateId || null,
-        startTime: session?.startTime || null,
-        availableSeats: session?.availabilityCount || 0,
-        rawCount: avail.length,
+        sessionId,
+        debug: availRes.data || availRes.raw,
       });
     }
 
-    // ── CREATE BOOKING via direct booking request ───────────────────────────
+    // ── CREATE BOOKING ──────────────────────────────────────────────────────
     if (action === 'book' || action === 'create_booking') {
 
-      // Step 1: get availability
+      // Step 1: get availability to find startTimeId
       const availPath = `/activity.json/${productId}/availabilities?start=${fixedDate}&end=${fixedDate}&includeSoldOut=false`;
-      const availResult = await bokunFetch('GET', availPath, apiKey, secretKey);
+      const availUrl = `https://api.bokun.io${availPath}`;
 
-      let startTimeId = null;
-      let defaultRateId = null;
-
-      if (availResult.ok && Array.isArray(availResult.data) && availResult.data.length > 0) {
-        const session = availResult.data[0];
-        startTimeId = session?.startTimeId || null;
-        defaultRateId = session?.defaultRateId || null;
+      // Use HMAC for api.bokun.io
+      const crypto = await import('crypto');
+      function bokunDate() {
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${now.getUTCFullYear()}-${pad(now.getUTCMonth()+1)}-${pad(now.getUTCDate())} ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
       }
 
-      // Step 2: build passengers array
-      const passengers = Array.from({ length: guestCount }, () => ({
-        pricingCategoryId: 1134529, // Adults
-      }));
+      const apiKey = process.env.BOKUN_ACCESS_KEY;
+      const secretKey = process.env.BOKUN_SECRET_KEY;
+      const bdate = bokunDate();
+      const sig = crypto.default.createHmac('sha1', secretKey).update(bdate + apiKey + 'GET' + availPath).digest('base64');
 
-      // Step 3: build activity booking request
-      const activityBooking = {
+      const availResp = await fetch(availUrl, {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'X-Bokun-Date': bdate,
+          'X-Bokun-AccessKey': apiKey,
+          'X-Bokun-Signature': sig,
+        }
+      });
+
+      const availText = await availResp.text();
+      let availData;
+      try { availData = JSON.parse(availText); } catch(e) { availData = null; }
+
+      const sessions = Array.isArray(availData) ? availData : [];
+      const session = sessions[0];
+      const startTimeId = session?.startTimeId || null;
+
+      // Step 2: create session on widgets.bokun.io
+      const sessionRes = await fetch(`https://widgets.bokun.io/online-sales/f6aa2b9b-2ab7-4ded-a773-a54e8178e2c6/create-session?currency=EUR`, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const sessionText = await sessionRes.text();
+      let sessionData;
+      try { sessionData = JSON.parse(sessionText); } catch(e) { sessionData = null; }
+      const sessionId = sessionData?.sessionId || sessionData?.id || null;
+
+      if (!sessionId) {
+        return res.status(200).json({
+          success: false,
+          error: 'Non riesco a creare sessione Bokun',
+          sessionDebug: sessionData || sessionText,
+          availDebug: availData || availText,
+        });
+      }
+
+      const BASE = `https://widgets.bokun.io`;
+      const SQ = `currency=EUR&sessionId=${sessionId}`;
+
+      // Step 3: add to cart
+      const cartPayload = {
         activityId: parseInt(productId),
         date: fixedDate,
-        passengers,
-        note: notes || 'Prenotazione da Widget IA Eremo di San Giusto',
+        startTimeId: startTimeId,
+        pricingCategoryBookings: [{ pricingCategoryId: 1134529, count: guestCount }],
       };
 
-      if (startTimeId) activityBooking.startTimeId = startTimeId;
-      if (defaultRateId) activityBooking.rateId = defaultRateId;
+      const addRes = await fetch(`${BASE}/-1?${SQ}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cartPayload),
+      });
+      const addText = await addRes.text();
+      let addData;
+      try { addData = JSON.parse(addText); } catch(e) { addData = null; }
 
-      // Step 4: direct booking request to checkout
-      const bookingRequest = {
-        activityBookings: [activityBooking],
-        mainContactDetails: {
+      if (!addRes.ok) {
+        return res.status(200).json({
+          success: false,
+          error: 'Errore add to cart',
+          cartDebug: addData || addText,
+        });
+      }
+
+      // Step 4: checkout
+      const checkoutPayload = {
+        customer: {
           firstName: firstName || '',
           lastName: lastName || '',
           email: email || '',
           phoneNumber: phone || '',
         },
-        sendNotificationToMainContact: true,
-        paymentMethod: 'SEND_INVOICE',
-        externalBookingEntityName: 'Eremo di San Giusto Widget IA',
+        paymentType: 'SEND_INVOICE',
+        sendConfirmationEmail: true,
+        notes: notes || 'Prenotazione da Widget IA Eremo di San Giusto',
       };
 
-      const checkoutPath = '/booking.json/checkout';
-      const checkoutResult = await bokunFetch('POST', checkoutPath, apiKey, secretKey, bookingRequest);
+      const checkoutRes = await fetch(`${BASE}/3?${SQ}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(checkoutPayload),
+      });
+      const checkoutText = await checkoutRes.text();
+      let checkoutData;
+      try { checkoutData = JSON.parse(checkoutText); } catch(e) { checkoutData = null; }
 
-      const bookingId = checkoutResult.data?.booking?.confirmationCode
-        || checkoutResult.data?.confirmationCode
-        || checkoutResult.data?.bookingConfirmationCode
-        || checkoutResult.data?.id
+      const bookingId = checkoutData?.confirmationCode
+        || checkoutData?.booking?.confirmationCode
+        || checkoutData?.id
         || ('BKN-' + Date.now());
 
       return res.status(200).json({
-        success: checkoutResult.ok,
+        success: checkoutRes.ok,
         bookingId,
-        productId,
-        date: fixedDate,
-        guests: guestCount,
+        productId, date: fixedDate, guests: guestCount,
         guest: { firstName, lastName, email, phone },
-        httpStatus: checkoutResult.status,
-        bokunResponse: checkoutResult.data || checkoutResult.raw,
+        httpStatus: checkoutRes.status,
+        bokunResponse: checkoutData || checkoutText,
       });
     }
 
