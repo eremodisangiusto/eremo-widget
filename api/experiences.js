@@ -75,13 +75,14 @@ export default async function handler(req, res) {
         available: avail.length > 0,
         productId, date: fixedDate, guests: guestCount,
         sessionId: session?.id || null,
+        startTimeId: session?.startTimeId || null,
         startTime: session?.startTime || null,
         availableSeats: session?.availableSeats || 0,
         rawCount: avail.length,
       });
     }
 
-    // CREATE BOOKING — nuovo flusso Bokun REST
+    // CREATE BOOKING
     if (action === 'book' || action === 'create_booking') {
 
       // Step 1: get availability to find startTimeId
@@ -91,22 +92,25 @@ export default async function handler(req, res) {
 
       if (availResult.ok && Array.isArray(availResult.data) && availResult.data.length > 0) {
         const session = availResult.data[0];
-        // startTimeId is the session id for DATE_AND_TIME products
         startTimeId = session?.startTimeId || session?.id || null;
       }
 
-      // Step 2: build booking request
+      // Step 2: build passengers array — one object per passenger
+      const passengers = Array.from({ length: guestCount }, () => ({
+        pricingCategoryId: 1134529, // Adults
+      }));
+
+      // Step 3: build activity booking request
       const activityBookingRequest = {
         activityId: parseInt(productId),
         date: fixedDate,
-        passengers: Array.from({ length: guestCount }, () => ({
-          pricingCategoryId: 1134529, // Adults
-        })),
+        passengers,
         note: notes || 'Prenotazione da Widget IA Eremo di San Giusto',
       };
 
       if (startTimeId) activityBookingRequest.startTimeId = startTimeId;
 
+      // Step 4: build full booking request
       const bookingRequest = {
         activityBookings: [activityBookingRequest],
         mainContactDetails: {
@@ -115,27 +119,40 @@ export default async function handler(req, res) {
           email: email || '',
           phoneNumber: phone || '',
         },
+        sendNotificationToMainContact: true,
         externalBookingEntityName: 'Eremo di San Giusto Widget IA',
       };
 
-      // Step 3: get checkout options
+      // Step 5: checkout options (validate)
       const checkoutOptsPath = '/booking.json/checkout-options';
       const optsResult = await bokunFetch('POST', checkoutOptsPath, apiKey, secretKey, bookingRequest);
 
       if (!optsResult.ok) {
         return res.status(200).json({
           success: false,
-          error: 'Errore checkout options',
+          step: 'checkout-options',
+          error: optsResult.raw || JSON.stringify(optsResult.data),
           bokunResponse: optsResult.data || optsResult.raw,
         });
       }
 
-      // Step 4: checkout finale
-      const checkoutPath = '/booking.json/checkout';
-      const checkoutResult = await bokunFetch('POST', checkoutPath, apiKey, secretKey, bookingRequest);
+      // Step 6: get payment info from checkout options
+      const checkoutOptions = optsResult.data;
+      const uti = checkoutOptions?.uti || null;
+      const paymentMethod = checkoutOptions?.paymentOptions?.[0]?.paymentMethod || 'FREE';
 
-      const bookingId = checkoutResult.data?.confirmationCode
-        || checkoutResult.data?.bookingConfirmationCode
+      // Step 7: checkout request
+      const checkoutPath = '/booking.json/checkout';
+      const checkoutPayload = {
+        ...bookingRequest,
+        paymentMethod,
+      };
+      if (uti) checkoutPayload.uti = uti;
+
+      const checkoutResult = await bokunFetch('POST', checkoutPath, apiKey, secretKey, checkoutPayload);
+
+      const bookingId = checkoutResult.data?.booking?.confirmationCode
+        || checkoutResult.data?.confirmationCode
         || checkoutResult.data?.id
         || ('BKN-' + Date.now());
 
