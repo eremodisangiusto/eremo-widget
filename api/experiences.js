@@ -110,8 +110,8 @@ export default async function handler(req, res) {
       const sessionId = generateUUID();
       const addPath = `/shopping-cart.json/session/${sessionId}/activity?currency=EUR&lang=EN`;
       const addPayload = {
-        activityId: parseInt(productId),
-        startDate: fixedDate,
+       activityId: parseInt(productId),
+       date: fixedDate,
         pricingCategoryBookings: [{ pricingCategoryId: 1134529, count: guestCount }],
       };
       if (startTimeId) addPayload.startTimeId = startTimeId;
