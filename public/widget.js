@@ -113,10 +113,14 @@ function esjInit() {
   async function callProxy(userText) {
     ESJ_MESSAGES.push({ role: "user", content: userText });
     var langNote = ESJ_LANG === "en" ? "\n\nIMPORTANT: The user is speaking English. Reply in English, keeping the same warm and elegant tone." : "";
+    var today = new Date().toISOString().split("T")[0];
+    var dateNote = "
+
+OGGI E' IL " + today + ". Quando un ospite menziona date senza anno (es. 'maggio', '15 aprile'), usa SEMPRE l'anno corrente o il prossimo anno se la data e' gia' passata. Non usare mai anni passati come 2024 o 2025 se siamo nel 2026.";
     var body = {
       model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
-      system: ESJ_SYSTEM + langNote,
+      system: ESJ_SYSTEM + langNote + dateNote,
       tools: ESJ_TOOLS,
       messages: ESJ_MESSAGES
     };
