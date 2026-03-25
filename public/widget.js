@@ -57,6 +57,138 @@ var ESJ_TOOLS = [
   }
 ];
 
+// ─── EXPERIENCE DATA (embedded) ─────────────────────────────
+// Dati completi per le schede prodotto custom (no Bókun)
+
+var ESJ_EXPERIENCES = [
+  { id:"liquid-gold", name:"Liquid Gold", nameEn:"Liquid Gold",
+    sub:"Frantoio ipogeo · Grotta naturale · Uliveto secolare · Degustazione EVO", subEn:"Hypogean mill · Natural cave · Ancient olive grove · EVO tasting",
+    duration:"2–2.5 ore", durationEn:"2–2.5 hours", difficulty:"Facile", difficultyEn:"Easy",
+    season:"Tutto l'anno", seasonEn:"Year-round", maxGuests:12, startTimes:["10:30","17:00"],
+    advanceBooking:"24h", type:"Food & Cultura", typeEn:"Food & Culture", priceFrom:35,
+    prices:[{label:"Standard (2–12 pp)",labelEn:"Standard",val:"€35/pp"},{label:"Gruppo privato",labelEn:"Private group",val:"€50/pp"},{label:"Bambini <12",labelEn:"Children <12",val:"€10"}],
+    desc:"Puglia produce più olio d'oliva di qualsiasi altra regione italiana. All'Eremo di San Giusto questa tradizione è la terra sotto i piedi e la pietra antica sotto le mani. L'esperienza inizia sottoterra nel frantoio ipogeo scavato nella roccia viva, continua nella grotta naturale adiacente e si conclude con una passeggiata tra ulivi secolari e una degustazione guidata di 3–4 varietà di olio EVO con pane e bruschette.",
+    descEn:"Puglia produces more olive oil than any other Italian region. At Eremo di San Giusto this tradition is the ground beneath your feet. The experience begins underground in the hypogean oil mill carved into living rock, continues into the adjacent natural cave, and concludes with a walk through ancient olive groves and a guided tasting of 3–4 EVO varieties with bread and bruschette.",
+    included:["Visita guidata al frantoio ipogeo","Visita alla grotta naturale","Passeggiata nell'oliveto con guida","Degustazione 3–4 oli EVO + pane e bruschette","Guida stampata sull'olivicoltura","Acqua per tutta la durata"],
+    includedEn:["Guided visit to the hypogean mill","Visit to the natural cave","Walk through the olive grove","Tasting of 3–4 EVO varieties + bread","Printed guide to Puglian olive cultivation","Water throughout"],
+    excluded:["Vino o bevande alcoliche","Olio in bottiglia (acquistabile in loco)","Pasti aggiuntivi","Trasferimento","Assicurazione viaggio"],
+    excludedEn:["Wine or alcoholic beverages","Bottled oil (available on site)","Additional meals","Transfer","Travel insurance"],
+    bring:["Scarpe chiuse comode (gradini e terreno irregolare)","Abbigliamento comodo","Macchina fotografica — gli ulivi meritano"],
+    bringEn:["Comfortable closed-toe shoes (steps and uneven terrain)","Comfortable clothing","Camera — the olive trees deserve it"],
+    notes:"Frantoio e grotta richiedono gradini — non completamente accessibile a sedie a rotelle. In raccolta (ott–nov): degustazione dell'olio nuovo dal frantoio.",
+    notesEn:"Mill and cave require steps — not fully wheelchair accessible. During harvest (Oct–Nov): fresh olio nuovo tasting directly from the press.",
+    policy:[{label:"Cancellazione gratuita",labelEn:"Free cancellation",val:"fino a 48h prima",valEn:"up to 48h before",color:"green"},{label:"Rimborso 50%",labelEn:"50% refund",val:"tra 24h e 48h",valEn:"between 24–48h",color:"amber"},{label:"Nessun rimborso",labelEn:"No refund",val:"entro 24h",valEn:"within 24h",color:"red"},{label:"Maltempo estremo",labelEn:"Extreme weather",val:"Rimborso completo",valEn:"Full refund",color:"green"}]
+  },
+  { id:"stargazing", name:"Stargazing", nameEn:"Stargazing",
+    sub:"Telescopio professionale · Guida astrofilo · Mappa stellare · Monte Morrone", subEn:"Professional telescope · Astrophile guide · Star map · Monte Morrone",
+    duration:"2 ore (22:00–00:00)", durationEn:"2 hours (22:00–00:00)", difficulty:"Facile", difficultyEn:"Easy",
+    season:"Aprile – Ottobre", seasonEn:"April – October", maxGuests:10, startTimes:["22:00"],
+    advanceBooking:"24h", type:"Astronomia & Outdoor", typeEn:"Astronomy & Outdoor", priceFrom:35,
+    prices:[{label:"Standard (2–10 pp)",labelEn:"Standard",val:"€35/pp"},{label:"Gruppo privato",labelEn:"Private group",val:"€45/pp"},{label:"Bambini <12",labelEn:"Children <12",val:"€15"}],
+    desc:"Monte Morrone si alza sopra i tetti bianchi di Ostuni con un dono raro: il buio. Lontano dall'inquinamento luminoso della costa, il cielo notturno è uno dei più limpidi della Puglia. Due ore di osservazione a occhio nudo e al telescopio con una guida astrofilo esperta — costellazioni, pianeti, crateri lunari, gli anelli di Saturno e, nelle notti eccezionali, nebulose lontane.",
+    descEn:"Monte Morrone rises above the white rooftops of Ostuni with one rare gift: darkness. Far from coastal light pollution, the night sky is one of the clearest in Puglia. Two hours of naked-eye and telescopic observation with an expert astrophile guide — constellations, planets, lunar craters, Saturn's rings and, on exceptional nights, distant nebulae.",
+    included:["Telescopio professionale per tutta la sessione","Guida astrofilo esperta IT/EN","Mappa stellare personalizzata per data e luogo","Tisane, caffè e cioccolata calda","Coperte e sedute outdoor comode"],
+    includedEn:["Professional telescope for the full session","Expert astrophile guide (IT/EN)","Personalised star map for date and location","Herbal teas, coffee and hot chocolate","Blankets and comfortable outdoor seating"],
+    excluded:["Binocoli personali (su richiesta)","Pasti","Trasferimento","Assicurazione viaggio"],
+    excludedEn:["Personal binoculars (on request)","Food or meals","Transfer","Travel insurance"],
+    bring:["Strati caldi — le temperature scendono dopo mezzanotte","Scarpe comode per terreno outdoor","Torcia con luce rossa se disponibile","Curiosità e pazienza"],
+    bringEn:["Warm layers — temperatures drop after midnight","Comfortable shoes for outdoor terrain","Red-light torch if available","Curiosity and patience"],
+    notes:"Rimborso completo se copertura nuvolosa >50% all'orario di inizio. Agosto: picco delle Perseidi (12–13 agosto).",
+    notesEn:"Full refund if cloud cover exceeds 50% at start time. August: Perseid meteor shower peak (Aug 12–13).",
+    policy:[{label:"Cancellazione gratuita",labelEn:"Free cancellation",val:"fino a 48h prima",valEn:"up to 48h before",color:"green"},{label:"Rimborso 50%",labelEn:"50% refund",val:"tra 24h e 48h",valEn:"between 24–48h",color:"amber"},{label:"Nessun rimborso",labelEn:"No refund",val:"entro 24h",valEn:"within 24h",color:"red"},{label:"Cielo nuvoloso >50%",labelEn:"Cloud cover >50%",val:"Rimborso completo",valEn:"Full refund",color:"green"}]
+  },
+  { id:"sunset-serenade", name:"Sunset Serenade", nameEn:"Sunset Serenade",
+    sub:"Fisarmonica & Mandolino · Vino DOC · Tagliere prodotti pugliesi", subEn:"Accordion & Mandolin · DOC wine · Puglian produce board",
+    duration:"90 minuti", durationEn:"90 minutes", difficulty:"—", difficultyEn:"—",
+    season:"Aprile – Ottobre", seasonEn:"April – October", maxGuests:20, startTimes:["variabile — 30 min prima del tramonto"],
+    advanceBooking:"48h", type:"Musica & Food", typeEn:"Music & Food", priceFrom:60,
+    prices:[{label:"Standard (2–20 pp)",labelEn:"Standard",val:"€60/pp"},{label:"Coppia romantica",labelEn:"Romantic couple",val:"€130 flat"},{label:"Bambini <16",labelEn:"Children <16",val:"€15"}],
+    desc:"Al tramonto sulla terrazza dell'Eremo un duo professionale di fisarmonica e mandolino esegue pizzica, tarantella, serenate e canzoni popolari del Sud Italia. Con un bicchiere di Primitivo in mano e un tagliere di prodotti locali — burrata, taralli, formaggi, salumi — mentre il cielo si tinge d'arancio e le luci di Ostuni cominciano a brillare nella valle.",
+    descEn:"As the sun descends over the Valle d'Itria, a professional accordion and mandolin duo performs pizzica, tarantella, serenate and southern Italian folk songs. With a glass of Primitivo in hand and a board of local produce — burrata, taralli, cheeses, cured meats — as the sky turns amber and the lights of Ostuni begin to flicker in the valley.",
+    included:["Concerto live 90 min — duo fisarmonica e mandolino","Un calice di vino DOC Primitivo o Negroamaro","Tagliere: burrata, taralli, formaggi, salumi, olio","Sedute outdoor sulla terrazza panoramica"],
+    includedEn:["90-min live concert — accordion and mandolin duo","One glass of DOC Primitivo or Negroamaro","Produce board: burrata, taralli, cheeses, cured meats, olive oil","Comfortable outdoor seating on the panoramic terrace"],
+    excluded:["Vino o cibo aggiuntivo oltre al servizio incluso","Trasferimento","Assicurazione viaggio"],
+    excludedEn:["Additional food or wine beyond the included serving","Transfer","Travel insurance"],
+    bring:["Abbigliamento comodo per la serata","Strati leggeri se la serata si raffredda","Fotocamera — i tramonti dell'Eremo meritano"],
+    bringEn:["Comfortable evening clothing","Light layers if the evening cools","Camera — the Eremo sunsets are unmissable"],
+    notes:"Orario di inizio variabile ogni mese (30 min prima del tramonto). Confermato alla prenotazione. Contiene latticini — avvisare in caso di allergie.",
+    notesEn:"Start time varies monthly (30 min before sunset) — confirmed at booking. Contains dairy products — notify us of allergies.",
+    policy:[{label:"Cancellazione gratuita",labelEn:"Free cancellation",val:"fino a 48h prima",valEn:"up to 48h before",color:"green"},{label:"Rimborso 50%",labelEn:"50% refund",val:"tra 24h e 48h",valEn:"between 24–48h",color:"amber"},{label:"Nessun rimborso",labelEn:"No refund",val:"entro 24h",valEn:"within 24h",color:"red"},{label:"Pioggia o vento forte",labelEn:"Rain or strong wind",val:"Rimborso o reschedule",valEn:"Refund or reschedule",color:"green"}]
+  },
+  { id:"cooking-class", name:"Cooking Class", nameEn:"Cooking Class",
+    sub:"Orecchiette fatte a mano · Cacioricotta · Chef locale · Cucina outdoor", subEn:"Handmade orecchiette · Cacioricotta · Local chef · Outdoor kitchen",
+    duration:"2–3 ore", durationEn:"2–3 hours", difficulty:"Facile", difficultyEn:"Easy",
+    season:"Tutto l'anno", seasonEn:"Year-round", maxGuests:8, startTimes:["11:00","18:30"],
+    advanceBooking:"48h", type:"Cucina & Cultura", typeEn:"Cooking & Culture", priceFrom:35,
+    prices:[{label:"Standard (2–8 pp)",labelEn:"Standard",val:"€35/pp"},{label:"Sessione privata",labelEn:"Private session",val:"€50/pp"},{label:"Bambini <12",labelEn:"Children <12",val:"€18"}],
+    desc:"Non c'è modo migliore di capire un posto che attraverso il suo cibo. All'Eremo imparerai a fare le orecchiette — la pasta iconica della Puglia — completamente a mano con uno chef locale professionista nella cucina outdoor tra i trulli e gli ulivi. Poi ti siedi a tavola per mangiare quello che hai fatto, condito con cacioricotta fresca e un calice di vino pugliese.",
+    descEn:"There is no better way to understand a place than through its food. At the Eremo you will learn to make orecchiette — the iconic pasta of Puglia — entirely by hand with a professional local chef in our outdoor kitchen surrounded by trulli and olive trees. Then sit down to enjoy what you have made, dressed with fresh cacioricotta and a glass of Puglian wine.",
+    included:["Tutti gli ingredienti freschi a km zero","Cucina outdoor attrezzata e tutti gli utensili","Chef locale professionista per tutta la sessione","Un calice di vino pugliese","Ricetta stampata da portare a casa","Sessione mattutina: pranzo · Serale: cena"],
+    includedEn:["All fresh locally sourced ingredients","Full outdoor kitchen and equipment","Professional local chef throughout","A glass of Puglian wine","Printed recipe card to take home","Morning: lunch · Evening: dinner"],
+    excluded:["Cibo o bevande aggiuntive","Trasferimento","Assicurazione viaggio"],
+    excludedEn:["Additional food or drinks","Transfer","Travel insurance"],
+    bring:["Abiti comodi che possono infarinarsi","Scarpe chiuse (obbligatorie in cucina)","Capelli lunghi raccolti — grembiuli forniti","Buon appetito"],
+    bringEn:["Comfortable clothes you don't mind getting floury","Closed-toe shoes (required in kitchen)","Long hair tied back — aprons provided","A good appetite"],
+    notes:"Contiene glutine e latticini. Avvisare di allergie alla prenotazione. Maltempo: reschedule gratuito.",
+    notesEn:"Contains gluten and dairy. Notify us of allergies at booking. Bad weather: free reschedule.",
+    policy:[{label:"Cancellazione gratuita",labelEn:"Free cancellation",val:"fino a 48h prima",valEn:"up to 48h before",color:"green"},{label:"Rimborso 50%",labelEn:"50% refund",val:"tra 24h e 48h",valEn:"between 24–48h",color:"amber"},{label:"Nessun rimborso",labelEn:"No refund",val:"entro 24h (ingredienti acquistati)",valEn:"within 24h (ingredients purchased)",color:"red"},{label:"Maltempo",labelEn:"Bad weather",val:"Reschedule gratuito",valEn:"Free reschedule",color:"green"}]
+  },
+  { id:"massaggi", name:"Rituali di Benessere", nameEn:"Wellness Rituals",
+    sub:"Massaggi professionali · Osteopata certificato · Trullo o terrazza esterna", subEn:"Professional massage · Certified osteopath · Trullo or outdoor terrace",
+    duration:"60 minuti", durationEn:"60 minutes", difficulty:"—", difficultyEn:"—",
+    season:"Aprile – Ottobre", seasonEn:"April – October", maxGuests:4, startTimes:["09:00","10:30","16:00","17:30"],
+    advanceBooking:"48h", type:"Benessere", typeEn:"Wellness", priceFrom:70,
+    prices:[{label:"Massaggio rilassante",labelEn:"Relaxing massage",val:"€70/pp"},{label:"Massaggio tonificante",labelEn:"Toning massage",val:"€70/pp"},{label:"Deep tissue / decontraente",labelEn:"Deep tissue",val:"€80/pp"}],
+    desc:"Nel silenzio dell'Eremo, dove la luce filtra tra gli ulivi antichi e il tempo rallenta, uno spazio per fermarsi davvero. Trattamenti eseguiti da un osteopata certificato nell'intimo interno del trullo — mura di calcarenite, temperatura fresca naturale, quiete assoluta — o sulla terrazza esterna attrezzata immersa tra ulivi e cielo aperto.",
+    descEn:"In the silence of the Eremo, where light filters through ancient olive trees and time slows, a space in which to truly stop. Treatments performed by a certified osteopath inside the intimate trullo interior — calcarenite walls, natural cool temperature, absolute stillness — or on the equipped outdoor terrace surrounded by olive trees and open sky.",
+    included:["Sessione completa 60 min con osteopata certificato","Uso del trullo o della terrazza esterna preparata","Lettino professionale, asciugamani, oli e attrezzatura","Acqua e tisana prima e dopo","Tempo libero nei giardini dell'Eremo post-trattamento"],
+    includedEn:["Full 60-min session by certified osteopath","Use of trullo or equipped outdoor terrace","Professional table, towels, oils and equipment","Water and herbal tea before and after","Post-session quiet time in the estate grounds"],
+    excluded:["Pasti o cibo aggiuntivo","Trasferimento","Assicurazione viaggio","Sessioni aggiuntive"],
+    excludedEn:["Meals or additional food","Transfer","Travel insurance","Additional sessions"],
+    bring:["Abbigliamento comodo e ampio","Evitare pasti pesanti nelle 2h precedenti","Arrivare 10 min prima per ambientarsi"],
+    bringEn:["Comfortable, loose-fitting clothing","Avoid heavy meals 2 hours before","Arrive 10 minutes early to settle"],
+    notes:"Minimo 2 partecipanti. Scelta setting alla prenotazione. Deep tissue sconsigliato nel primo trimestre di gravidanza. Comunicare condizioni mediche.",
+    notesEn:"Minimum 2 participants. Setting choice at booking. Deep tissue not recommended in first trimester. Notify us of medical conditions.",
+    policy:[{label:"Cancellazione gratuita",labelEn:"Free cancellation",val:"fino a 48h prima",valEn:"up to 48h before",color:"green"},{label:"Rimborso 50%",labelEn:"50% refund",val:"tra 24h e 48h",valEn:"between 24–48h",color:"amber"},{label:"Nessun rimborso",labelEn:"No refund",val:"entro 24h",valEn:"within 24h",color:"red"},{label:"Min. 2 pp non raggiunto",labelEn:"Min. 2 guests not met",val:"Rimborso completo",valEn:"Full refund or reschedule",color:"green"}]
+  },
+  { id:"trekking", name:"Trekking Monte Morrone", nameEn:"Trekking Monte Morrone",
+    sub:"Sentieri sacri · Santuari antichi · Valle d'Itria · Ostuni", subEn:"Sacred paths · Ancient sanctuaries · Valle d'Itria · Ostuni",
+    duration:"2–4 ore", durationEn:"2–4 hours", difficulty:"Facile", difficultyEn:"Easy",
+    season:"Tutto l'anno", seasonEn:"Year-round", maxGuests:10, startTimes:["08:00","17:00"],
+    advanceBooking:"24h", type:"Outdoor & Cultura", typeEn:"Outdoor & Culture", priceFrom:25,
+    prices:[{label:"Percorso corto 5km",labelEn:"Short route 5km",val:"€25/pp"},{label:"Percorso lungo 10km",labelEn:"Long route 10km",val:"€35/pp"},{label:"Gruppo privato",labelEn:"Private group",val:"€250 flat"},{label:"Bambini <12",labelEn:"Children <12",val:"€8–12"}],
+    desc:"Scopri l'anima della Puglia a piedi. Una passeggiata guidata su Monte Morrone tra i Santuari di Sant'Oronzo e San Biagio, macchia mediterranea profumata, oliveti secolari e percorsi in pietra calcarea levigati da generazioni di pellegrini. Il tuo host condivide storie, geologia e tradizioni locali che nessuna guida può offrire.",
+    descEn:"Discover the soul of Puglia on foot. A guided walk across Monte Morrone between the Sanctuaries of Sant'Oronzo and San Biagio, through fragrant Mediterranean scrubland, centuries-old olive groves and limestone paths worn smooth by generations of pilgrims.",
+    included:["Acqua fresca e bevande stagionali","Guida locale esperta IT/EN (il tuo host)","Mappa del percorso e note sui santuari","Orientamento su flora, fauna e storia locale"],
+    includedEn:["Fresh water and seasonal beverages","Expert local guide IT/EN (your host)","Route maps and notes on the sanctuaries","Orientation on local flora, fauna and history"],
+    excluded:["Calzature da trekking e attrezzatura personale","Pasti o picnic (su richiesta)","Trasferimento","Assicurazione viaggio"],
+    excludedEn:["Hiking footwear and personal equipment","Meals or picnic (available on request)","Transfer","Travel insurance"],
+    bring:["Scarpe chiuse comode o stivaletti leggeri","Protezione solare: cappello, crema, occhiali","Strati leggeri (mattine e serate fresche)","Borraccia e zaino piccolo"],
+    bringEn:["Comfortable closed-toe shoes or light hiking boots","Sun protection: hat, sunscreen, sunglasses","Light layers (mornings and evenings can be cool)","Water bottle and small backpack"],
+    notes:"Percorso 5km: adatto a tutti. Percorso 10km: discese su terreno carsico. Maltempo grave: reschedule gratuito.",
+    notesEn:"5km route: suitable for all fitness levels. 10km route: includes karst limestone descents. Severe weather: free reschedule.",
+    policy:[{label:"Cancellazione gratuita",labelEn:"Free cancellation",val:"fino a 48h prima",valEn:"up to 48h before",color:"green"},{label:"Rimborso 50%",labelEn:"50% refund",val:"tra 24h e 48h",valEn:"between 24–48h",color:"amber"},{label:"Nessun rimborso",labelEn:"No refund",val:"entro 24h",valEn:"within 24h",color:"red"},{label:"Maltempo grave",labelEn:"Severe weather",val:"Reschedule gratuito",valEn:"Free reschedule",color:"green"}]
+  },
+  { id:"ciuchino-birichino", name:"Ciuchino Birichino", nameEn:"Ciuchino Birichino",
+    sub:"Parco avventura · Zip-line · Percorsi treetop · Famiglie", subEn:"Adventure park · Zip-line · Treetop circuits · Families",
+    duration:"2–3 ore", durationEn:"2–3 hours", difficulty:"Vari livelli", difficultyEn:"Multiple levels",
+    season:"Aprile – Ottobre", seasonEn:"April – October", maxGuests:99, startTimes:["09:30","15:00"],
+    advanceBooking:"24h", type:"Avventura & Famiglia", typeEn:"Adventure & Family", priceFrom:15,
+    prices:[{label:"Junior (3–6 anni)",labelEn:"Junior (3–6 yrs)",val:"€15"},{label:"Verde (6+ / >110cm)",labelEn:"Green (6+/>110cm)",val:"€25"},{label:"Blu (8+ / >120cm)",labelEn:"Blue (8+/>120cm)",val:"€30"},{label:"Rosso/Nero (10+ / >130cm)",labelEn:"Red/Black (10+/>130cm)",val:"€35"}],
+    desc:"A due passi dall'Eremo, nel bosco mediterraneo di Monte Morrone, il Parco Avventura Ciuchino Birichino è l'avventura perfetta per le famiglie. Percorsi treetop ad altezze crescenti, zip-line mozzafiato, ponti di corda e reti da scalata supervisionate da personale qualificato tra gli alberi veri e il paesaggio straordinario della Valle d'Itria.",
+    descEn:"Right on the doorstep of the Eremo, in the Mediterranean woodland of Monte Morrone, the Ciuchino Birichino adventure park is perfect for families. Treetop circuits at increasing heights, a thrilling zip-line, rope bridges and climbing nets — all supervised by trained staff among real trees and the extraordinary Valle d'Itria landscape.",
+    included:["Ingresso e accesso ai circuiti appropriati per età","Zip-line (inclusa tranne Junior)","Imbragatura, casco e moschettoni","Briefing sicurezza e supervisione personale qualificato","Area Junior per bambini 3–6 anni"],
+    includedEn:["Park entrance and age-appropriate circuits","Zip-line (included except Junior)","Harness, helmet and carabiner system","Safety briefing and trained staff supervision","Junior area for children aged 3–6"],
+    excluded:["Cibo e bevande (portare il proprio o acquistare al parco)","Scarpe chiuse con suola rigida (obbligatorie, non fornite)","Trasferimento","Assicurazione viaggio"],
+    excludedEn:["Food and drinks (bring your own or buy at the park)","Closed-toe shoes with firm sole (mandatory, not provided)","Transfer","Travel insurance"],
+    bring:["Scarpe chiuse con suola rigida — OBBLIGATORIE","Abbigliamento comodo e aderente — no sciarpe o gioielli pendenti","Borraccia e crema solare","Cambio di vestiti per i bambini"],
+    bringEn:["Closed-toe shoes with firm sole — MANDATORY","Comfortable fitted clothing — no loose scarves or dangling jewellery","Water bottle and sunscreen","Change of clothes for young children"],
+    notes:"Opera in tutte le condizioni meteo tranne temporali. Bambini area Junior: sempre accompagnati da un genitore. Scarpe inadeguate: accesso negato.",
+    notesEn:"Operates in all weather except thunderstorms. Junior area children must always be accompanied by a parent. Inadequate footwear: access denied.",
+    policy:[{label:"Cancellazione gratuita",labelEn:"Free cancellation",val:"fino a 48h prima",valEn:"up to 48h before",color:"green"},{label:"Rimborso 50%",labelEn:"50% refund",val:"tra 24h e 48h",valEn:"between 24–48h",color:"amber"},{label:"Nessun rimborso",labelEn:"No refund",val:"entro 24h",valEn:"within 24h",color:"red"},{label:"Chiusura per meteo",labelEn:"Weather closure",val:"Reschedule gratuito",valEn:"Free reschedule",color:"green"}]
+  }
+];
+
 // ─── INIT ────────────────────────────────────────────────────
 
 function esjInit() {
@@ -179,7 +311,42 @@ function esjInit() {
     + ".esj-send:hover{transform:scale(1.08)}"
     + ".esj-send:disabled{opacity:0.35;cursor:not-allowed;transform:none}"
     + ".esj-send svg{width:16px;height:16px;fill:#fff}"
-    + ".esj-brand{text-align:center;padding:0.35rem;font-family:'Jost',sans-serif;font-size:0.6rem;color:var(--esj-txt3);letter-spacing:0.08em;flex-shrink:0;background:var(--esj-bg2);border-top:1px solid var(--esj-bg3)}";
+    + ".esj-brand{text-align:center;padding:0.35rem;font-family:'Jost',sans-serif;font-size:0.6rem;color:var(--esj-txt3);letter-spacing:0.08em;flex-shrink:0;background:var(--esj-bg2);border-top:1px solid var(--esj-bg3)}"
+    + ".esj-exp-card{background:#fff;border-radius:14px;border:1px solid #ece4d8;overflow:hidden;font-family:'Jost',sans-serif}"
+    + ".esj-exp-hero{background:linear-gradient(135deg,#f5ede0,#ede0cc);padding:1rem 1.1rem 0.85rem;border-bottom:1px solid #ece4d8}"
+    + ".esj-exp-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#2c2218;font-weight:600;margin-bottom:4px;line-height:1.3}"
+    + ".esj-exp-sub{font-size:0.68rem;color:#8a7560;margin-bottom:8px;line-height:1.4}"
+    + ".esj-exp-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}"
+    + ".esj-exp-badge{display:inline-flex;align-items:center;gap:3px;font-size:0.63rem;padding:2px 7px;border-radius:20px;font-weight:500}"
+    + ".esj-exp-price{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:#8a6030;font-weight:600}"
+    + ".esj-exp-pfrom{font-size:0.66rem;color:#8a7560;margin-right:4px}"
+    + ".esj-exp-sec{padding:0.7rem 1rem;border-bottom:1px solid #f2ece2}"
+    + ".esj-exp-sec:last-child{border-bottom:none}"
+    + ".esj-exp-sec-title{font-size:0.62rem;font-weight:500;color:#8a7560;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}"
+    + ".esj-exp-desc{font-size:0.76rem;color:#3a2e22;line-height:1.68}"
+    + ".esj-exp-2col{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem}"
+    + ".esj-exp-li{display:flex;align-items:flex-start;gap:5px;font-size:0.72rem;color:#3a2e22;line-height:1.5;margin-bottom:4px}"
+    + ".esj-exp-check{width:13px;height:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}"
+    + ".esj-exp-check-y{background:#eaf3de}"
+    + ".esj-exp-check-n{background:#fcebeb}"
+    + ".esj-exp-meta{display:grid;grid-template-columns:1fr 1fr;gap:5px}"
+    + ".esj-exp-meta-item{background:#f9f5f0;border-radius:7px;padding:6px 8px}"
+    + ".esj-exp-meta-k{font-size:0.58rem;color:#8a7560;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px}"
+    + ".esj-exp-meta-v{font-size:0.72rem;color:#2c2218;font-weight:500}"
+    + ".esj-exp-policy-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-size:0.7rem;padding:3px 0;border-bottom:1px solid #f0e8d8}"
+    + ".esj-exp-policy-row:last-child{border-bottom:none}"
+    + ".esj-exp-pol-l{color:#8a7560;flex-shrink:0}"
+    + ".esj-exp-pol-v{font-weight:500;text-align:right}"
+    + ".esj-exp-pol-green{color:#3b6d11}"
+    + ".esj-exp-pol-amber{color:#854f0b}"
+    + ".esj-exp-pol-red{color:#a32d2d}"
+    + ".esj-exp-policy-box{background:#fdf8f2;border:1px solid #e8dcc8;border-radius:8px;padding:8px 10px}"
+    + ".esj-exp-note{background:#faeeda;border-radius:8px;padding:7px 10px;font-size:0.7rem;color:#633806;line-height:1.55}"
+    + ".esj-exp-cta{padding:0.7rem 1rem 0.8rem;display:flex;flex-direction:column;gap:6px}"
+    + ".esj-exp-book{width:100%;padding:10px;background:linear-gradient(135deg,#c8a97e,#9a6e38);border:none;border-radius:9px;color:#fff;font-family:'Jost',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;transition:opacity 0.2s}"
+    + ".esj-exp-book:hover{opacity:0.9}"
+    + ".esj-exp-ask{width:100%;padding:7px;background:transparent;border:1px solid #e0d5c5;border-radius:9px;color:#8a6030;font-family:'Jost',sans-serif;font-size:0.74rem;cursor:pointer;transition:all 0.2s}"
+    + ".esj-exp-ask:hover{border-color:#c8a97e;background:#faf7f2}";
 
   var style = document.createElement("style");
   style.textContent = css;
@@ -363,6 +530,125 @@ function esjInit() {
     loadC = false; sndC.disabled = false; inpC.focus();
   }
 
+  // ── KEYWORD MAP: parole chiave → ID esperienza ────────────────
+  var ESJ_EXP_KEYWORDS = {
+    "liquid-gold":        ["liquid gold","olio","frantoio","ulivo","evo","degustazione olio","olive oil","mill","grove"],
+    "stargazing":         ["stargazing","stelle","telescopio","astronomia","star","telescope","cielo"],
+    "sunset-serenade":    ["serenade","tramonto","fisarmonica","mandolino","sunset","concerto","musica","serenad"],
+    "cooking-class":      ["cooking","orecchiette","cucina","chef","pasta","cacioricotta","cook"],
+    "massaggi":           ["massaggio","benessere","wellness","osteopata","rituali","massage","relax","trullo spa"],
+    "trekking":           ["trekking","trek","camminata","santuario","monte morrone","sentiero","hike","hiking","sant'oronzo","san biagio"],
+    "ciuchino-birichino": ["ciuchino","avventura","zip","parco","bambini","family","adventure","zipline","birichino"]
+  };
+
+  function esjDetectExperience(text) {
+    var q = text.toLowerCase();
+    var ids = Object.keys(ESJ_EXP_KEYWORDS);
+    for (var i = 0; i < ids.length; i++) {
+      var kws = ESJ_EXP_KEYWORDS[ids[i]];
+      for (var j = 0; j < kws.length; j++) {
+        if (q.includes(kws[j])) return ids[i];
+      }
+    }
+    return null;
+  }
+
+  // ── CARD RENDERER (inline, no external file) ──────────────────
+  function esjRenderCard(expId) {
+    var exp = ESJ_EXPERIENCES.find(function(e) { return e.id === expId; });
+    if (!exp) return null;
+    var it = ESJ_LANG === "it";
+
+    function chk(ok) {
+      return ok
+        ? '<svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#3b6d11" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : '<svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M3 3l4 4M7 3l-4 4" stroke="#a32d2d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
+
+    var name   = it ? exp.name       : exp.nameEn;
+    var sub    = it ? exp.sub        : exp.subEn;
+    var dur    = it ? exp.duration   : exp.durationEn;
+    var diff   = it ? exp.difficulty : exp.difficultyEn;
+    var seas   = it ? exp.season     : exp.seasonEn;
+    var desc   = (it ? exp.desc : exp.descEn).split("\n")[0];
+    var incl   = it ? exp.included   : exp.includedEn;
+    var excl   = it ? exp.excluded   : exp.excludedEn;
+    var bring  = it ? exp.bring      : exp.bringEn;
+    var note   = it ? exp.notes      : exp.notesEn;
+    var pol    = exp.policy;
+    var prices = exp.prices;
+    var meta   = [
+      { k: it?"Durata":"Duration",       v: dur },
+      { k: it?"Stagione":"Season",        v: seas },
+      { k: it?"Max ospiti":"Max guests",  v: exp.maxGuests < 99 ? exp.maxGuests+(it?" pp":" guests") : (it?"Nessun limite":"No limit") },
+      { k: it?"Orari":"Times",            v: exp.startTimes.join(", ") },
+      { k: it?"Prenotare":"Book ahead",   v: exp.advanceBooking+(it?" prima":" before") },
+      { k: it?"Tipo":"Type",              v: it ? exp.type : exp.typeEn }
+    ];
+
+    var bookMsg = (it ? "Voglio prenotare " : "I want to book ") + name;
+    var askMsg  = (it ? "Dimmi di più su " : "Tell me more about ") + name;
+    var bookLbl = it ? "Prenota questa esperienza ↗" : "Book this experience ↗";
+    var askLbl  = it ? "Fai una domanda a Sofia ↗"   : "Ask Sofia a question ↗";
+
+    var h = '<div class="esj-exp-card">';
+    // Hero
+    h += '<div class="esj-exp-hero">';
+    h += '<div class="esj-exp-title">'+name+'</div>';
+    h += '<div class="esj-exp-sub">'+sub+'</div>';
+    h += '<div class="esj-exp-badges">';
+    if (dur !== "—") h += '<span class="esj-exp-badge" style="background:#f1efe8;color:#444441;"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="#5F5E5A" stroke-width="1"/><path d="M6 3.5V6l1.5 1" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round"/></svg>'+dur+'</span>';
+    if (diff !== "—") h += '<span class="esj-exp-badge" style="background:#eaf3de;color:#3b6d11;"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 9L5 4l3 3 2-4" stroke="#3b6d11" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+diff+'</span>';
+    h += '<span class="esj-exp-badge" style="background:#e6f1fb;color:#0c447c;"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="2" y="3" width="8" height="7" rx="1" stroke="#185FA5" stroke-width="1"/><path d="M4 2v2M8 2v2M2 6h8" stroke="#185FA5" stroke-width="1" stroke-linecap="round"/></svg>'+seas+'</span>';
+    if (exp.maxGuests < 99) h += '<span class="esj-exp-badge" style="background:#faeeda;color:#633806;">max '+exp.maxGuests+(it?" pp":" guests")+'</span>';
+    h += '</div>';
+    h += '<span class="esj-exp-pfrom">'+(it?"da":"from")+'</span><span class="esj-exp-price">€'+exp.priceFrom+'</span><span style="font-size:0.66rem;color:#8a7560;">/pp</span>';
+    h += '</div>';
+    // Desc
+    h += '<div class="esj-exp-sec"><div class="esj-exp-sec-title">'+(it?"L'esperienza":"About")+'</div><div class="esj-exp-desc">'+desc+'</div></div>';
+    // Prices
+    h += '<div class="esj-exp-sec"><div class="esj-exp-sec-title">'+(it?"Prezzi":"Pricing")+'</div>';
+    prices.forEach(function(p){ h += '<div class="esj-exp-policy-row"><span class="esj-exp-pol-l">'+(it?p.label:p.labelEn)+'</span><span class="esj-exp-pol-v" style="color:#2c2218;">'+p.val+'</span></div>'; });
+    h += '</div>';
+    // Included / Excluded
+    h += '<div class="esj-exp-sec"><div class="esj-exp-2col"><div><div class="esj-exp-sec-title">'+(it?"Incluso":"Included")+'</div>';
+    incl.forEach(function(x){ h += '<div class="esj-exp-li"><span class="esj-exp-check esj-exp-check-y">'+chk(true)+'</span><span>'+x+'</span></div>'; });
+    h += '</div><div><div class="esj-exp-sec-title">'+(it?"Non incluso":"Excluded")+'</div>';
+    excl.forEach(function(x){ h += '<div class="esj-exp-li"><span class="esj-exp-check esj-exp-check-n">'+chk(false)+'</span><span>'+x+'</span></div>'; });
+    h += '</div></div></div>';
+    // Bring
+    h += '<div class="esj-exp-sec"><div class="esj-exp-sec-title">'+(it?"Cosa portare":"What to bring")+'</div>';
+    bring.forEach(function(x){ h += '<div class="esj-exp-li"><span style="color:#8a6030;font-size:11px;flex-shrink:0;margin-top:2px;">·</span><span>'+x+'</span></div>'; });
+    h += '</div>';
+    // Meta
+    h += '<div class="esj-exp-sec"><div class="esj-exp-sec-title">'+(it?"Informazioni":"Details")+'</div><div class="esj-exp-meta">';
+    meta.forEach(function(m){ h += '<div class="esj-exp-meta-item"><div class="esj-exp-meta-k">'+m.k+'</div><div class="esj-exp-meta-v">'+m.v+'</div></div>'; });
+    h += '</div></div>';
+    // Notes
+    if (note) h += '<div class="esj-exp-sec"><div class="esj-exp-sec-title">'+(it?"Note":"Notes")+'</div><div class="esj-exp-note">'+note+'</div></div>';
+    // Policy
+    h += '<div class="esj-exp-sec"><div class="esj-exp-sec-title">'+(it?"Cancellazione":"Cancellation")+'</div><div class="esj-exp-policy-box">';
+    pol.forEach(function(p){ h += '<div class="esj-exp-policy-row"><span class="esj-exp-pol-l">'+(it?p.label:p.labelEn)+'</span><span class="esj-exp-pol-v esj-exp-pol-'+p.color+'">'+(it?p.val:p.valEn)+'</span></div>'; });
+    h += '</div></div>';
+    // CTA
+    var bm = bookMsg.replace(/'/g,"\\'"), am = askMsg.replace(/'/g,"\\'");
+    h += '<div class="esj-exp-cta">';
+    h += '<button class="esj-exp-book" onclick="(function(){ESJ_MSG_E.push({role:\'user\',content:\''+bm+'\'});esjGoView(\'esperienze\');setTimeout(function(){document.getElementById(\'esj-inp-e\').value=\'\';},100);})()">'+(it?"Prenota questa esperienza ↗":"Book this experience ↗")+'</button>';
+    h += '<button class="esj-exp-ask" onclick="esjGoView(\'esperienze\');setTimeout(function(){var i=document.getElementById(\'esj-inp-e\');if(i){i.value=\''+am+'\';i.dispatchEvent(new Event(\'input\'));}},200)">'+(it?"Fai una domanda a Sofia ↗":"Ask Sofia a question ↗")+'</button>';
+    h += '</div></div>';
+    return h;
+  }
+
+  // ── INJECT CARD into chat (no text bubble, just the card) ─────
+  function esjShowCard(html) {
+    typE.classList.remove("on");
+    var d = document.createElement("div");
+    d.className = "esj-msg assistant";
+    d.innerHTML = '<div style="padding:0;background:transparent;border:none;">'+html+'</div>';
+    msgsE.insertBefore(d, typE);
+    msgsE.scrollTop = msgsE.scrollHeight;
+  }
+
   // ── SEND ESPERIENZE ───────────────────────────────────────────
   async function sendE(text) {
     if (!text.trim() || loadE) return;
@@ -370,13 +656,37 @@ function esjInit() {
     qrE.style.display = "none";
     addMsg(msgsE, typE, "user", text);
     inpE.value = ""; inpE.style.height = "auto";
-    typE.classList.add("on"); msgsE.scrollTop = msgsE.scrollHeight;
-    ESJ_MSG_E.push({ role: "user", content: text });
-    try {
-      var r = await callProxy(ESJ_MSG_E, "\n\nCONTESTO: flusso ESPERIENZE. Usa SEMPRE il Bokun ID corretto per ogni esperienza. Presenta disponibilita e prenota.");
-      addMsg(msgsE, typE, "assistant", r);
-    } catch(e) {
-      addMsg(msgsE, typE, "assistant", ESJ_LANG === "en" ? "Sorry, please try again." : "Mi dispiace, riprova tra un momento.");
+    msgsE.scrollTop = msgsE.scrollHeight;
+
+    // Detect if user is asking about a specific experience → show card first
+    var detectedId = esjDetectExperience(text);
+    var isInfoRequest = /\b(cos[aè]|info|dettagli|descri|spiega|mostr|dimmi|tell|show|what|about|detail|info)\b/i.test(text);
+
+    if (detectedId && isInfoRequest) {
+      // Show the rich card immediately, then let Sofia add context
+      var cardHtml = esjRenderCard(detectedId);
+      if (cardHtml) esjShowCard(cardHtml);
+      // Short Sofia follow-up (no full card re-description)
+      ESJ_MSG_E.push({ role: "user", content: text });
+      typE.classList.add("on"); msgsE.scrollTop = msgsE.scrollHeight;
+      try {
+        var ctx = "\n\nCONTESTO: flusso ESPERIENZE custom (no Bokun). Ho appena mostrato la scheda prodotto visuale per '"+detectedId+"'. Aggiungi solo un breve commento caldo (2-3 righe) senza ripetere i dettagli della scheda, e chiedi se vuole prenotare o ha domande.";
+        var r = await callProxy(ESJ_MSG_E, ctx);
+        addMsg(msgsE, typE, "assistant", r);
+      } catch(e) {
+        typE.classList.remove("on");
+      }
+    } else {
+      // Normal flow: Sofia risponde in testo
+      typE.classList.add("on"); msgsE.scrollTop = msgsE.scrollHeight;
+      ESJ_MSG_E.push({ role: "user", content: text });
+      try {
+        var ctx2 = "\n\nCONTESTO: flusso ESPERIENZE custom (no Bokun). Sistema di prenotazione proprietario: disponibilita e prenotazioni gestite internamente. Per raccogliere una prenotazione chiedi: esperienza scelta, data, numero partecipanti, nome, cognome, email, telefono. Poi invia richiesta di conferma.";
+        var r2 = await callProxy(ESJ_MSG_E, ctx2);
+        addMsg(msgsE, typE, "assistant", r2);
+      } catch(e) {
+        addMsg(msgsE, typE, "assistant", ESJ_LANG === "en" ? "Sorry, please try again." : "Mi dispiace, riprova tra un momento.");
+      }
     }
     loadE = false; sndE.disabled = false; inpE.focus();
   }
