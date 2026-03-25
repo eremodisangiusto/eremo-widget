@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento confermato · Eremo di San Giusto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100vh; font-family: 'Jost', sans-serif;
+      background: #1a1410; display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: #faf7f2; border-radius: 20px; padding: 2.5rem 2rem;
+      max-width: 440px; width: 100%; text-align: center;
+    }
+    .icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, #eaf3de, #c0dd97);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    .icon svg { width: 28px; height: 28px; }
+    h1 {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.8rem;
+      color: #2c2218; font-weight: 600; margin-bottom: 0.75rem;
+    }
+    p { font-size: 0.88rem; color: #5a4a38; line-height: 1.7; margin-bottom: 0.5rem; }
+    .ref {
+      display: inline-block; margin: 1rem 0;
+      background: #f2ece2; border-radius: 8px; padding: 0.5rem 1.2rem;
+      font-family: 'Jost', monospace; font-size: 1rem; font-weight: 500;
+      color: #8a6030; letter-spacing: 0.08em;
+    }
+    .btn {
+      display: inline-block; margin-top: 1.5rem;
+      padding: 0.75rem 2rem; background: linear-gradient(135deg, #c8a97e, #9a6e38);
+      border-radius: 10px; color: #fff; text-decoration: none;
+      font-size: 0.88rem; font-weight: 500; transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .divider { height: 1px; background: #ece4d8; margin: 1.5rem 0; }
+    .note { font-size: 0.78rem; color: #8a7560; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M20 6L9 17l-5-5" stroke="#3b6d11" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>Prenotazione confermata</h1>
+    <p>Il tuo pagamento è andato a buon fine.<br>Ti aspettiamo all'Eremo di San Giusto.</p>
+    <div class="ref" id="booking-ref">—</div>
+    <div class="divider"></div>
+    <p class="note">Riceverai una email di conferma con tutti i dettagli e le indicazioni per raggiungerci. Se non la vedi, controlla la cartella spam.</p>
+    <a href="/widget.html" class="btn">Torna alla home Sofia</a>
+  </div>
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get('ref');
+    if (ref) document.getElementById('booking-ref').textContent = ref;
+  </script>
+</body>
+</html>
