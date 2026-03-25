@@ -6,10 +6,10 @@
 //   - Slots:         Slot id, Esperienza, Data, Orario,
 //                    Posti totali, Posti prenotati, Posti disponibili (formula),
 //                    Stato, Note interne
-//   - Prenotazioni:  Booking ref, Slot ID, Esperienza, Data, Orario,
+//   - Prenotazioni:  Booking ref, Slot id, Esperienza, Data, Orario,
 //                    Nome, Cognome, Email, Telefono, Partecipanti,
-//                    Tipo prezzo, Totale €, Stato prenotazione,
-//                    Note ospite, Creata il
+//                    Prezzo, Totale €, Stato prenotazione,
+//                    Note Ospiti, Creata il
 //
 // Env vars richieste:
 //   AIRTABLE_BASE_ID  = apps5JGXCcVxRw4EH
@@ -217,18 +217,19 @@ export default async function handler(req, res) {
           records: [{
             fields: {
               'Booking ref':        bookingRef,
+              'Slot id':            slot.id,
               'Esperienza':         esperienza,
               'Data':               data,
               'Orario':             orario,
               'Nome':               firstName,
               'Cognome':            lastName,
               'Email':              email,
-              'Telefono':           phone     || '',
+              'Telefono':           phone    || '',
               'Partecipanti':       numPax,
-              'Tipo prezzo':        tipo,
+              'Prezzo':             tipo,
               'Totale €':           totale,
               'Stato prenotazione': 'In attesa',
-              'Note ospite':        noteOspite || '',
+              'Note Ospiti':        noteOspite || '',
             },
           }],
         },
