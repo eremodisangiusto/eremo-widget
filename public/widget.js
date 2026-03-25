@@ -642,16 +642,45 @@ function esjInit() {
   }
 
   // ── PROXY CALL ────────────────────────────────────────────────
+  // Pulisce la history da tool_use senza tool_result corrispondente
+  function sanitizeHistory(msgs) {
+    var clean = [];
+    for (var i = 0; i < msgs.length; i++) {
+      var msg = msgs[i];
+      if (msg.role === "assistant" && Array.isArray(msg.content)) {
+        var hasToolUse = msg.content.some(function(b) { return b.type === "tool_use"; });
+        if (hasToolUse) {
+          // Verifica che il messaggio successivo sia un tool_result
+          var next = msgs[i + 1];
+          var hasToolResult = next && next.role === "user" && Array.isArray(next.content) &&
+            next.content.some(function(b) { return b.type === "tool_result"; });
+          if (!hasToolResult) {
+            // Salta questo messaggio e il successivo (se esiste)
+            i++; continue;
+          }
+        }
+      }
+      clean.push(msg);
+    }
+    return clean;
+  }
+
   async function callProxy(msgArr, ctx) {
     var today = new Date().toISOString().split("T")[0];
     var lang  = ESJ_LANG === "en" ? "\n\nIMPORTANT: Reply in English." : "";
     var sys   = ESJ_SYSTEM_BASE + lang + ctx + "\n\nOGGI E' IL " + today + ". Non usare mai date passate.";
-    var body  = { model: "claude-sonnet-4-20250514", max_tokens: 1024, system: sys, tools: ESJ_TOOLS, messages: msgArr };
+    var cleanMsgs = sanitizeHistory(msgArr);
+    var body  = { model: "claude-sonnet-4-20250514", max_tokens: 1024, system: sys, tools: ESJ_TOOLS, messages: cleanMsgs };
 
     var resp = await fetch(ESJ_PROXY + "/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     var data = await resp.json();
 
     while (data.stop_reason === "tool_use") {
+      // Guard: se data.content non esiste o non ha tool_use blocks, esci
+      if (!data.content || !Array.isArray(data.content)) break;
+      var toolUseBlocks = data.content.filter(function(x) { return x.type === "tool_use"; });
+      if (toolUseBlocks.length === 0) break;
+
       msgArr.push({ role: "assistant", content: data.content });
       var results = [];
       for (var i = 0; i < data.content.length; i++) {
@@ -663,14 +692,13 @@ function esjInit() {
             res = await (await fetch(ESJ_PROXY + "/api/availability", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
           } else if (b.name === "create_room_booking") {
             res = await (await fetch(ESJ_PROXY + "/api/booking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
-            // Attiva Stripe dopo prenotazione camera riuscita
             if (res && res.bookingId && msgArr === ESJ_MSG_C) {
               var notti = Math.round((new Date(b.input.checkout) - new Date(b.input.checkin)) / 86400000);
-              var prezzoStimato = res.totalPrice || (notti * 200); // fallback stima
+              var prezzoStimato = res.totalPrice || (notti * 200);
               esjStripeRedirect({
                 type: "camera", tariffa: res.rateType || "standard",
                 bookingRef: res.bookingId,
-                descrizione: "Camera " + b.input.checkin + " → " + b.input.checkout + " · " + notti + (ESJ_LANG==="it"?" notti":" nights"),
+                descrizione: "Camera " + b.input.checkin + " \u2192 " + b.input.checkout + " \u00b7 " + notti + (ESJ_LANG==="it"?" notti":" nights"),
                 importo: prezzoStimato,
                 firstName: b.input.firstName, lastName: b.input.lastName, email: b.input.email,
                 msgsEl: msgsC, typEl: typC
@@ -682,26 +710,32 @@ function esjInit() {
             res = await (await fetch(ESJ_PROXY + "/api/airtable", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "check_availability", ...b.input }) })).json();
           } else if (b.name === "create_experience_booking") {
             res = await (await fetch(ESJ_PROXY + "/api/airtable", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "create_booking", ...b.input }) })).json();
-            // Attiva Stripe dopo prenotazione esperienza riuscita
             if (res && res.success && res.bookingRef) {
               var msgsTarget = msgArr === ESJ_MSG_E ? msgsE : msgsP;
               var typTarget  = msgArr === ESJ_MSG_E ? typE  : typP;
               esjStripeRedirect({
                 type: "esperienza",
                 bookingRef: res.bookingRef,
-                descrizione: (b.input.esperienza || "") + " · " + (b.input.data || "") + " · " + (b.input.partecipanti || 1) + (ESJ_LANG==="it"?" persone":" guests"),
-                importo: res.totale || b.input.importo || 0,
+                descrizione: (b.input.esperienza || "") + " \u00b7 " + (b.input.data || "") + " \u00b7 " + (b.input.partecipanti || 1) + (ESJ_LANG==="it"?" persone":" guests"),
+                importo: res.totale || 0,
                 firstName: b.input.firstName, lastName: b.input.lastName, email: b.input.email,
                 msgsEl: msgsTarget, typEl: typTarget
               });
             }
           }
         } catch(e) { res = { error: e.message }; }
-        results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res || { error: "no response" }) });
+        results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res) });
+      }
+      // Verifica che tutti i tool_use abbiano un tool_result prima di mandare
+      if (results.length !== toolUseBlocks.length) {
+        console.error("tool_use/tool_result mismatch:", toolUseBlocks.length, "vs", results.length);
+        break;
       }
       msgArr.push({ role: "user", content: results });
       var b2 = { model: "claude-sonnet-4-20250514", max_tokens: 1024, system: sys, tools: ESJ_TOOLS, messages: msgArr };
       data = await (await fetch(ESJ_PROXY + "/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b2) })).json();
+      // Guard sull'errore API nella risposta successiva
+      if (data.type === "error" || !data.content) break;
     }
 
     var txt = "";
