@@ -117,7 +117,7 @@ export default async function handler(req, res) {
       }
 
       const formula = encodeURIComponent(
-        `AND({Esperienza}="${esperienza}",IS_SAME({Data},"${data}","day"),{Stato}="Aperto",{Posti disponibili}>0)`
+        `AND({Esperienza}="${esperienza}",DATESTR({Data})="${data}",{Stato}="Aperto",{Posti disponibili}>0)`
       );
       const result = await atFetch('GET', TABLE_SLOTS, {
         query: `filterByFormula=${formula}&sort[0][field]=Orario&sort[0][direction]=asc`,
@@ -130,13 +130,17 @@ export default async function handler(req, res) {
         const dataObj  = new Date(data);
         const dataFine = new Date(dataObj);
         dataFine.setDate(dataFine.getDate() + 28);
+        const dataFineStr = dataFine.toISOString().split('T')[0];
         const fAlt = encodeURIComponent(
-          `AND({Esperienza}="${esperienza}",IS_AFTER({Data},"${data}"),IS_BEFORE({Data},"${dataFine.toISOString().split('T')[0]}"),{Stato}="Aperto",{Posti disponibili}>0)`
+          `AND({Esperienza}="${esperienza}",DATESTR({Data})>"${data}",DATESTR({Data})<"${dataFineStr}",{Stato}="Aperto",{Posti disponibili}>0)`
         );
         const altResult = await atFetch('GET', TABLE_SLOTS, {
           query: `filterByFormula=${fAlt}&sort[0][field]=Data&sort[0][direction]=asc&maxRecords=3`,
         });
-        const altDates = [...new Set((altResult.records || []).map(r => r.fields['Data']))];
+        const altDates = [...new Set((altResult.records || []).map(r => {
+          const d = r.fields['Data'];
+          return d ? new Date(d).toISOString().split('T')[0] : null;
+        }).filter(Boolean))];
 
         return res.status(200).json({
           available:    false,
@@ -178,7 +182,7 @@ export default async function handler(req, res) {
 
       // 1. Trova lo slot
       const formula = encodeURIComponent(
-        `AND({Esperienza}="${esperienza}",IS_SAME({Data},"${data}","day"),{Orario}="${orario}",{Stato}="Aperto")`
+        `AND({Esperienza}="${esperienza}",DATESTR({Data})="${data}",{Orario}="${orario}",{Stato}="Aperto")`
       );
       const slotResult = await atFetch('GET', TABLE_SLOTS, { query: `filterByFormula=${formula}` });
       const slot = slotResult.records?.[0];
@@ -312,7 +316,7 @@ export default async function handler(req, res) {
       const dataFine   = dataFineObj.toISOString().split('T')[0];
 
       const formula = encodeURIComponent(
-        `AND({Esperienza}="${esperienza}",IS_AFTER({Data},"${dataDa}"),IS_BEFORE({Data},"${dataFine}"),{Stato}="Aperto",{Posti disponibili}>=${numPax})`
+        `AND({Esperienza}="${esperienza}",DATESTR({Data})>"${dataDa}",DATESTR({Data})<"${dataFine}",{Stato}="Aperto",{Posti disponibili}>=${numPax})`
       );
       const result = await atFetch('GET', TABLE_SLOTS, {
         query: `filterByFormula=${formula}&sort[0][field]=Data&sort[0][direction]=asc&sort[1][field]=Orario&sort[1][direction]=asc`,
@@ -328,11 +332,13 @@ export default async function handler(req, res) {
         });
       }
 
-      // Raggruppa per data — max 5 date distinte
+      // Raggruppa per data normalizzata — max 5 date distinte
       const dateMap = {};
       for (const r of records) {
-        const d = r.fields['Data'];
-        if (!d) continue;
+        const rawD = r.fields['Data'];
+        if (!rawD) continue;
+        // Airtable può restituire la data come "2026-04-05" o come timestamp
+        const d = rawD.includes('T') ? rawD.split('T')[0] : rawD.substring(0, 10);
         if (!dateMap[d]) {
           if (Object.keys(dateMap).length >= 5) break;
           dateMap[d] = [];
