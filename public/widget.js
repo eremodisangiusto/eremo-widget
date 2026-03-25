@@ -658,30 +658,42 @@ function esjInit() {
     inpE.value = ""; inpE.style.height = "auto";
     msgsE.scrollTop = msgsE.scrollHeight;
 
-    // Detect if user is asking about a specific experience → show card first
+    // Rileva esperienza specifica nel messaggio
     var detectedId = esjDetectExperience(text);
-    var isInfoRequest = /\b(cos[aè]|info|dettagli|descri|spiega|mostr|dimmi|tell|show|what|about|detail|info)\b/i.test(text);
 
-    if (detectedId && isInfoRequest) {
-      // Show the rich card immediately, then let Sofia add context
+    // Mostra card se: viene rilevata un'esperienza E l'utente non sta
+    // già fornendo dati di prenotazione (date, email, nome ecc.)
+    var isBookingData = /\b(\d{1,2}[\/\-]\d{1,2}|\d{4}\-\d{2}|@|luglio|agosto|settembre|ottobre|novembre|dicembre|gennaio|febbraio|marzo|aprile|maggio|giugno|july|august|september|prenoto|book now)\b/i.test(text);
+    var showCard = detectedId && !isBookingData;
+
+    if (showCard) {
+      // 1. Mostra subito la scheda prodotto visuale
       var cardHtml = esjRenderCard(detectedId);
       if (cardHtml) esjShowCard(cardHtml);
-      // Short Sofia follow-up (no full card re-description)
+      // 2. Sofia aggiunge solo un commento caldo breve (non ripete i dettagli)
       ESJ_MSG_E.push({ role: "user", content: text });
       typE.classList.add("on"); msgsE.scrollTop = msgsE.scrollHeight;
       try {
-        var ctx = "\n\nCONTESTO: flusso ESPERIENZE custom (no Bokun). Ho appena mostrato la scheda prodotto visuale per '"+detectedId+"'. Aggiungi solo un breve commento caldo (2-3 righe) senza ripetere i dettagli della scheda, e chiedi se vuole prenotare o ha domande.";
+        var ctx = "\n\nCONTESTO: flusso ESPERIENZE custom. Ho appena mostrato all'utente la scheda prodotto VISUALE completa per '"
+          + detectedId
+          + "' con tutti i dettagli (prezzi, inclusi, esclusi, policy). "
+          + "Scrivi SOLO 1-2 frasi calde di presentazione senza ripetere nulla di quello che c'è nella scheda. "
+          + "Poi chiedi solo: vuole prenotare, o ha domande?";
         var r = await callProxy(ESJ_MSG_E, ctx);
         addMsg(msgsE, typE, "assistant", r);
       } catch(e) {
         typE.classList.remove("on");
       }
     } else {
-      // Normal flow: Sofia risponde in testo
+      // Flusso normale: Sofia gestisce in conversazione
       typE.classList.add("on"); msgsE.scrollTop = msgsE.scrollHeight;
       ESJ_MSG_E.push({ role: "user", content: text });
       try {
-        var ctx2 = "\n\nCONTESTO: flusso ESPERIENZE custom (no Bokun). Sistema di prenotazione proprietario: disponibilita e prenotazioni gestite internamente. Per raccogliere una prenotazione chiedi: esperienza scelta, data, numero partecipanti, nome, cognome, email, telefono. Poi invia richiesta di conferma.";
+        var ctx2 = "\n\nCONTESTO: flusso ESPERIENZE custom (no Bokun, no Bókun ID). "
+          + "Sistema prenotazione interno. "
+          + "Se l'utente menziona un'esperienza senza ancora averla vista, descrivila brevemente e proponi di mostrargli la scheda. "
+          + "Se sta prenotando, raccogli: esperienza, data, partecipanti, nome, cognome, email, telefono. "
+          + "Non inventare disponibilità — rispondi che verificherai e confermerai via email.";
         var r2 = await callProxy(ESJ_MSG_E, ctx2);
         addMsg(msgsE, typE, "assistant", r2);
       } catch(e) {
@@ -782,8 +794,8 @@ function esjInit() {
       : [
           { it: "Liquid Gold \u2014 olio EVO", en: "Liquid Gold \u2014 olive oil" },
           { it: "Stargazing",                  en: "Stargazing"                  },
-          { it: "Pacchetti weekend",           en: "Weekend packages"            },
-          { it: "Tutte le esperienze",         en: "All experiences"             }
+          { it: "Sunset Serenade",             en: "Sunset Serenade"             },
+          { it: "Tutti i pacchetti weekend",   en: "All weekend packages"        }
         ];
     btns.forEach(function(b) {
       var btn = document.createElement("button");
