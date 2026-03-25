@@ -70,39 +70,22 @@ async function esjStripeRedirect(opts) {
   msgsEl.insertBefore(d, typEl);
   msgsEl.scrollTop = msgsEl.scrollHeight;
 
-  // Click: paga ora
+  // Click: paga ora — redirect a /checkout su Vercel (stesso dominio, zero CORS)
   setTimeout(function() {
     var payBtn = document.getElementById("esj-pay-btn");
     if (payBtn) {
-      payBtn.addEventListener("click", async function() {
-        payBtn.disabled = true;
-        payBtn.textContent = it ? "Reindirizzamento…" : "Redirecting…";
-        try {
-          var stripeResp = await fetch(ESJ_PROXY + "/api/stripe", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              type:        opts.type,
-              tariffa:     opts.tariffa || "standard",
-              payNow:      true,
-              bookingRef:  opts.bookingRef,
-              descrizione: opts.descrizione,
-              importo:     opts.importo,
-              firstName:   opts.firstName,
-              lastName:    opts.lastName,
-              email:       opts.email,
-            })
-          }).then(function(r) { return r.json(); });
-          if (stripeResp.url) {
-            window.location.href = stripeResp.url;
-          } else {
-            payBtn.disabled = false;
-            payBtn.textContent = it ? "Errore — riprova" : "Error — try again";
-          }
-        } catch(e) {
-          payBtn.disabled = false;
-          payBtn.textContent = it ? "Errore — riprova" : "Error — try again";
-        }
+      payBtn.addEventListener("click", function() {
+        var params = new URLSearchParams({
+          type:      opts.type        || "esperienza",
+          tariffa:   opts.tariffa     || "standard",
+          ref:       opts.bookingRef  || "",
+          desc:      encodeURIComponent(opts.descrizione || ""),
+          importo:   String(opts.importo || 0),
+          firstName: opts.firstName   || "",
+          lastName:  opts.lastName    || "",
+          email:     opts.email       || "",
+        });
+        window.location.href = ESJ_PROXY + "/checkout?" + params.toString();
       });
     }
     var laterBtn = document.getElementById("esj-pay-later-btn");
@@ -674,7 +657,7 @@ function esjInit() {
       for (var i = 0; i < data.content.length; i++) {
         var b = data.content[i];
         if (b.type !== "tool_use") continue;
-        var res;
+        var res = { error: "Tool non riconosciuto: " + b.name };
         try {
           if (b.name === "check_availability") {
             res = await (await fetch(ESJ_PROXY + "/api/availability", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
@@ -714,7 +697,7 @@ function esjInit() {
             }
           }
         } catch(e) { res = { error: e.message }; }
-        results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res) });
+        results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res || { error: "no response" }) });
       }
       msgArr.push({ role: "user", content: results });
       var b2 = { model: "claude-sonnet-4-20250514", max_tokens: 1024, system: sys, tools: ESJ_TOOLS, messages: msgArr };
@@ -998,15 +981,31 @@ function esjInit() {
         for (var i = 0; i < data.content.length; i++) {
           var b = data.content[i];
           if (b.type !== "tool_use") continue;
-          var res;
+          var res = { error: "Tool non supportato in questo contesto: " + b.name };
           try {
             if (b.name === "check_availability") {
               res = await (await fetch(ESJ_PROXY + "/api/availability", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
             } else if (b.name === "create_room_booking") {
               res = await (await fetch(ESJ_PROXY + "/api/booking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
+              // Attiva Stripe dopo prenotazione camera nel pacchetto
+              if (res && res.bookingId) {
+                var notti = Math.round((new Date(b.input.checkout) - new Date(b.input.checkin)) / 86400000);
+                esjStripeRedirect({
+                  type: "camera", tariffa: "standard",
+                  bookingRef: res.bookingId,
+                  descrizione: "Camera " + b.input.checkin + " \u2192 " + b.input.checkout + " \u00b7 " + notti + (ESJ_LANG === "it" ? " notti" : " nights"),
+                  importo: res.totalPrice || (notti * 200),
+                  firstName: b.input.firstName, lastName: b.input.lastName, email: b.input.email,
+                  msgsEl: msgsP, typEl: typP
+                });
+              }
+            } else if (b.name === "check_experience_availability") {
+              res = await (await fetch(ESJ_PROXY + "/api/airtable", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "check_availability", ...b.input }) })).json();
+            } else if (b.name === "get_next_available_dates") {
+              res = await (await fetch(ESJ_PROXY + "/api/airtable", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "get_next_dates", ...b.input }) })).json();
             }
           } catch(e) { res = { error: e.message }; }
-          results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res) });
+          results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res || { error: "no response" }) });
         }
         ESJ_MSG_P.push({ role: "user", content: results });
         data = await fetch(ESJ_PROXY + "/api/chat", {
