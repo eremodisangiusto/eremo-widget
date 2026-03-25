@@ -201,6 +201,25 @@ var ESJ_EXPERIENCES = [
     notes:"Opera in tutte le condizioni meteo tranne temporali. Bambini area Junior: sempre accompagnati da un genitore. Scarpe inadeguate: accesso negato.",
     notesEn:"Operates in all weather except thunderstorms. Junior area children must always be accompanied by a parent. Inadequate footwear: access denied.",
     policy:[{label:"Cancellazione gratuita",labelEn:"Free cancellation",val:"fino a 48h prima",valEn:"up to 48h before",color:"green"},{label:"Rimborso 50%",labelEn:"50% refund",val:"tra 24h e 48h",valEn:"between 24–48h",color:"amber"},{label:"Nessun rimborso",labelEn:"No refund",val:"entro 24h",valEn:"within 24h",color:"red"},{label:"Chiusura per meteo",labelEn:"Weather closure",val:"Reschedule gratuito",valEn:"Free reschedule",color:"green"}]
+  },
+  { id:"carriages", name:"Carriages & Countryside", nameEn:"Carriages & Countryside",
+    sub:"Museo carrozze d'epoca · Parco agricolo · Chiesa rupestre · Masseria Carestia", subEn:"Vintage carriage museum · Agricultural park · Frescoed rock church · Masseria Carestia",
+    duration:"2.5–3 ore", durationEn:"2.5–3 hours", difficulty:"Facile", difficultyEn:"Easy",
+    season:"Mar – Dom", seasonEn:"Tue – Sun",
+    maxGuests:15, startTimes:["10:00","17:00"],
+    advanceBooking:"48h", type:"Cultura & Storia", typeEn:"Culture & History", priceFrom:35,
+    prices:[{label:"Standard (2–15 pp)",labelEn:"Standard (2–15 guests)",val:"€35/pp"},{label:"Gruppo privato",labelEn:"Private group",val:"€35/pp"},{label:"Bambini <12",labelEn:"Children under 12",val:"€10"}],
+    desc:"A pochi chilometri dall'Eremo di San Giusto, nascosto tra gli uliveti e i muretti a secco della campagna di Ostuni, si trova uno dei musei più insoliti e straordinari di tutta la Puglia: il Museo delle Carrozze d'Epoca alla Masseria Carestia. Oltre trenta carrozze a trazione equina meticolosamente restaurate — landò, brougham, phaeton, vittorie e carri agricoli — raccontano come la società del Sud Italia si muovesse e celebrasse nel corso di due secoli. Ma le carrozze sono solo l'inizio: il percorso continua nel parco agricolo della masseria, tra ulivi millenari e muretti in pietra a secco, fino alla sorpresa che nessuno si aspetta — una chiesa rupestre scavata nella roccia calcarea con affreschi medievali di rara bellezza.",
+    descEn:"A few kilometres from the Eremo di San Giusto, hidden among the olive groves and dry-stone walls of the Ostuni countryside, lies one of the most unusual and quietly astonishing museums in all of Puglia: the Museo delle Carrozze d'Epoca at Masseria Carestia. Over thirty horse-drawn carriages — landaus, broughams, phaetons, victorias and working farm carts — meticulously restored, tell the story of how southern Italian society moved and celebrated across two centuries. But the carriages are only the beginning: the visit continues through the masseria's agricultural park before reaching the unexpected highlight — a rupestrian church carved into the limestone rock face, decorated with rare medieval frescoes.",
+    included:["Biglietto d'ingresso al Museo delle Carrozze d'Epoca","Accompagnamento del tuo host dell'Eremo per tutta la visita","Materiali stampati su carrozze, masseria e chiesa rupestre","Rinfreschi — acqua, bibite e bevande stagionali alla masseria"],
+    includedEn:["Museum entrance ticket to the Museo delle Carrozze d'Epoca","Accompaniment throughout by your host from Eremo di San Giusto","Printed materials on the carriages, the masseria and the rock church","Refreshments — water, soft drinks and seasonal beverages at the masseria"],
+    excluded:["Trasporto a Masseria Carestia — ~10 min in auto da Ostuni","Pasti aggiuntivi","Assicurazione viaggio personale"],
+    excludedEn:["Transport to Masseria Carestia — approx. 10 min by car from Ostuni","Additional meals","Personal travel insurance"],
+    bring:["Scarpe comode chiuse (parte del percorso è all'aperto e su terreno irregolare)","Macchina fotografica — la fotografia è benvenuta in tutta la visita","Strati leggeri se la visita serale"],
+    bringEn:["Comfortable closed shoes (part of the visit is outdoors on uneven ground)","Camera — photography is welcome throughout","Light layers for the evening visit"],
+    notes:"Il museo è aperto martedì–domenica. La chiesa rupestre è su terreno irregolare — non accessibile a sedie a rotelle. Prenotazione obbligatoria 48h prima per coordinamento con la masseria. Per info: www.carrozzedepoca.it",
+    notesEn:"Museum open Tuesday–Sunday. The rupestrian church involves uneven ground — not wheelchair accessible. Booking required 48h in advance to coordinate with the estate. More info: www.carrozzedepoca.it",
+    policy:[{label:"Cancellazione gratuita",labelEn:"Free cancellation",val:"fino a 48h prima",valEn:"up to 48h before",color:"green"},{label:"Rimborso 50%",labelEn:"50% refund",val:"tra 24h e 48h",valEn:"between 24–48h",color:"amber"},{label:"Nessun rimborso",labelEn:"No refund",val:"entro 24h",valEn:"within 24h",color:"red"},{label:"Masseria chiusa",labelEn:"Masseria unexpectedly closed",val:"Rimborso completo",valEn:"Full refund",color:"green"}]
   }
 ];
 
@@ -256,6 +275,7 @@ function esjInit() {
     + ".esj-greeting{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--esj-txt);line-height:1.7;padding:1rem 1.1rem;background:#fff;border:1px solid var(--esj-bg3);border-radius:14px}"
     // Card grid
     + ".esj-home-cards{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem}"
+    + ".esj-home-cards-full{grid-column:1/-1}"
     + ".esj-main-card{background:#fff;border:1.5px solid var(--esj-bg3);border-radius:14px;padding:1.1rem;cursor:pointer;transition:border-color 0.2s,background 0.2s;text-align:left;width:100%;box-sizing:border-box}"
     + ".esj-main-card:hover{border-color:var(--esj-gold);background:#fffbf5}"
     + ".esj-card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:0.7rem}"
@@ -361,7 +381,29 @@ function esjInit() {
     + ".esj-exp-book{width:100%;padding:10px;background:linear-gradient(135deg,#c8a97e,#9a6e38);border:none;border-radius:9px;color:#fff;font-family:'Jost',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;transition:opacity 0.2s}"
     + ".esj-exp-book:hover{opacity:0.9}"
     + ".esj-exp-ask{width:100%;padding:7px;background:transparent;border:1px solid #e0d5c5;border-radius:9px;color:#8a6030;font-family:'Jost',sans-serif;font-size:0.74rem;cursor:pointer;transition:all 0.2s}"
-    + ".esj-exp-ask:hover{border-color:#c8a97e;background:#faf7f2}";
+    + ".esj-exp-ask:hover{border-color:#c8a97e;background:#faf7f2}"
+    // ── GUIDA VIEW ──
+    + "#esj-guida{display:none;flex:1;flex-direction:column;min-height:0;background:var(--esj-bg)}"
+    + ".esj-guida-body{flex:1;overflow-y:auto;padding:0.9rem 1rem}"
+    + ".esj-guida-body::-webkit-scrollbar{width:3px}"
+    + ".esj-guida-body::-webkit-scrollbar-thumb{background:var(--esj-bg3);border-radius:2px}"
+    + ".esj-guida-tabs{display:flex;gap:4px;padding:0.6rem 1rem;border-bottom:1px solid var(--esj-bg3);background:var(--esj-bg2);overflow-x:auto;flex-shrink:0}"
+    + ".esj-guida-tabs::-webkit-scrollbar{display:none}"
+    + ".esj-gtab{font-family:'Jost',sans-serif;font-size:0.68rem;padding:5px 11px;border-radius:20px;border:1.5px solid var(--esj-bg3);background:#fff;color:var(--esj-txt2);cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0}"
+    + ".esj-gtab.active{background:var(--esj-gold2);border-color:var(--esj-gold2);color:#fff}"
+    + ".esj-gsec{display:none}"
+    + ".esj-gsec.active{display:block}"
+    + ".esj-gsec-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--esj-txt);font-weight:600;margin:0.8rem 0 0.5rem;padding-bottom:0.3rem;border-bottom:1px solid var(--esj-bg3)}"
+    + ".esj-gsec-sub{font-size:0.7rem;font-weight:500;color:var(--esj-gold2);text-transform:uppercase;letter-spacing:0.08em;margin:0.7rem 0 0.3rem}"
+    + ".esj-gitem{padding:0.65rem 0.8rem;background:#fff;border-radius:10px;border:1px solid var(--esj-bg3);margin-bottom:0.5rem}"
+    + ".esj-gitem-name{font-size:0.8rem;font-weight:500;color:var(--esj-txt);margin-bottom:2px}"
+    + ".esj-gitem-desc{font-size:0.72rem;color:var(--esj-txt2);line-height:1.55}"
+    + ".esj-gitem-badge{display:inline-block;font-size:0.62rem;padding:1px 7px;border-radius:10px;background:var(--esj-bg2);color:var(--esj-gold2);margin-top:4px;font-weight:500}"
+    + ".esj-gdist{display:grid;grid-template-columns:1fr auto auto;gap:4px 10px;font-size:0.72rem;padding:0.5rem 0;border-bottom:1px solid var(--esj-bg3);align-items:center}"
+    + ".esj-gdist:last-child{border-bottom:none}"
+    + ".esj-gdist-name{color:var(--esj-txt);font-weight:500}"
+    + ".esj-gdist-km{color:var(--esj-gold2);font-weight:500;text-align:right}"
+    + ".esj-gdist-time{color:var(--esj-txt3);text-align:right}";
 
   var style = document.createElement("style");
   style.textContent = css;
@@ -418,15 +460,27 @@ function esjInit() {
     +       '</div>'
     +       '<div class="esj-card-title" id="esj-ct1">Prenota una camera</div>'
     +       '<div class="esj-card-sub" id="esj-cs1">Trullo &middot; Lamia &middot; disponibilit&agrave; live</div>'
-    +       '<span class="esj-card-badge" style="background:rgba(24,95,165,0.15);color:#85B7EB;">via Beds24</span>'
+    +       '<span class="esj-card-badge" style="background:rgba(24,95,165,0.15);color:#185FA5;">via Beds24</span>'
     +     '</button>'
     +     '<button class="esj-main-card" onclick="esjGoView(\'esperienze\')">'
     +       '<div class="esj-card-icon" style="background:rgba(29,158,117,0.15)">'
-    +         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" stroke="#5DCAA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    +         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
     +       '</div>'
     +       '<div class="esj-card-title" id="esj-ct2">Esperienze</div>'
-    +       '<div class="esj-card-sub" id="esj-cs2">7 esperienze &middot; pacchetti weekend</div>'
-    +       '<span class="esj-card-badge" style="background:rgba(29,158,117,0.15);color:#5DCAA5;">via B&oacute;kun</span>'
+    +       '<div class="esj-card-sub" id="esj-cs2">8 esperienze &middot; pacchetti weekend</div>'
+    +       '<span class="esj-card-badge" style="background:rgba(29,158,117,0.15);color:#0F6E56;" id="esj-cs2b">8 esperienze</span>'
+    +     '</button>'
+    +     '<button class="esj-main-card esj-home-cards-full" onclick="esjGoView(\'guida\')">'
+    +       '<div style="display:flex;align-items:center;gap:0.8rem">'
+    +         '<div class="esj-card-icon" style="background:rgba(186,117,23,0.12);width:34px;height:34px;flex-shrink:0">'
+    +           '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#BA7517" opacity="0.8"/></svg>'
+    +         '</div>'
+    +         '<div style="flex:1">'
+    +           '<div class="esj-card-title" id="esj-ct3">Ostuni &amp; Dintorni</div>'
+    +           '<div class="esj-card-sub" id="esj-cs3">Spiagge &middot; Borghi &middot; Gastronomia &middot; Distanze</div>'
+    +         '</div>'
+    +         '<span class="esj-card-badge" style="background:rgba(186,117,23,0.12);color:#854F0B;" id="esj-cs3b">Guida ospiti</span>'
+    +       '</div>'
     +     '</button>'
     +   '</div>'
     +   '<div class="esj-home-quick" id="esj-home-quick"></div>'
@@ -442,6 +496,14 @@ function esjInit() {
 
     // ESPERIENZE CHAT
     + chatView("esj-esperienze","esj-back-e","esj-lbl-e","esj-msgs-e","esj-typing-e","esj-qr-e","esj-inp-e","esj-mic-e","esj-snd-e")
+
+    // GUIDA VIEW
+    + '<div id="esj-guida" style="display:none;flex-direction:column;">'
+    +   '<button class="esj-back-bar" onclick="esjGoView(\'home\')">' + backSvg + '<span id="esj-back-g"></span></button>'
+    +   '<div class="esj-view-label" id="esj-lbl-g"></div>'
+    +   '<div class="esj-guida-tabs" id="esj-guida-tabs"></div>'
+    +   '<div class="esj-guida-body" id="esj-guida-body"></div>'
+    + '</div>'
 
     + '<div class="esj-brand">Powered by Claude AI</div>';
 
@@ -781,6 +843,7 @@ function esjInit() {
     document.getElementById("esj-home").style.display       = "none";
     document.getElementById("esj-camere").style.display     = "none";
     document.getElementById("esj-esperienze").style.display = "none";
+    document.getElementById("esj-guida").style.display      = "none";
 
     if (view === "home") {
       document.getElementById("esj-home").style.display = "flex";
@@ -804,9 +867,124 @@ function esjInit() {
             .then(function(r) { addMsg(msgsE, typE, "assistant", r); renderQR(qrE, "esperienze"); });
         }, 300);
       }
+    } else if (view === "guida") {
+      document.getElementById("esj-guida").style.display = "flex";
+      renderGuida();
     }
     updateLabels();
   };
+
+  // ── GUIDA DATA ────────────────────────────────────────────────
+  var ESJ_GUIDA = {
+    tabs: [
+      { id:"ostuni",   it:"Ostuni",        en:"Ostuni" },
+      { id:"spiagge",  it:"Spiagge",       en:"Beaches" },
+      { id:"borghi",   it:"Borghi",        en:"Villages" },
+      { id:"cucina",   it:"Cucina",        en:"Food" },
+      { id:"distanze", it:"Distanze",      en:"Distances" }
+    ],
+    ostuni: {
+      title: { it:"Ostuni — La Città Bianca", en:"Ostuni — The White City" },
+      items: [
+        { name:"Piazza della Libertà", it:"Il salotto di Ostuni con la Colonna di Sant'Oronzo (1771) e i migliori bar panoramici.", en:"Ostuni's main square with the Column of Sant'Oronzo (1771) and the best panoramic bars.", badge:"Centro storico" },
+        { name:"Cattedrale di Santa Maria Assunta", it:"Capolavoro gotico pugliese (1435–1495) con rosone a 24 raggi, unico nel Salento.", en:"Masterpiece of Puglian Gothic (1435–1495) with a 24-ray rose window, unique in the Salento.", badge:"Arte & Architettura" },
+        { name:"Mura Aragonesi", it:"XV sec. Offrono una passeggiata panoramica sulla Valle d'Itria. Nelle giornate limpide si vedono le Isole Tremiti.", en:"15th century. Panoramic walk over the Itria Valley. On clear days the Tremiti Islands are visible.", badge:"Panorama" },
+        { name:"Museo Civiltà Preclassiche", it:"Via Cattedrale. Ospita la 'Delia' (Venere di Ostuni), scheletro di donna gravida di 25.000 anni fa. Chiuso il lunedì.", en:"Via Cattedrale. Houses the 'Delia' (Venus of Ostuni), a 25,000-year-old skeleton of a pregnant woman. Closed Mondays.", badge:"Museo" },
+        { name:"Parcheggi consigliati", it:"P. Via Pola (gratuito, 500m dal centro) · P. Ex Mattatoio (gratuito, evita ZTL) · P. Stazione FS (gratuito, navetta estiva). In luglio-agosto arrivare prima delle 9:30 o dopo le 19:00.", en:"P. Via Pola (free, 500m from centre) · P. Ex Mattatoio (free, avoids ZTL) · P. Railway Station (free, summer shuttle). In July–August arrive before 9:30 am or after 7 pm.", badge:"Pratico" }
+      ]
+    },
+    spiagge: {
+      title: { it:"Le Spiagge di Ostuni", en:"The Beaches of Ostuni" },
+      items: [
+        { name:"Torre Guaceto — Riserva Naturale", it:"La più bella. Costa quasi incontaminata, riserva statale, torre aragonese del '500. Accesso gratuito a piedi. Ideale per snorkeling. ~13 km.", en:"The finest. Near-pristine coastline, state nature reserve, 16th-century Aragonese tower. Free access on foot. Ideal for snorkelling. ~13 km.", badge:"Natura protetta" },
+        { name:"Rosa Marina", it:"Spiaggia bianchissima con stabilimenti di qualità, villaggio residenziale elegante. ~15 km.", en:"Whitest sand with quality beach clubs, elegant residential village. ~15 km.", badge:"Attrezzata" },
+        { name:"Villanova", it:"Piccolo porto peschereccio ancora attivo, spiaggia mista, ottimi ristoranti di pesce sul porto.", en:"Small still-active fishing harbour, mixed beach, excellent seafood restaurants on the harbour.", badge:"Autentica" },
+        { name:"Costa Merlata", it:"Sabbia fine, acque basse, adatta alle famiglie. Grande parcheggio. Vicino al villaggio turistico.", en:"Fine sand, shallow waters, family-friendly. Large car park. Near the resort village.", badge:"Famiglie" },
+        { name:"Consiglio pratico", it:"Evitare 12–16 in luglio-agosto (>35°C). La costa si raggiunge in auto o navetta dal centro (giugno–settembre).", en:"Avoid 12–4pm in July–August (>35°C). Reachable by car or shuttle from the centre (June–September).", badge:"Suggerimento" }
+      ]
+    },
+    borghi: {
+      title: { it:"Borghi della Valle d'Itria", en:"Villages of the Itria Valley" },
+      items: [
+        { name:"Cisternino · 15 km, ~20 min", it:"Il più autentico della Valle d'Itria. Vicoli bianchi, Torre Normanno-Sveva, Cattedrale di San Nicola. Famoso per le bombette ai fornelli pronti. Parcheggio gratuito.", en:"The most authentic in the Itria Valley. White alleys, Norman-Swabian Tower, Cathedral of San Nicola. Famous for bombette at the fornelli pronti. Free parking.", badge:"Borghi più belli d'Italia" },
+        { name:"Ceglie Messapica · 18 km, ~25 min", it:"Capitale gastronomica della Puglia. Castello Ducale, ristoranti stellati, Torrone di Ceglie Presidio Slow Food, Festival GustaMondo (luglio–agosto).", en:"Gastronomic capital of Puglia. Ducal Castle, Michelin-starred restaurants, Torrone di Ceglie Slow Food Presidium, GustaMondo Festival (July–August).", badge:"Gastronomia" },
+        { name:"Martina Franca · 22 km, ~30 min", it:"Barocco pugliese, Palazzo Ducale, Basilica di San Martino. Festival della Valle d'Itria (luglio–agosto, prenotare con mesi anticipo). Capocollo Presidio Slow Food.", en:"Puglian Baroque, Ducal Palace, Basilica of San Martino. Valle d'Itria Festival (July–August, book months ahead). Capocollo Slow Food Presidium.", badge:"Barocco & Opera" },
+        { name:"Locorotondo · 25 km, ~30 min", it:"Borgo circolare patrimonio UNESCO, tetti a cummerse unici. Belvedere mozzafiato sulla Valle. DOC Locorotondo (bianco), degustazioni in cantina.", en:"Circular village, unique cummerse rooftops. Breathtaking Valley belvedere. DOC Locorotondo (white wine), winery tastings.", badge:"Borghi più belli d'Italia" },
+        { name:"Alberobello · 30 km, ~35 min", it:"Simbolo della Puglia nel mondo. Oltre 1.000 trulli nel Rione Monti (UNESCO 1996). Visitare prima delle 9:00 o dopo le 18:00 in estate.", en:"Symbol of Puglia worldwide. Over 1,000 trulli in Rione Monti (UNESCO 1996). Visit before 9am or after 6pm in summer.", badge:"UNESCO" }
+      ]
+    },
+    cucina: {
+      title: { it:"Gastronomia Tipica", en:"Local Gastronomy" },
+      items: [
+        { name:"Olio EVO DOP Valle d'Itria", it:"La colonna vertebrale di ogni piatto locale. Degustalo nella nostra esperienza Liquid Gold.", en:"The backbone of every local dish. Taste it in our Liquid Gold experience.", badge:"Must try" },
+        { name:"Fave e Cicoria", it:"Il piatto povero per eccellenza. Straordinaria semplicità e bontà — pura cucina contadina pugliese.", en:"The quintessential peasant dish. Extraordinary simplicity and flavour.", badge:"Must try" },
+        { name:"Orecchiette", it:"Con ragù di carne o cime di rapa. Impara a farle nella nostra Cooking Class!", en:"With meat ragù or turnip tops. Learn to make them in our Cooking Class!", badge:"Must try" },
+        { name:"Bombette di Cisternino", it:"Involtini di capocollo ripieni di formaggio. Da mangiare ai fornelli pronti di Cisternino.", en:"Rolled capocollo stuffed with cheese. Eat them at the fornelli pronti in Cisternino.", badge:"Cisternino" },
+        { name:"Burrata e Mozzarella", it:"Di Andria. Con pomodorini e olio locale — indispensabile a ogni pasto.", en:"From Andria. With cherry tomatoes and local olive oil — essential at every meal.", badge:"Prodotto tipico" },
+        { name:"Primitivo di Manduria & Negroamaro", it:"Vini rossi del territorio — abbinarli alle carni e ai formaggi stagionati.", en:"Local red wines — pair with meats and aged cheeses.", badge:"Vino" },
+        { name:"Pasticciotti & Cartellate", it:"Dolci tipici pugliesi — pasticciotti a colazione, cartellate a Natale.", en:"Traditional Puglian pastries — pasticciotti for breakfast, cartellate at Christmas.", badge:"Dolci" }
+      ]
+    },
+    distanze: {
+      title: { it:"Distanze dall'Eremo", en:"Distances from the Eremo" },
+      rows: [
+        { dest:"Ostuni (centro storico)", destEn:"Ostuni (historic centre)", km:"3 km",   time:"~8 min" },
+        { dest:"Aeroporto Brindisi",       destEn:"Brindisi Airport",         km:"35 km",  time:"~35 min" },
+        { dest:"Cisternino",               destEn:"Cisternino",               km:"15 km",  time:"~20 min" },
+        { dest:"Ceglie Messapica",         destEn:"Ceglie Messapica",         km:"18 km",  time:"~25 min" },
+        { dest:"Martina Franca",           destEn:"Martina Franca",           km:"22 km",  time:"~30 min" },
+        { dest:"Locorotondo",              destEn:"Locorotondo",              km:"25 km",  time:"~30 min" },
+        { dest:"Alberobello",              destEn:"Alberobello",              km:"30 km",  time:"~35 min" },
+        { dest:"Bari",                     destEn:"Bari",                     km:"65 km",  time:"~55 min" },
+        { dest:"Taranto",                  destEn:"Taranto",                  km:"60 km",  time:"~55 min" },
+        { dest:"Lecce",                    destEn:"Lecce",                    km:"80 km",  time:"~1h 10 min" }
+      ]
+    }
+  };
+
+  var ESJ_GUIDA_CUR = "ostuni";
+
+  function renderGuida() {
+    var it = ESJ_LANG === "it";
+    // Tabs
+    var tabsEl = document.getElementById("esj-guida-tabs");
+    tabsEl.innerHTML = "";
+    ESJ_GUIDA.tabs.forEach(function(t) {
+      var btn = document.createElement("button");
+      btn.className = "esj-gtab" + (t.id === ESJ_GUIDA_CUR ? " active" : "");
+      btn.textContent = it ? t.it : t.en;
+      btn.onclick = function() { ESJ_GUIDA_CUR = t.id; renderGuida(); };
+      tabsEl.appendChild(btn);
+    });
+    // Content
+    var body = document.getElementById("esj-guida-body");
+    body.innerHTML = "";
+    var sec = ESJ_GUIDA[ESJ_GUIDA_CUR];
+    var titleEl = document.createElement("div");
+    titleEl.className = "esj-gsec-title";
+    titleEl.textContent = it ? sec.title.it : sec.title.en;
+    body.appendChild(titleEl);
+
+    if (ESJ_GUIDA_CUR === "distanze") {
+      sec.rows.forEach(function(r) {
+        var row = document.createElement("div");
+        row.className = "esj-gdist";
+        row.innerHTML = '<span class="esj-gdist-name">'+(it?r.dest:r.destEn)+'</span>'
+          + '<span class="esj-gdist-km">'+r.km+'</span>'
+          + '<span class="esj-gdist-time">'+r.time+'</span>';
+        body.appendChild(row);
+      });
+    } else {
+      sec.items.forEach(function(item) {
+        var el = document.createElement("div");
+        el.className = "esj-gitem";
+        el.innerHTML = '<div class="esj-gitem-name">'+item.name+'</div>'
+          + '<div class="esj-gitem-desc">'+(it?item.it:item.en)+'</div>'
+          + '<span class="esj-gitem-badge">'+item.badge+'</span>';
+        body.appendChild(el);
+      });
+    }
+  }
 
   // ── QUICK REPLIES ─────────────────────────────────────────────
   function renderQR(container, type) {
@@ -872,9 +1050,11 @@ function esjInit() {
   };
 
   function routeHome(text) {
-    var expKw = ["esperienza","esperienze","experience","olio","ulivo","stelle","star","cucina","cook","massaggio","massage","trekking","carrozze","serenade","tramonto","sunset","ciuchino","avventura","weekend","pacchetto","package"];
-    var isExp = expKw.some(function(k) { return text.toLowerCase().includes(k); });
-    esjGoView(isExp ? "esperienze" : "camere");
+    var expKw = ["esperienza","esperienze","experience","olio","ulivo","stelle","star","cucina","cook","massaggio","massage","trekking","carrozze","carriages","serenade","tramonto","sunset","ciuchino","avventura","weekend","pacchetto","package"];
+    var guidaKw = ["ostuni","spiaggia","spiagge","beach","borgo","borghi","village","ristorante","mangiare","food","distanza","distanze","distance","dove","parcheggio","come arrivare","getting around","dintorni","surroundings"];
+    var isGuida = guidaKw.some(function(k) { return text.toLowerCase().includes(k); });
+    var isExp   = expKw.some(function(k)   { return text.toLowerCase().includes(k); });
+    esjGoView(isGuida ? "guida" : isExp ? "esperienze" : "camere");
     setTimeout(function() { isExp ? sendE(text) : sendC(text); }, 500);
   }
 
@@ -894,15 +1074,20 @@ function esjInit() {
     var it = ESJ_LANG === "it";
     var s = function(id, txt) { var el = document.getElementById(id); if (el) el.innerHTML = txt; };
     s("esj-sub",      it ? "Assistente di Prenotazione \u00b7 Ostuni, Puglia" : "Booking Assistant \u00b7 Ostuni, Puglia");
-    s("esj-home-msg", it ? "Ciao! Sono Sofia. Posso aiutarti a prenotare una camera o a scoprire le esperienze dell\u2019Eremo di San Giusto." : "Hi! I\u2019m Sofia. I can help you book a room or discover the experiences at Eremo di San Giusto.");
+    s("esj-home-msg", it ? "Ciao! Sono Sofia. Posso aiutarti a prenotare una camera, scoprire le esperienze dell\u2019Eremo o orientarti su Ostuni e dintorni." : "Hi! I\u2019m Sofia. I can help you book a room, discover the Eremo experiences, or explore Ostuni and the surroundings.");
     s("esj-ct1",      it ? "Prenota una camera" : "Book a room");
     s("esj-cs1",      it ? "Trullo &middot; Lamia &middot; disponibilit&agrave; live" : "Trullo &middot; Lamia &middot; live availability");
     s("esj-ct2",      it ? "Esperienze" : "Experiences");
-    s("esj-cs2",      it ? "7 esperienze &middot; pacchetti weekend" : "7 experiences &middot; weekend packages");
+    s("esj-cs2",      it ? "8 esperienze &middot; pacchetti weekend" : "8 experiences &middot; weekend packages");
+    s("esj-ct3",      it ? "Ostuni &amp; Dintorni" : "Getting Around");
+    s("esj-cs3",      it ? "Spiagge &middot; Borghi &middot; Gastronomia &middot; Distanze" : "Beaches &middot; Villages &middot; Food &middot; Distances");
+    s("esj-cs3b",     it ? "Guida ospiti" : "Guest guide");
     s("esj-back-c",   it ? "\u2190 Home" : "\u2190 Home");
     s("esj-back-e",   it ? "\u2190 Home" : "\u2190 Home");
+    s("esj-back-g",   it ? "\u2190 Home" : "\u2190 Home");
     s("esj-lbl-c",    it ? "Prenotazione Camera &middot; Beds24" : "Room Booking &middot; Beds24");
     s("esj-lbl-e",    it ? "Esperienze &middot; Sistema Custom" : "Experiences &middot; Custom System");
+    s("esj-lbl-g",    it ? "Ostuni &amp; Dintorni &middot; Guida Ospiti" : "Ostuni &amp; Surroundings &middot; Guest Guide");
     var hInp = document.getElementById("esj-home-inp");
     if (hInp) hInp.placeholder = it ? "Scrivi una domanda..." : "Ask a question...";
     var iC = document.getElementById("esj-inp-c");
