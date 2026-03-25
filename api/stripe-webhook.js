@@ -1,15 +1,9 @@
 // ============================================================
 // Eremo di San Giusto — api/stripe-webhook.js
 // Riceve eventi Stripe e aggiorna lo stato delle prenotazioni
-//
-// Env vars richieste:
-//   STRIPE_SECRET_KEY      = sk_live_...
-//   STRIPE_WEBHOOK_SECRET  = whsec_...  (da Stripe Dashboard)
-//   AIRTABLE_BASE_ID       = apps5JGXCcVxRw4EH
-//   AIRTABLE_TOKEN         = pat6xQf9...
 // ============================================================
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const Stripe = require('stripe');
 
 const AIRTABLE_API   = 'https://api.airtable.com/v0';
 const AIRTABLE_BASE  = process.env.AIRTABLE_BASE_ID;
@@ -75,9 +69,10 @@ async function inviaEmailConferma(metadata, importo, tipo) {
 
 // ── Handler principale ────────────────────────────────────────────
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
+  const stripe  = Stripe(process.env.STRIPE_SECRET_KEY);
   const sig     = req.headers['stripe-signature'];
   const secret  = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -161,6 +156,5 @@ export default async function handler(req, res) {
 }
 
 // Disabilita il bodyParser di Next.js — Stripe richiede il body raw
-export const config = {
-  api: { bodyParser: false },
-};
+module.exports = handler;
+module.exports.config = { api: { bodyParser: false } };
