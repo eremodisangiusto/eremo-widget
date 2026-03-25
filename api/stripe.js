@@ -1,46 +1,39 @@
 // ============================================================
 // Eremo di San Giusto — api/stripe.js
 // Crea Stripe Checkout Session per camere ed esperienze
-//
-// Env vars richieste:
-//   STRIPE_SECRET_KEY  = sk_live_...
-//   VERCEL_URL         = eremo-bookings.vercel.app (auto)
 // ============================================================
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const Stripe = require('stripe');
 
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+module.exports = async function handler(req, res) {
+  // CORS — deve essere il primissimo cosa che facciamo
+  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Max-Age',       '86400');
+
+  // Risposta immediata alla preflight OPTIONS
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
   const {
-    type,           // 'camera' | 'esperienza' | 'pacchetto'
-    tariffa,        // 'standard' | 'non_rimborsabile'  (solo per camera)
-    payNow,         // true | false  (solo per esperienza)
-    // Dati prenotazione
-    bookingRef,     // ref Airtable o Beds24
-    descrizione,    // es. "Liquid Gold – 5 apr 2026 – 3 persone"
-    importo,        // importo in euro (es. 105)
-    // Dati ospite
-    firstName,
-    lastName,
-    email,
-    // Metadata per il webhook
-    metadata,
+    type, tariffa, payNow,
+    bookingRef, descrizione, importo,
+    firstName, lastName, email, metadata,
   } = req.body;
 
   try {
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'https://eremo-bookings.vercel.app';
-
+    const baseUrl = 'https://eremo-bookings.vercel.app';
     const successUrl = `${baseUrl}/payment-success?ref=${bookingRef}&type=${type}`;
     const cancelUrl  = `${baseUrl}/payment-cancel?ref=${bookingRef}`;
 
-    // ── Costruisci la riga prodotto ──────────────────────────
     const lineItems = [{
       price_data: {
         currency: 'eur',
@@ -49,65 +42,53 @@ export default async function handler(req, res) {
           description: type === 'camera'
             ? (tariffa === 'non_rimborsabile'
                 ? 'Tariffa non rimborsabile — addebito immediato'
-                : 'Tariffa standard — autorizzazione carta, addebito all\'arrivo. Cancellazione gratuita entro 14 giorni.')
-            : (payNow
-                ? 'Pagamento anticipato esperienza'
-                : null),
-          images: ['https://eremo-bookings.vercel.app/logo.png'],
+                : "Tariffa standard — autorizzazione carta, addebito all'arrivo. Cancellazione gratuita entro 14 giorni.")
+            : 'Pagamento anticipato esperienza',
         },
-        unit_amount: Math.round(importo * 100), // in centesimi
+        unit_amount: Math.round(Number(importo) * 100),
       },
       quantity: 1,
     }];
 
-    // ── Parametri specifici per tipo ─────────────────────────
-    let sessionParams = {
+    const sessionParams = {
       payment_method_types: ['card'],
       line_items: lineItems,
       customer_email: email,
       client_reference_id: bookingRef,
       success_url: successUrl,
       cancel_url: cancelUrl,
+      mode: 'payment',
+      payment_intent_data: {
+        capture_method: (type === 'camera' && tariffa === 'standard') ? 'manual' : 'automatic',
+        description: `Eremo di San Giusto — ${descrizione}`,
+        metadata: {
+          bookingRef:  bookingRef || '',
+          type:        type || '',
+          firstName:   firstName || '',
+          lastName:    lastName || '',
+          email:       email || '',
+          tariffa:     tariffa || '',
+          payNow:      String(payNow || true),
+          ...(metadata || {}),
+        },
+      },
       metadata: {
-        bookingRef:  bookingRef || '',
-        type:        type || '',
-        firstName:   firstName || '',
-        lastName:    lastName || '',
-        email:       email || '',
-        tariffa:     tariffa || '',
-        payNow:      String(payNow || false),
-        ...(metadata || {}),
+        bookingRef: bookingRef || '',
+        type:       type || '',
+        email:      email || '',
       },
     };
-
-    if (type === 'camera' && tariffa === 'standard') {
-      // Tariffa standard: autorizza la carta ma non addebitare subito
-      sessionParams.mode = 'payment';
-      sessionParams.payment_intent_data = {
-        capture_method: 'manual', // hold — cattura manuale all'arrivo
-        description: `Camera Eremo di San Giusto — ${descrizione}`,
-        metadata: sessionParams.metadata,
-      };
-    } else {
-      // Addebito immediato: camera non rimborsabile, esperienze paga ora, pacchetti
-      sessionParams.mode = 'payment';
-      sessionParams.payment_intent_data = {
-        capture_method: 'automatic',
-        description: `Eremo di San Giusto — ${descrizione}`,
-        metadata: sessionParams.metadata,
-      };
-    }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 
     return res.status(200).json({
       success:   true,
       sessionId: session.id,
-      url:       session.url, // redirect l'utente qui
+      url:       session.url,
     });
 
   } catch (err) {
     console.error('[stripe.js] Error:', err.message);
     return res.status(500).json({ error: err.message });
   }
-}
+};
