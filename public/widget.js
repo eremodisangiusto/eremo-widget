@@ -630,11 +630,11 @@ function esjInit() {
     h += '<div class="esj-exp-sec"><div class="esj-exp-sec-title">'+(it?"Cancellazione":"Cancellation")+'</div><div class="esj-exp-policy-box">';
     pol.forEach(function(p){ h += '<div class="esj-exp-policy-row"><span class="esj-exp-pol-l">'+(it?p.label:p.labelEn)+'</span><span class="esj-exp-pol-v esj-exp-pol-'+p.color+'">'+(it?p.val:p.valEn)+'</span></div>'; });
     h += '</div></div>';
-    // CTA
-    var bm = bookMsg.replace(/'/g,"\\'"), am = askMsg.replace(/'/g,"\\'");
+    // CTA — usa window.esjSendE (globale) perché questi onclick sono fuori dallo scope di esjInit
+    var bm = bookMsg.replace(/'/g, "\\'"), am = askMsg.replace(/'/g, "\\'");
     h += '<div class="esj-exp-cta">';
-    h += '<button class="esj-exp-book" onclick="(function(){ESJ_MSG_E.push({role:\'user\',content:\''+bm+'\'});esjGoView(\'esperienze\');setTimeout(function(){document.getElementById(\'esj-inp-e\').value=\'\';},100);})()">'+(it?"Prenota questa esperienza ↗":"Book this experience ↗")+'</button>';
-    h += '<button class="esj-exp-ask" onclick="esjGoView(\'esperienze\');setTimeout(function(){var i=document.getElementById(\'esj-inp-e\');if(i){i.value=\''+am+'\';i.dispatchEvent(new Event(\'input\'));}},200)">'+(it?"Fai una domanda a Sofia ↗":"Ask Sofia a question ↗")+'</button>';
+    h += '<button class="esj-exp-book" onclick="esjGoView(\'esperienze\');setTimeout(function(){if(window.esjSendE)window.esjSendE(\''+bm+'\');},300);">'+(it?"Prenota questa esperienza ↗":"Book this experience ↗")+'</button>';
+    h += '<button class="esj-exp-ask" onclick="esjGoView(\'esperienze\');setTimeout(function(){if(window.esjSendE)window.esjSendE(\''+am+'\');},300);">'+(it?"Fai una domanda a Sofia ↗":"Ask Sofia a question ↗")+'</button>';
     h += '</div></div>';
     return h;
   }
@@ -862,7 +862,7 @@ function esjInit() {
     s("esj-back-c",   it ? "\u2190 Home" : "\u2190 Home");
     s("esj-back-e",   it ? "\u2190 Home" : "\u2190 Home");
     s("esj-lbl-c",    it ? "Prenotazione Camera &middot; Beds24" : "Room Booking &middot; Beds24");
-    s("esj-lbl-e",    it ? "Esperienze &middot; B\u00f3kun" : "Experiences &middot; B\u00f3kun");
+    s("esj-lbl-e",    it ? "Esperienze &middot; Sistema Custom" : "Experiences &middot; Custom System");
     var hInp = document.getElementById("esj-home-inp");
     if (hInp) hInp.placeholder = it ? "Scrivi una domanda..." : "Ask a question...";
     var iC = document.getElementById("esj-inp-c");
@@ -878,6 +878,10 @@ function esjInit() {
     fab.classList.toggle("open", ESJ_OPEN);
     if (ESJ_OPEN) { updateLabels(); renderHomeQuick(); }
   });
+
+  // Esponi send* globalmente: gli onclick delle card dinamiche sono fuori dallo scope di esjInit
+  window.esjSendE = sendE;
+  window.esjSendC = sendC;
 
   updateLabels();
   renderHomeQuick();
