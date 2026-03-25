@@ -294,8 +294,64 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, stato });
     }
 
+    // ════════════════════════════════════════════════════════
+    // ACTION: get_next_dates
+    // Cerca le prossime date disponibili per un'esperienza
+    // a partire da una data di riferimento (max 5 date, 90gg)
+    // ════════════════════════════════════════════════════════
+    if (action === 'get_next_dates') {
+      const { esperienza, da_data, partecipanti } = req.body;
+      if (!esperienza || !da_data) {
+        return res.status(400).json({ error: 'esperienza e da_data sono obbligatori' });
+      }
+
+      const numPax     = Math.max(1, Number(partecipanti) || 1);
+      const dataDa     = normalizeDate(da_data);
+      const dataFineObj = new Date(dataDa);
+      dataFineObj.setDate(dataFineObj.getDate() + 90);
+      const dataFine   = dataFineObj.toISOString().split('T')[0];
+
+      const formula = encodeURIComponent(
+        `AND({Esperienza}="${esperienza}",IS_AFTER({Data},"${dataDa}"),IS_BEFORE({Data},"${dataFine}"),{Stato}="Aperto",{Posti disponibili}>=${numPax})`
+      );
+      const result = await atFetch('GET', TABLE_SLOTS, {
+        query: `filterByFormula=${formula}&sort[0][field]=Data&sort[0][direction]=asc&sort[1][field]=Orario&sort[1][direction]=asc`,
+      });
+
+      const records = result.records || [];
+
+      if (records.length === 0) {
+        return res.status(200).json({
+          found: false, esperienza, da_data: dataDa, partecipanti: numPax,
+          message: `Nessuna disponibilità nei prossimi 90 giorni per ${esperienza} con ${numPax} partecipanti.`,
+          dates: [],
+        });
+      }
+
+      // Raggruppa per data — max 5 date distinte
+      const dateMap = {};
+      for (const r of records) {
+        const d = r.fields['Data'];
+        if (!d) continue;
+        if (!dateMap[d]) {
+          if (Object.keys(dateMap).length >= 5) break;
+          dateMap[d] = [];
+        }
+        dateMap[d].push({
+          orario:      r.fields['Orario']            || '',
+          postiLiberi: r.fields['Posti disponibili'] || 0,
+        });
+      }
+
+      const dates = Object.entries(dateMap).map(([data, slots]) => ({ data, slots }));
+
+      return res.status(200).json({
+        found: true, esperienza, da_data: dataDa, partecipanti: numPax, dates,
+      });
+    }
+
     return res.status(400).json({
-      error: 'Azione non valida. Azioni disponibili: check_availability, create_booking, update_status',
+      error: 'Azione non valida. Azioni disponibili: check_availability, create_booking, get_next_dates, update_status',
     });
 
   } catch (err) {
