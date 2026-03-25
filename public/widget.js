@@ -631,10 +631,14 @@ function esjInit() {
     pol.forEach(function(p){ h += '<div class="esj-exp-policy-row"><span class="esj-exp-pol-l">'+(it?p.label:p.labelEn)+'</span><span class="esj-exp-pol-v esj-exp-pol-'+p.color+'">'+(it?p.val:p.valEn)+'</span></div>'; });
     h += '</div></div>';
     // CTA — usa window.esjSendE (globale) perché questi onclick sono fuori dallo scope di esjInit
-    var bm = bookMsg.replace(/'/g, "\\'"), am = askMsg.replace(/'/g, "\\'");
+    // bookMsg usa "Voglio prenotare" che è nella regex isBookingData → bypassa la card, va al flusso dati
+    var bookTrigger = (it ? "Voglio prenotare " : "I want to book ") + name;
+    var askTrigger  = (it ? "Ho una domanda su " : "I have a question about ") + name;
+    var bookTriggerSafe = bookTrigger.replace(/'/g, "\\'");
+    var askTriggerSafe  = askTrigger.replace(/'/g, "\\'");
     h += '<div class="esj-exp-cta">';
-    h += '<button class="esj-exp-book" onclick="esjGoView(\'esperienze\');setTimeout(function(){if(window.esjSendE)window.esjSendE(\''+bm+'\');},300);">'+(it?"Prenota questa esperienza ↗":"Book this experience ↗")+'</button>';
-    h += '<button class="esj-exp-ask" onclick="esjGoView(\'esperienze\');setTimeout(function(){if(window.esjSendE)window.esjSendE(\''+am+'\');},300);">'+(it?"Fai una domanda a Sofia ↗":"Ask Sofia a question ↗")+'</button>';
+    h += '<button class="esj-exp-book" onclick="esjGoView(\'esperienze\');setTimeout(function(){if(window.esjSendE)window.esjSendE(\''+bookTriggerSafe+'\');},300);">'+(it?"Prenota questa esperienza ↗":"Book this experience ↗")+'</button>';
+    h += '<button class="esj-exp-ask" onclick="esjGoView(\'esperienze\');setTimeout(function(){if(window.esjSendE)window.esjSendE(\''+askTriggerSafe+'\');},300);">'+(it?"Fai una domanda a Sofia ↗":"Ask Sofia a question ↗")+'</button>';
     h += '</div></div>';
     return h;
   }
@@ -662,8 +666,15 @@ function esjInit() {
     var detectedId = esjDetectExperience(text);
 
     // Mostra card se: viene rilevata un'esperienza E l'utente non sta
-    // già fornendo dati di prenotazione (date, email, nome ecc.)
-    var isBookingData = /\b(\d{1,2}[\/\-]\d{1,2}|\d{4}\-\d{2}|@|luglio|agosto|settembre|ottobre|novembre|dicembre|gennaio|febbraio|marzo|aprile|maggio|giugno|july|august|september|prenoto|book now)\b/i.test(text);
+    // già fornendo dati di prenotazione o chiedendo esplicitamente di prenotare
+    var isBookingData = (function(t) {
+      if (/\b(voglio prenotare|i want to book|vorrei prenotare|i'd like to book|prenoto|book now)\b/i.test(t)) return true;
+      if (/\d{1,2}\s*(luglio|agosto|settembre|ottobre|novembre|dicembre|gennaio|febbraio|marzo|aprile|maggio|giugno|july|august|september|october|november|december|january|february|march|june)/i.test(t)) return true;
+      if (/\b\d{1,2}[\/\-]\d{1,2}\b/.test(t)) return true;
+      if (/\b\d{4}\-\d{2}/.test(t)) return true;
+      if (/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/.test(t)) return true;
+      return false;
+    })(text);
     var showCard = detectedId && !isBookingData;
 
     if (showCard) {
