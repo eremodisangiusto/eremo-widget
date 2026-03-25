@@ -12,6 +12,116 @@ var ESJ_MSG_E = []; // conversazione esperienze
 var ESJ_MSG_G = []; // conversazione guida / ostuni & dintorni
 var ESJ_MSG_P = []; // conversazione weekend esclusivi / pacchetti
 
+// Stripe publishable key (pubblica — sicura lato browser)
+var ESJ_STRIPE_PK = "pk_live_51QYYzwA99LxG9Z4B4Cf2hGGrgw6OuawEnNc9nOhMQySLIB7lWlc9MOEahl4qYMJMLNPx8tZag43S44M0B1eE27KL000MDKaAKd";
+
+// ── Stripe redirect helper ───────────────────────────────────
+// Chiamato dopo una prenotazione riuscita per mostrare la card di pagamento
+async function esjStripeRedirect(opts) {
+  // opts: { type, bookingRef, descrizione, importo, firstName, lastName, email, tariffa, payNow, msgsEl, typEl }
+  var msgsEl = opts.msgsEl;
+  var typEl  = opts.typEl;
+
+  // Mostra card di pagamento nella chat
+  typEl.classList.remove("on");
+  var it = ESJ_LANG === "it";
+
+  var cardHtml = '<div style="background:#fff;border-radius:14px;border:1px solid #ece4d8;overflow:hidden;font-family:\'Jost\',sans-serif;">'
+    + '<div style="background:linear-gradient(135deg,#534AB7,#3C3489);padding:1rem 1.1rem;">'
+    + '<div style="font-family:\'Cormorant Garamond\',serif;font-size:1.1rem;color:#fff;font-weight:600;margin-bottom:4px;">'
+    + (it ? "Completa il pagamento" : "Complete payment") + '</div>'
+    + '<div style="font-size:0.72rem;color:rgba(255,255,255,0.75);">' + opts.descrizione + '</div>'
+    + '</div>'
+    + '<div style="padding:0.9rem 1.1rem;">'
+    + '<div style="display:flex;justify-content:space-between;font-size:0.82rem;padding:6px 0;border-bottom:1px solid #f2ece2;">'
+    + '<span style="color:#5a4a38;">' + (it ? "Codice prenotazione" : "Booking ref") + '</span>'
+    + '<span style="font-weight:500;color:#2c2218;">' + opts.bookingRef + '</span></div>';
+
+  if (opts.type === 'camera') {
+    var tarifLabel = opts.tariffa === 'non_rimborsabile'
+      ? (it ? "Tariffa non rimborsabile" : "Non-refundable rate")
+      : (it ? "Tariffa standard" : "Standard rate");
+    var tarifNote = opts.tariffa === 'non_rimborsabile'
+      ? (it ? "Addebito immediato" : "Charged immediately")
+      : (it ? "Carta autorizzata · addebito all'arrivo" : "Card authorised · charged at arrival");
+    cardHtml += '<div style="display:flex;justify-content:space-between;font-size:0.82rem;padding:6px 0;border-bottom:1px solid #f2ece2;">'
+      + '<span style="color:#5a4a38;">' + tarifLabel + '</span>'
+      + '<span style="color:#3b6d11;font-size:0.74rem;">' + tarifNote + '</span></div>';
+  }
+
+  cardHtml += '<div style="display:flex;justify-content:space-between;font-size:0.95rem;padding:8px 0;margin-top:4px;">'
+    + '<span style="color:#2c2218;font-weight:500;">' + (it ? "Totale" : "Total") + '</span>'
+    + '<span style="font-family:\'Cormorant Garamond\',serif;font-size:1.3rem;color:#8a6030;font-weight:600;">€' + opts.importo + '</span></div>'
+    + '</div>'
+    + '<div style="padding:0 1.1rem 1rem;display:flex;flex-direction:column;gap:8px;">'
+    + '<button id="esj-pay-btn" style="width:100%;padding:11px;background:linear-gradient(135deg,#534AB7,#3C3489);border:none;border-radius:9px;color:#fff;font-family:\'Jost\',sans-serif;font-size:0.88rem;font-weight:500;cursor:pointer;">'
+    + (it ? "Paga ora con carta ↗" : "Pay now by card ↗") + '</button>';
+
+  if (opts.type === 'esperienza') {
+    cardHtml += '<button id="esj-pay-later-btn" style="width:100%;padding:9px;background:transparent;border:1.5px solid #ece4d8;border-radius:9px;color:#8a6030;font-family:\'Jost\',sans-serif;font-size:0.8rem;cursor:pointer;">'
+      + (it ? "Paga il giorno dell\'esperienza" : "Pay on the day") + '</button>';
+  }
+
+  cardHtml += '</div></div>';
+
+  var d = document.createElement("div");
+  d.className = "esj-msg assistant";
+  d.innerHTML = '<div style="padding:0;background:transparent;border:none;">' + cardHtml + '</div>';
+  msgsEl.insertBefore(d, typEl);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+
+  // Click: paga ora
+  setTimeout(function() {
+    var payBtn = document.getElementById("esj-pay-btn");
+    if (payBtn) {
+      payBtn.addEventListener("click", async function() {
+        payBtn.disabled = true;
+        payBtn.textContent = it ? "Reindirizzamento…" : "Redirecting…";
+        try {
+          var stripeResp = await fetch(ESJ_PROXY + "/api/stripe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type:        opts.type,
+              tariffa:     opts.tariffa || "standard",
+              payNow:      true,
+              bookingRef:  opts.bookingRef,
+              descrizione: opts.descrizione,
+              importo:     opts.importo,
+              firstName:   opts.firstName,
+              lastName:    opts.lastName,
+              email:       opts.email,
+            })
+          }).then(function(r) { return r.json(); });
+          if (stripeResp.url) {
+            window.location.href = stripeResp.url;
+          } else {
+            payBtn.disabled = false;
+            payBtn.textContent = it ? "Errore — riprova" : "Error — try again";
+          }
+        } catch(e) {
+          payBtn.disabled = false;
+          payBtn.textContent = it ? "Errore — riprova" : "Error — try again";
+        }
+      });
+    }
+    var laterBtn = document.getElementById("esj-pay-later-btn");
+    if (laterBtn) {
+      laterBtn.addEventListener("click", function() {
+        laterBtn.disabled = true;
+        var msg = it
+          ? "Perfetto! Pagherai il giorno dell'esperienza in contanti o carta. La tua prenotazione " + opts.bookingRef + " è confermata. A presto all'Eremo! 🫒"
+          : "Perfect! You'll pay on the day of the experience. Your booking " + opts.bookingRef + " is confirmed. See you at the Eremo! 🫒";
+        var dm = document.createElement("div");
+        dm.className = "esj-msg assistant";
+        dm.innerHTML = '<div class="esj-bubble">' + msg + '</div>';
+        msgsEl.insertBefore(dm, typEl);
+        msgsEl.scrollTop = msgsEl.scrollHeight;
+      });
+    }
+  }, 100);
+}
+
 // ─── SYSTEM PROMPT ──────────────────────────────────────────
 
 var ESJ_SYSTEM_BASE = "Sei Sofia, l'assistente virtuale dell'Eremo di San Giusto. Parli con un tono caldo, elegante e pugliese nell'anima. Non inventare mai informazioni — usa sempre gli strumenti per verificare disponibilita e prezzi reali.\n\nLA PROPRIETA':\nL'Eremo di San Giusto e' un trullo con lamia situato a 2 km dal centro storico di Ostuni, alle pendici del Monte Morrone, sul Cammino Materano che abbraccia i santuari di Sant'Oronzo e San Biagio. Gode di una vista mozzafiato sugli ulivi millenari e sul Mare Adriatico.\n\nSPAZI E COMFORT:\n- 2 camere da letto matrimoniali con 2 bagni indipendenti\n- In una camera matrimoniale e' disponibile anche un letto singolo per bambini\n- Capienza massima: 5 persone (massimo 4 adulti)\n- Vasca idromassaggio Novellini Natural Air in camera\n- Minipiscina idromassaggio sul terrazzo con vista panoramica\n- Parco agrario privato di 5 ettari con ulivi verso il mare\n- Cucina attrezzata, ampi spazi esterni\n\nSERVIZI INCLUSI: Aria condizionata, TV, Wi-Fi gratuito, bottiglia di vino e snack di benvenuto. Animali domestici ammessi con supplemento 50 euro.\n\nCHECK-IN dalle 15:00 — CHECK-OUT entro le 10:30\n\nESPERIENZE (sistema prenotazione interno — usa i tool airtable):\n1. LIQUID GOLD (id: liquid-gold): Frantoio ipogeo, grotta, ulivi, degustazione EVO. Standard 35 eur/pp, Privato 50 eur/pp, Bambino 10 eur. Max 12 pp. Tutto l'anno. Orari: 10:30, 17:00.\n2. RITUALI DI BENESSERE — Massaggi (id: massaggi): Osteopata certificato. Deep tissue 80 eur, Rilassante 70 eur, Tonificante 70 eur. Min 2 pp. Apr-Ott. Orari: 09:00, 10:30, 16:00, 17:30.\n3. CIUCHINO BIRICHINO — Parco avventura (id: ciuchino-birichino): Zip line, treetop. Junior 15, Verde 25, Blu 30, Rosso/Nero 35 eur. Apr-Ott. Orari: 09:30, 15:00.\n4. ORECCHIETTE COOKING CLASS (id: cooking-class): Chef locale, cucina outdoor. Standard 35 eur/pp, Privato 50 eur/pp, Bambino 18 eur. Max 8 pp. Orari: 11:00, 18:30.\n5. STARGAZING (id: stargazing): Telescopio professionale. Standard 35 eur/pp, Privato 45 eur/pp, Bambino 15 eur. Max 10 pp. Apr-Ott. Orario: 22:00.\n6. SUNSET SERENADE (id: sunset-serenade): Duo musicale, vino e tagliere. Standard 60 eur/pp, Coppia 130 eur flat. Max 20 pp. Apr-Ott. Orario variabile al tramonto.\n7. TREKKING MONTE MORRONE (id: trekking): Santuari. Corto 5km 25 eur/pp, Lungo 10km 35 eur/pp, Privato 250 eur flat. Max 10 pp. Orari: 08:00, 17:00.\n8. CARRIAGES AND COUNTRYSIDE (id: carriages): Museo carrozze, chiesa rupestre. Standard 35 eur/pp, Privato 50 eur/pp. Max 15 pp. Mar-Dom. Orari: 10:00, 17:00.\n\nPACCHETTI WEEKEND (2 notti, coppia):\n- Puglian Immersion: da 780 eur (bassa) / 980 eur (alta).\n- Into the Wild: da 750 eur / 950 eur.\n- Senses Journey: da 940 eur / 1140 eur.\n\nCANCELLAZIONE ESPERIENZE: Gratuita fino a 48h prima. 50% rimborso tra 24h e 48h. Nessun rimborso entro 24h.\n\nFLUSSO CAMERA: 1) Chiedi date e ospiti 2) Usa check_availability 3) Presenta con prezzo reale 4) Proponi esperienze abbinabili 5) Raccogli nome/cognome/email/telefono 6) Usa create_room_booking con roomId 469679 7) Dai codice conferma Beds24.\n\nFLUSSO ESPERIENZA (sistema Airtable): 1) Identifica l'esperienza e il suo ID corretto (es. 'liquid-gold') 2) Se l'utente non sa la data o chiede 'quando siete disponibili?' usa get_next_available_dates con la data di oggi come da_data per mostrare le prossime 5 date disponibili 3) Se l'utente ha una data specifica usa check_experience_availability 4) Se la data non e' disponibile usa get_next_available_dates a partire da quella data per proporre alternative 5) Presenta gli slot con date, orari e posti liberi 6) Chiedi tipo prezzo 7) Raccogli nome, cognome, email, telefono, eventuali note 8) Usa create_experience_booking con tutti i dati 9) Comunica il codice ESG-XXXXXX e conferma email.\n\nREGOLE ASSOLUTE: Usa SEMPRE i tool — mai inventare disponibilita o prezzi. Usa roomId 469679 per le camere. Per le esperienze usa SEMPRE l'ID corretto (liquid-gold, massaggi, ciuchino-birichino, cooking-class, stargazing, sunset-serenade, trekking, carriages). La data va sempre in formato YYYY-MM-DD.";
@@ -570,12 +680,38 @@ function esjInit() {
             res = await (await fetch(ESJ_PROXY + "/api/availability", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
           } else if (b.name === "create_room_booking") {
             res = await (await fetch(ESJ_PROXY + "/api/booking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
+            // Attiva Stripe dopo prenotazione camera riuscita
+            if (res && res.bookingId && msgArr === ESJ_MSG_C) {
+              var notti = Math.round((new Date(b.input.checkout) - new Date(b.input.checkin)) / 86400000);
+              var prezzoStimato = res.totalPrice || (notti * 200); // fallback stima
+              esjStripeRedirect({
+                type: "camera", tariffa: res.rateType || "standard",
+                bookingRef: res.bookingId,
+                descrizione: "Camera " + b.input.checkin + " → " + b.input.checkout + " · " + notti + (ESJ_LANG==="it"?" notti":" nights"),
+                importo: prezzoStimato,
+                firstName: b.input.firstName, lastName: b.input.lastName, email: b.input.email,
+                msgsEl: msgsC, typEl: typC
+              });
+            }
           } else if (b.name === "get_next_available_dates") {
             res = await (await fetch(ESJ_PROXY + "/api/airtable", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "get_next_dates", ...b.input }) })).json();
           } else if (b.name === "check_experience_availability") {
             res = await (await fetch(ESJ_PROXY + "/api/airtable", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "check_availability", ...b.input }) })).json();
           } else if (b.name === "create_experience_booking") {
             res = await (await fetch(ESJ_PROXY + "/api/airtable", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "create_booking", ...b.input }) })).json();
+            // Attiva Stripe dopo prenotazione esperienza riuscita
+            if (res && res.success && res.bookingRef) {
+              var msgsTarget = msgArr === ESJ_MSG_E ? msgsE : msgsP;
+              var typTarget  = msgArr === ESJ_MSG_E ? typE  : typP;
+              esjStripeRedirect({
+                type: "esperienza",
+                bookingRef: res.bookingRef,
+                descrizione: (b.input.esperienza || "") + " · " + (b.input.data || "") + " · " + (b.input.partecipanti || 1) + (ESJ_LANG==="it"?" persone":" guests"),
+                importo: res.totale || b.input.importo || 0,
+                firstName: b.input.firstName, lastName: b.input.lastName, email: b.input.email,
+                msgsEl: msgsTarget, typEl: typTarget
+              });
+            }
           }
         } catch(e) { res = { error: e.message }; }
         results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res) });
