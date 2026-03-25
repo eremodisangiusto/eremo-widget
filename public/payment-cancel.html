@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento annullato · Eremo di San Giusto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100vh; font-family: 'Jost', sans-serif;
+      background: #1a1410; display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: #faf7f2; border-radius: 20px; padding: 2.5rem 2rem;
+      max-width: 440px; width: 100%; text-align: center;
+    }
+    .icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, #faeeda, #f5c475);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    .icon svg { width: 28px; height: 28px; }
+    h1 {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.8rem;
+      color: #2c2218; font-weight: 600; margin-bottom: 0.75rem;
+    }
+    p { font-size: 0.88rem; color: #5a4a38; line-height: 1.7; margin-bottom: 0.5rem; }
+    .divider { height: 1px; background: #ece4d8; margin: 1.5rem 0; }
+    .note { font-size: 0.78rem; color: #8a7560; }
+    .btn {
+      display: inline-block; margin-top: 1.5rem;
+      padding: 0.75rem 2rem; background: linear-gradient(135deg, #c8a97e, #9a6e38);
+      border-radius: 10px; color: #fff; text-decoration: none;
+      font-size: 0.88rem; font-weight: 500; transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 9v4M12 17h.01M12 3C6.48 3 2 7.48 2 12s4.48 9 10 9 10-4.48 10-10S17.52 3 12 3z"
+          stroke="#854f0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>Pagamento annullato</h1>
+    <p>Non è stato effettuato nessun addebito.<br>La tua prenotazione non è ancora confermata.</p>
+    <div class="divider"></div>
+    <p class="note">Puoi riprovare quando vuoi oppure contattarci direttamente a <strong>info@eremodisangiusto.it</strong> per assistenza.</p>
+    <a href="/widget.html" class="btn">Torna a Sofia e riprova</a>
+  </div>
+</body>
+</html>
