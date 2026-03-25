@@ -9,6 +9,8 @@ var ESJ_OPEN  = false;
 var ESJ_LANG  = "it";
 var ESJ_MSG_C = []; // conversazione camere
 var ESJ_MSG_E = []; // conversazione esperienze
+var ESJ_MSG_G = []; // conversazione guida / ostuni & dintorni
+var ESJ_MSG_P = []; // conversazione weekend esclusivi / pacchetti
 
 // ─── SYSTEM PROMPT ──────────────────────────────────────────
 
@@ -381,29 +383,7 @@ function esjInit() {
     + ".esj-exp-book{width:100%;padding:10px;background:linear-gradient(135deg,#c8a97e,#9a6e38);border:none;border-radius:9px;color:#fff;font-family:'Jost',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;transition:opacity 0.2s}"
     + ".esj-exp-book:hover{opacity:0.9}"
     + ".esj-exp-ask{width:100%;padding:7px;background:transparent;border:1px solid #e0d5c5;border-radius:9px;color:#8a6030;font-family:'Jost',sans-serif;font-size:0.74rem;cursor:pointer;transition:all 0.2s}"
-    + ".esj-exp-ask:hover{border-color:#c8a97e;background:#faf7f2}"
-    // ── GUIDA VIEW ──
-    + "#esj-guida{display:none;flex:1;flex-direction:column;min-height:0;background:var(--esj-bg)}"
-    + ".esj-guida-body{flex:1;overflow-y:auto;padding:0.9rem 1rem}"
-    + ".esj-guida-body::-webkit-scrollbar{width:3px}"
-    + ".esj-guida-body::-webkit-scrollbar-thumb{background:var(--esj-bg3);border-radius:2px}"
-    + ".esj-guida-tabs{display:flex;gap:4px;padding:0.6rem 1rem;border-bottom:1px solid var(--esj-bg3);background:var(--esj-bg2);overflow-x:auto;flex-shrink:0}"
-    + ".esj-guida-tabs::-webkit-scrollbar{display:none}"
-    + ".esj-gtab{font-family:'Jost',sans-serif;font-size:0.68rem;padding:5px 11px;border-radius:20px;border:1.5px solid var(--esj-bg3);background:#fff;color:var(--esj-txt2);cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0}"
-    + ".esj-gtab.active{background:var(--esj-gold2);border-color:var(--esj-gold2);color:#fff}"
-    + ".esj-gsec{display:none}"
-    + ".esj-gsec.active{display:block}"
-    + ".esj-gsec-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--esj-txt);font-weight:600;margin:0.8rem 0 0.5rem;padding-bottom:0.3rem;border-bottom:1px solid var(--esj-bg3)}"
-    + ".esj-gsec-sub{font-size:0.7rem;font-weight:500;color:var(--esj-gold2);text-transform:uppercase;letter-spacing:0.08em;margin:0.7rem 0 0.3rem}"
-    + ".esj-gitem{padding:0.65rem 0.8rem;background:#fff;border-radius:10px;border:1px solid var(--esj-bg3);margin-bottom:0.5rem}"
-    + ".esj-gitem-name{font-size:0.8rem;font-weight:500;color:var(--esj-txt);margin-bottom:2px}"
-    + ".esj-gitem-desc{font-size:0.72rem;color:var(--esj-txt2);line-height:1.55}"
-    + ".esj-gitem-badge{display:inline-block;font-size:0.62rem;padding:1px 7px;border-radius:10px;background:var(--esj-bg2);color:var(--esj-gold2);margin-top:4px;font-weight:500}"
-    + ".esj-gdist{display:grid;grid-template-columns:1fr auto auto;gap:4px 10px;font-size:0.72rem;padding:0.5rem 0;border-bottom:1px solid var(--esj-bg3);align-items:center}"
-    + ".esj-gdist:last-child{border-bottom:none}"
-    + ".esj-gdist-name{color:var(--esj-txt);font-weight:500}"
-    + ".esj-gdist-km{color:var(--esj-gold2);font-weight:500;text-align:right}"
-    + ".esj-gdist-time{color:var(--esj-txt3);text-align:right}";
+    + ".esj-exp-ask:hover{border-color:#c8a97e;background:#faf7f2}";;
 
   var style = document.createElement("style");
   style.textContent = css;
@@ -482,6 +462,18 @@ function esjInit() {
     +         '<span class="esj-card-badge" style="background:rgba(186,117,23,0.12);color:#854F0B;" id="esj-cs3b">Guida ospiti</span>'
     +       '</div>'
     +     '</button>'
+    +     '<button class="esj-main-card esj-home-cards-full" onclick="esjGoView(\'pacchetti\')">'
+    +       '<div style="display:flex;align-items:center;gap:0.8rem">'
+    +         '<div class="esj-card-icon" style="background:rgba(83,74,183,0.12);width:34px;height:34px;flex-shrink:0">'
+    +           '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    +         '</div>'
+    +         '<div style="flex:1">'
+    +           '<div class="esj-card-title" id="esj-ct4">Weekend Esclusivi</div>'
+    +           '<div class="esj-card-sub" id="esj-cs4">3 pacchetti curati &middot; camera + esperienze</div>'
+    +         '</div>'
+    +         '<span class="esj-card-badge" style="background:rgba(83,74,183,0.12);color:#3C3489;" id="esj-cs4b">da &euro;750</span>'
+    +       '</div>'
+    +     '</button>'
     +   '</div>'
     +   '<div class="esj-home-quick" id="esj-home-quick"></div>'
     +   '<div class="esj-home-bar">'
@@ -497,13 +489,11 @@ function esjInit() {
     // ESPERIENZE CHAT
     + chatView("esj-esperienze","esj-back-e","esj-lbl-e","esj-msgs-e","esj-typing-e","esj-qr-e","esj-inp-e","esj-mic-e","esj-snd-e")
 
-    // GUIDA VIEW
-    + '<div id="esj-guida" style="display:none;flex-direction:column;">'
-    +   '<button class="esj-back-bar" onclick="esjGoView(\'home\')">' + backSvg + '<span id="esj-back-g"></span></button>'
-    +   '<div class="esj-view-label" id="esj-lbl-g"></div>'
-    +   '<div class="esj-guida-tabs" id="esj-guida-tabs"></div>'
-    +   '<div class="esj-guida-body" id="esj-guida-body"></div>'
-    + '</div>'
+    // GUIDA CHAT
+    + chatView("esj-guida","esj-back-g","esj-lbl-g","esj-msgs-g","esj-typing-g","esj-qr-g","esj-inp-g","esj-mic-g","esj-snd-g")
+
+    // PACCHETTI CHAT
+    + chatView("esj-pacchetti","esj-back-p","esj-lbl-p","esj-msgs-p","esj-typing-p","esj-qr-p","esj-inp-p","esj-mic-p","esj-snd-p")
 
     + '<div class="esj-brand">Powered by Claude AI</div>';
 
@@ -513,19 +503,31 @@ function esjInit() {
   // ── REFS ──────────────────────────────────────────────────────
   var msgsC   = document.getElementById("esj-msgs-c");
   var msgsE   = document.getElementById("esj-msgs-e");
+  var msgsG   = document.getElementById("esj-msgs-g");
+  var msgsP   = document.getElementById("esj-msgs-p");
   var typC    = document.getElementById("esj-typing-c");
   var typE    = document.getElementById("esj-typing-e");
+  var typG    = document.getElementById("esj-typing-g");
+  var typP    = document.getElementById("esj-typing-p");
   var inpC    = document.getElementById("esj-inp-c");
   var inpE    = document.getElementById("esj-inp-e");
+  var inpG    = document.getElementById("esj-inp-g");
+  var inpP    = document.getElementById("esj-inp-p");
   var sndC    = document.getElementById("esj-snd-c");
   var sndE    = document.getElementById("esj-snd-e");
+  var sndG    = document.getElementById("esj-snd-g");
+  var sndP    = document.getElementById("esj-snd-p");
   var micC    = document.getElementById("esj-mic-c");
   var micE    = document.getElementById("esj-mic-e");
+  var micG    = document.getElementById("esj-mic-g");
+  var micP    = document.getElementById("esj-mic-p");
   var micHome = document.getElementById("esj-home-mic");
   var homeInp = document.getElementById("esj-home-inp");
   var qrC     = document.getElementById("esj-qr-c");
   var qrE     = document.getElementById("esj-qr-e");
-  var loadC   = false, loadE = false;
+  var qrG     = document.getElementById("esj-qr-g");
+  var qrP     = document.getElementById("esj-qr-p");
+  var loadC   = false, loadE = false, loadG = false, loadP = false;
 
   // ── FORMAT ────────────────────────────────────────────────────
   function fmt(t) {
@@ -793,6 +795,102 @@ function esjInit() {
     loadE = false; sndE.disabled = false; inpE.focus();
   }
 
+  // ── SYSTEM PROMPT GUIDA ───────────────────────────────────────
+  var ESJ_SYSTEM_GUIDA = "Sei Sofia, l'assistente virtuale dell'Eremo di San Giusto. In questa sezione sei la guida locale per gli ospiti — rispondi a domande su Ostuni, le spiagge, i borghi della Valle d'Itria, la gastronomia, gli eventi, le distanze e i consigli pratici. Usa un tono caldo e da insider locale. Quando presenti elenchi di luoghi o distanze usa tabelle o liste chiare. Puoi usare emoji con moderazione.\n\nOSTUNI:\nCitta Bianca arroccata su tre colli a 200m s.l.m. Origini preistoriche ('Delia', scheletro 25.000 anni). Centro storico: Piazza della Liberta con Colonna di Sant'Oronzo (1771), Cattedrale di Santa Maria Assunta (1435-1495, rosone gotico a 24 raggi), Mura Aragonesi (XV sec, panorama Valle d'Itria). Musei: Museo Civilta Preclassiche (Via Cattedrale, chiuso lun), Museo Civilta Contadina.\nPARCHEGGI: P.Via Pola (gratuito, 500m), P.Ex Mattatoio (gratuito, evita ZTL), P.Stazione FS (gratuito + navetta estiva), P.Porta Nova (0.80 eur/h). Luglio-agosto: arrivare prima 9:30 o dopo 19:00.\n\nSPIAGGE:\n- Torre Guaceto (~13km): riserva naturale, costa incontaminata, torre aragonese, snorkeling, accesso gratuito a piedi\n- Rosa Marina (~15km): spiaggia bianchissima, stabilimenti qualità, villaggio elegante\n- Villanova: porto peschereccio, spiaggia mista, ristoranti di pesce\n- Costa Merlata: sabbia fine, acque basse, famiglie\nConsigli: evitare 12-16 luglio-agosto (35+ gradi). Navetta dal centro giugno-settembre.\n\nBORGHI VALLE D'ITRIA:\n- Cisternino (15km, 20min): borghi piu belli d'Italia, vicoli bianchi, Torre Normanno-Sveva, bombette ai fornelli pronti\n- Ceglie Messapica (18km, 25min): capitale gastronomica Puglia, Castello Ducale, ristoranti stellati, Torrone Slow Food, GustaMondo (lug-ago)\n- Martina Franca (22km, 30min): barocco pugliese, Palazzo Ducale, Festival Valle d'Itria opera (lug-ago), Capocollo Slow Food\n- Locorotondo (25km, 30min): forma circolare, tetti cummerse unici, belvedere Valle d'Itria, DOC Locorotondo bianco, degustazioni cantine\n- Alberobello (30km, 35min): UNESCO 1996, 1000+ trulli Rione Monti, visitare prima 9:00 o dopo 18:00 in estate\n\nGASTRONOMIA:\nOlio EVO DOP Valle d'Itria, Fave e cicoria, Orecchiette (ragu/cime di rapa), Bombette di Cisternino, Burrata e mozzarella di Andria, Pane di Altamura DOP, Pasticciotti e cartellate, Primitivo di Manduria e Negroamaro.\n\nEVENTI:\n- 17 gen: Festa Sant'Antonio Abate\n- Pasqua: Processione Venerdi Santo (perdune incappucciati)\n- Fine apr/mag: Sagra Fava e Cicoria\n- Ago: Cavalcata di Sant'Oronzo (26 ago, evento principale), Sagra Braciola, Ostuni Music Festival, Notte Bianca\n- Ott: Sagra Olio Nuovo\n- Dic: Presepe Vivente, Mercatini Natale\n\nDISTANZE DALL'EREMO:\nOstuni centro 3km/8min | Torre Guaceto 13km/20min | Brindisi Aeroporto 35km/35min | Cisternino 15km/20min | Ceglie Messapica 18km/25min | Martina Franca 22km/30min | Locorotondo 25km/30min | Alberobello 30km/35min | Bari 65km/55min | Taranto 60km/55min | Lecce 80km/1h10min\n\nREGOLE: Rispondi solo a domande su Ostuni e dintorni. Se chiedono di prenotare camera o esperienze, di' loro di tornare alla Home e usare le sezioni apposite.";
+
+  // ── SEND GUIDA ────────────────────────────────────────────────
+  async function sendG(text) {
+    if (!text.trim() || loadG) return;
+    loadG = true; sndG.disabled = true;
+    qrG.style.display = "none";
+    addMsg(msgsG, typG, "user", text);
+    inpG.value = ""; inpG.style.height = "auto";
+    typG.classList.add("on"); msgsG.scrollTop = msgsG.scrollHeight;
+    ESJ_MSG_G.push({ role: "user", content: text });
+    var lang = ESJ_LANG === "en" ? "\n\nIMPORTANT: Reply in English." : "";
+    try {
+      var data = await fetch(ESJ_PROXY + "/api/chat", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514", max_tokens: 1024,
+          system: ESJ_SYSTEM_GUIDA + lang,
+          messages: ESJ_MSG_G
+        })
+      }).then(function(r) { return r.json(); });
+      var txt = "";
+      for (var i = 0; i < data.content.length; i++) {
+        if (data.content[i].type === "text") txt = data.content[i].text;
+      }
+      if (txt) ESJ_MSG_G.push({ role: "assistant", content: txt });
+      addMsg(msgsG, typG, "assistant", txt || (ESJ_LANG === "en" ? "Sorry, please try again." : "Mi dispiace, riprova tra un momento."));
+    } catch(e) {
+      addMsg(msgsG, typG, "assistant", ESJ_LANG === "en" ? "Sorry, please try again." : "Mi dispiace, riprova tra un momento.");
+    }
+    loadG = false; sndG.disabled = false; inpG.focus();
+  }
+
+  // ── SYSTEM PROMPT PACCHETTI ───────────────────────────────────
+  var ESJ_SYSTEM_PACCHETTI = "Sei Sofia, l'assistente virtuale dell'Eremo di San Giusto. In questa sezione presenti e vendi i Weekend Esclusivi — pacchetti curati che combinano 2 notti nella proprietà con una selezione di esperienze autentiche pugliesi.\n\nWEEKEND ESCLUSIVI (tutti includono 2 notti, colazione inclusa, per coppia):\n\n🌿 PUGLIAN IMMERSION\nIl pacchetto più completo — un'immersione totale nella Puglia autentica.\nEsperienze incluse: Cooking Class (orecchiette con chef locale) + Liquid Gold (frantoio ipogeo + degustazione EVO) + Carriages & Countryside (museo carrozze + chiesa rupestre) + Sunset Serenade (duo musicale al tramonto) + Trekking 5km (santuari Monte Morrone)\nPrezzo: da €780 (bassa stagione) / €980 (alta stagione) per coppia\nIdeal per: coppie che vogliono vivere la Puglia a 360° — cultura, gastronomia, natura, musica\n\n🌿 INTO THE WILD\nPer chi cerca avventura, natura e silenzio nella campagna pugliese.\nEsperienze incluse: Liquid Gold + Trekking 10km (percorso lungo santuari) + Sunset Serenade + Stargazing (osservazione stellare con telescopio)\nPrezzo: da €750 (bassa stagione) / €950 (alta stagione) per coppia\nIdeal per: coppie attive, amanti della natura e del cielo notturno\n\n🌿 SENSES JOURNEY\nUn viaggio sensoriale completo — gusto, benessere, musica, stelle.\nEsperienze incluse: Cooking Class + Liquid Gold + Massaggio benessere (osteopata certificato) + Sunset Serenade + Stargazing + Trekking 5km\nPrezzo: da €940 (bassa stagione) / €1.140 (alta stagione) per coppia\nIdeal per: coppie che cercano relax profondo e coccole oltre alle esperienze culturali\n\nNOTE SUI PACCHETTI:\n- Prezzi per coppia (2 persone), camera matrimoniale inclusa\n- Le esperienze sono distribuite nelle 2 giornate complete tra check-in (giorno 1) e check-out (giorno 3)\n- E' possibile personalizzare il pacchetto sostituendo o aggiungendo esperienze\n- Supplemento terza persona (letto singolo in camera): €80/notte\n- Alta stagione: giugno–settembre. Bassa stagione: ottobre–maggio\n- Cancellazione: gratuita fino a 7 giorni prima, 50% tra 3 e 7 giorni, nessun rimborso entro 3 giorni\n\nFLUSSO PRENOTAZIONE PACCHETTO:\n1) Presenta i pacchetti con entusiasmo e chiedi quale incuriosisce di più\n2) Chiedi date di arrivo/partenza e numero ospiti\n3) Chiedi eventuali personalizzazioni (sostituire esperienze, esigenze speciali)\n4) Calcola il prezzo totale (incluso eventuale supplemento terza persona)\n5) Raccogli: nome, cognome, email, telefono, note speciali\n6) Usa check_availability (Beds24) per verificare la camera\n7) Se disponibile, usa create_room_booking per la camera\n8) Informa che le esperienze saranno confermate separatamente via email entro 24h\n9) Fornisci riepilogo completo con prezzo totale\n\nREGOLE: Usa SEMPRE i tool per verificare disponibilità camera. Per le esperienze del pacchetto, dopo la prenotazione camera informa l'ospite che riceverà conferma separata per ciascuna. Non inventare disponibilità.";
+
+  // ── SEND PACCHETTI ────────────────────────────────────────────
+  async function sendP(text) {
+    if (!text.trim() || loadP) return;
+    loadP = true; sndP.disabled = true;
+    qrP.style.display = "none";
+    addMsg(msgsP, typP, "user", text);
+    inpP.value = ""; inpP.style.height = "auto";
+    typP.classList.add("on"); msgsP.scrollTop = msgsP.scrollHeight;
+    ESJ_MSG_P.push({ role: "user", content: text });
+    var today = new Date().toISOString().split("T")[0];
+    var lang  = ESJ_LANG === "en" ? "\n\nIMPORTANT: Reply in English." : "";
+    try {
+      var body = {
+        model: "claude-sonnet-4-20250514", max_tokens: 1024,
+        system: ESJ_SYSTEM_PACCHETTI + lang + "\n\nOGGI E' IL " + today + ". Non usare mai date passate.",
+        tools: ESJ_TOOLS,
+        messages: ESJ_MSG_P
+      };
+      var data = await fetch(ESJ_PROXY + "/api/chat", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }).then(function(r) { return r.json(); });
+
+      // Tool use loop (per check_availability e create_room_booking)
+      while (data.stop_reason === "tool_use") {
+        ESJ_MSG_P.push({ role: "assistant", content: data.content });
+        var results = [];
+        for (var i = 0; i < data.content.length; i++) {
+          var b = data.content[i];
+          if (b.type !== "tool_use") continue;
+          var res;
+          try {
+            if (b.name === "check_availability") {
+              res = await (await fetch(ESJ_PROXY + "/api/availability", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
+            } else if (b.name === "create_room_booking") {
+              res = await (await fetch(ESJ_PROXY + "/api/booking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
+            }
+          } catch(e) { res = { error: e.message }; }
+          results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res) });
+        }
+        ESJ_MSG_P.push({ role: "user", content: results });
+        data = await fetch(ESJ_PROXY + "/api/chat", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1024, system: ESJ_SYSTEM_PACCHETTI + lang, tools: ESJ_TOOLS, messages: ESJ_MSG_P })
+        }).then(function(r) { return r.json(); });
+      }
+
+      var txt = "";
+      for (var j = 0; j < data.content.length; j++) {
+        if (data.content[j].type === "text") txt = data.content[j].text;
+      }
+      if (txt) ESJ_MSG_P.push({ role: "assistant", content: txt });
+      addMsg(msgsP, typP, "assistant", txt || (ESJ_LANG === "en" ? "Sorry, please try again." : "Mi dispiace, riprova tra un momento."));
+    } catch(e) {
+      addMsg(msgsP, typP, "assistant", ESJ_LANG === "en" ? "Sorry, please try again." : "Mi dispiace, riprova tra un momento.");
+    }
+    loadP = false; sndP.disabled = false; inpP.focus();
+  }
+
   // ── INPUT SETUP ───────────────────────────────────────────────
   function setupInput(inp, snd, fn) {
     inp.addEventListener("input", function() {
@@ -807,6 +905,8 @@ function esjInit() {
   }
   setupInput(inpC, sndC, sendC);
   setupInput(inpE, sndE, sendE);
+  setupInput(inpG, sndG, sendG);
+  setupInput(inpP, sndP, sendP);
 
   // ── VOICE SETUP (solo INPUT — zero TTS output) ────────────────
   function setupVoice(micEl, onResult) {
@@ -836,6 +936,8 @@ function esjInit() {
 
   var recC    = setupVoice(micC,    function(t) { inpC.value = t; sendC(t); });
   var recE    = setupVoice(micE,    function(t) { inpE.value = t; sendE(t); });
+  var recG    = setupVoice(micG,    function(t) { inpG.value = t; sendG(t); });
+  var recP    = setupVoice(micP,    function(t) { inpP.value = t; sendP(t); });
   var recHome = setupVoice(micHome, function(t) { homeInp.value = t; routeHome(t); });
 
   // ── VIEW SWITCH ───────────────────────────────────────────────
@@ -844,6 +946,7 @@ function esjInit() {
     document.getElementById("esj-camere").style.display     = "none";
     document.getElementById("esj-esperienze").style.display = "none";
     document.getElementById("esj-guida").style.display      = "none";
+    document.getElementById("esj-pacchetti").style.display  = "none";
 
     if (view === "home") {
       document.getElementById("esj-home").style.display = "flex";
@@ -869,122 +972,33 @@ function esjInit() {
       }
     } else if (view === "guida") {
       document.getElementById("esj-guida").style.display = "flex";
-      renderGuida();
+      if (ESJ_MSG_G.length === 0) {
+        setTimeout(function() {
+          typG.classList.add("on"); msgsG.scrollTop = msgsG.scrollHeight;
+          var intro = ESJ_LANG === "it"
+            ? "Inizia la conversazione sulla guida di Ostuni e dintorni. Presentati come Sofia e offri di aiutare con informazioni su cosa vedere, dove mangiare, le spiagge, i borghi vicini, le distanze e consigli pratici."
+            : "Start the Ostuni guide conversation. Introduce yourself as Sofia and offer to help with what to see, where to eat, the beaches, nearby villages, distances and practical tips.";
+          ESJ_MSG_G.push({ role: "user", content: intro });
+          callProxy(ESJ_MSG_G, "\n\nCONTESTO: flusso GUIDA OSPITI. Rispondi solo a domande su Ostuni e dintorni.")
+            .then(function(r) { addMsg(msgsG, typG, "assistant", r); renderQR(qrG, "guida"); });
+        }, 300);
+      }
+    } else if (view === "pacchetti") {
+      document.getElementById("esj-pacchetti").style.display = "flex";
+      if (ESJ_MSG_P.length === 0) {
+        setTimeout(function() {
+          typP.classList.add("on"); msgsP.scrollTop = msgsP.scrollHeight;
+          var intro = ESJ_LANG === "it"
+            ? "Presentati come Sofia e mostra i 3 Weekend Esclusivi dell'Eremo di San Giusto con tutti i dettagli — nome, esperienze incluse, prezzi bassa e alta stagione. Poi chiedi per quante persone e quando vorrebbero venire."
+            : "Introduce yourself as Sofia and present the 3 Exclusive Weekends at Eremo di San Giusto — name, included experiences, low and high season prices. Then ask for how many guests and when they would like to come.";
+          ESJ_MSG_P.push({ role: "user", content: intro });
+          callProxy(ESJ_MSG_P, "\n\nCONTESTO: flusso WEEKEND ESCLUSIVI.")
+            .then(function(r) { addMsg(msgsP, typP, "assistant", r); renderQR(qrP, "pacchetti"); });
+        }, 300);
+      }
     }
     updateLabels();
   };
-
-  // ── GUIDA DATA ────────────────────────────────────────────────
-  var ESJ_GUIDA = {
-    tabs: [
-      { id:"ostuni",   it:"Ostuni",        en:"Ostuni" },
-      { id:"spiagge",  it:"Spiagge",       en:"Beaches" },
-      { id:"borghi",   it:"Borghi",        en:"Villages" },
-      { id:"cucina",   it:"Cucina",        en:"Food" },
-      { id:"distanze", it:"Distanze",      en:"Distances" }
-    ],
-    ostuni: {
-      title: { it:"Ostuni — La Città Bianca", en:"Ostuni — The White City" },
-      items: [
-        { name:"Piazza della Libertà", it:"Il salotto di Ostuni con la Colonna di Sant'Oronzo (1771) e i migliori bar panoramici.", en:"Ostuni's main square with the Column of Sant'Oronzo (1771) and the best panoramic bars.", badge:"Centro storico" },
-        { name:"Cattedrale di Santa Maria Assunta", it:"Capolavoro gotico pugliese (1435–1495) con rosone a 24 raggi, unico nel Salento.", en:"Masterpiece of Puglian Gothic (1435–1495) with a 24-ray rose window, unique in the Salento.", badge:"Arte & Architettura" },
-        { name:"Mura Aragonesi", it:"XV sec. Offrono una passeggiata panoramica sulla Valle d'Itria. Nelle giornate limpide si vedono le Isole Tremiti.", en:"15th century. Panoramic walk over the Itria Valley. On clear days the Tremiti Islands are visible.", badge:"Panorama" },
-        { name:"Museo Civiltà Preclassiche", it:"Via Cattedrale. Ospita la 'Delia' (Venere di Ostuni), scheletro di donna gravida di 25.000 anni fa. Chiuso il lunedì.", en:"Via Cattedrale. Houses the 'Delia' (Venus of Ostuni), a 25,000-year-old skeleton of a pregnant woman. Closed Mondays.", badge:"Museo" },
-        { name:"Parcheggi consigliati", it:"P. Via Pola (gratuito, 500m dal centro) · P. Ex Mattatoio (gratuito, evita ZTL) · P. Stazione FS (gratuito, navetta estiva). In luglio-agosto arrivare prima delle 9:30 o dopo le 19:00.", en:"P. Via Pola (free, 500m from centre) · P. Ex Mattatoio (free, avoids ZTL) · P. Railway Station (free, summer shuttle). In July–August arrive before 9:30 am or after 7 pm.", badge:"Pratico" }
-      ]
-    },
-    spiagge: {
-      title: { it:"Le Spiagge di Ostuni", en:"The Beaches of Ostuni" },
-      items: [
-        { name:"Torre Guaceto — Riserva Naturale", it:"La più bella. Costa quasi incontaminata, riserva statale, torre aragonese del '500. Accesso gratuito a piedi. Ideale per snorkeling. ~13 km.", en:"The finest. Near-pristine coastline, state nature reserve, 16th-century Aragonese tower. Free access on foot. Ideal for snorkelling. ~13 km.", badge:"Natura protetta" },
-        { name:"Rosa Marina", it:"Spiaggia bianchissima con stabilimenti di qualità, villaggio residenziale elegante. ~15 km.", en:"Whitest sand with quality beach clubs, elegant residential village. ~15 km.", badge:"Attrezzata" },
-        { name:"Villanova", it:"Piccolo porto peschereccio ancora attivo, spiaggia mista, ottimi ristoranti di pesce sul porto.", en:"Small still-active fishing harbour, mixed beach, excellent seafood restaurants on the harbour.", badge:"Autentica" },
-        { name:"Costa Merlata", it:"Sabbia fine, acque basse, adatta alle famiglie. Grande parcheggio. Vicino al villaggio turistico.", en:"Fine sand, shallow waters, family-friendly. Large car park. Near the resort village.", badge:"Famiglie" },
-        { name:"Consiglio pratico", it:"Evitare 12–16 in luglio-agosto (>35°C). La costa si raggiunge in auto o navetta dal centro (giugno–settembre).", en:"Avoid 12–4pm in July–August (>35°C). Reachable by car or shuttle from the centre (June–September).", badge:"Suggerimento" }
-      ]
-    },
-    borghi: {
-      title: { it:"Borghi della Valle d'Itria", en:"Villages of the Itria Valley" },
-      items: [
-        { name:"Cisternino · 15 km, ~20 min", it:"Il più autentico della Valle d'Itria. Vicoli bianchi, Torre Normanno-Sveva, Cattedrale di San Nicola. Famoso per le bombette ai fornelli pronti. Parcheggio gratuito.", en:"The most authentic in the Itria Valley. White alleys, Norman-Swabian Tower, Cathedral of San Nicola. Famous for bombette at the fornelli pronti. Free parking.", badge:"Borghi più belli d'Italia" },
-        { name:"Ceglie Messapica · 18 km, ~25 min", it:"Capitale gastronomica della Puglia. Castello Ducale, ristoranti stellati, Torrone di Ceglie Presidio Slow Food, Festival GustaMondo (luglio–agosto).", en:"Gastronomic capital of Puglia. Ducal Castle, Michelin-starred restaurants, Torrone di Ceglie Slow Food Presidium, GustaMondo Festival (July–August).", badge:"Gastronomia" },
-        { name:"Martina Franca · 22 km, ~30 min", it:"Barocco pugliese, Palazzo Ducale, Basilica di San Martino. Festival della Valle d'Itria (luglio–agosto, prenotare con mesi anticipo). Capocollo Presidio Slow Food.", en:"Puglian Baroque, Ducal Palace, Basilica of San Martino. Valle d'Itria Festival (July–August, book months ahead). Capocollo Slow Food Presidium.", badge:"Barocco & Opera" },
-        { name:"Locorotondo · 25 km, ~30 min", it:"Borgo circolare patrimonio UNESCO, tetti a cummerse unici. Belvedere mozzafiato sulla Valle. DOC Locorotondo (bianco), degustazioni in cantina.", en:"Circular village, unique cummerse rooftops. Breathtaking Valley belvedere. DOC Locorotondo (white wine), winery tastings.", badge:"Borghi più belli d'Italia" },
-        { name:"Alberobello · 30 km, ~35 min", it:"Simbolo della Puglia nel mondo. Oltre 1.000 trulli nel Rione Monti (UNESCO 1996). Visitare prima delle 9:00 o dopo le 18:00 in estate.", en:"Symbol of Puglia worldwide. Over 1,000 trulli in Rione Monti (UNESCO 1996). Visit before 9am or after 6pm in summer.", badge:"UNESCO" }
-      ]
-    },
-    cucina: {
-      title: { it:"Gastronomia Tipica", en:"Local Gastronomy" },
-      items: [
-        { name:"Olio EVO DOP Valle d'Itria", it:"La colonna vertebrale di ogni piatto locale. Degustalo nella nostra esperienza Liquid Gold.", en:"The backbone of every local dish. Taste it in our Liquid Gold experience.", badge:"Must try" },
-        { name:"Fave e Cicoria", it:"Il piatto povero per eccellenza. Straordinaria semplicità e bontà — pura cucina contadina pugliese.", en:"The quintessential peasant dish. Extraordinary simplicity and flavour.", badge:"Must try" },
-        { name:"Orecchiette", it:"Con ragù di carne o cime di rapa. Impara a farle nella nostra Cooking Class!", en:"With meat ragù or turnip tops. Learn to make them in our Cooking Class!", badge:"Must try" },
-        { name:"Bombette di Cisternino", it:"Involtini di capocollo ripieni di formaggio. Da mangiare ai fornelli pronti di Cisternino.", en:"Rolled capocollo stuffed with cheese. Eat them at the fornelli pronti in Cisternino.", badge:"Cisternino" },
-        { name:"Burrata e Mozzarella", it:"Di Andria. Con pomodorini e olio locale — indispensabile a ogni pasto.", en:"From Andria. With cherry tomatoes and local olive oil — essential at every meal.", badge:"Prodotto tipico" },
-        { name:"Primitivo di Manduria & Negroamaro", it:"Vini rossi del territorio — abbinarli alle carni e ai formaggi stagionati.", en:"Local red wines — pair with meats and aged cheeses.", badge:"Vino" },
-        { name:"Pasticciotti & Cartellate", it:"Dolci tipici pugliesi — pasticciotti a colazione, cartellate a Natale.", en:"Traditional Puglian pastries — pasticciotti for breakfast, cartellate at Christmas.", badge:"Dolci" }
-      ]
-    },
-    distanze: {
-      title: { it:"Distanze dall'Eremo", en:"Distances from the Eremo" },
-      rows: [
-        { dest:"Ostuni (centro storico)", destEn:"Ostuni (historic centre)", km:"3 km",   time:"~8 min" },
-        { dest:"Aeroporto Brindisi",       destEn:"Brindisi Airport",         km:"35 km",  time:"~35 min" },
-        { dest:"Cisternino",               destEn:"Cisternino",               km:"15 km",  time:"~20 min" },
-        { dest:"Ceglie Messapica",         destEn:"Ceglie Messapica",         km:"18 km",  time:"~25 min" },
-        { dest:"Martina Franca",           destEn:"Martina Franca",           km:"22 km",  time:"~30 min" },
-        { dest:"Locorotondo",              destEn:"Locorotondo",              km:"25 km",  time:"~30 min" },
-        { dest:"Alberobello",              destEn:"Alberobello",              km:"30 km",  time:"~35 min" },
-        { dest:"Bari",                     destEn:"Bari",                     km:"65 km",  time:"~55 min" },
-        { dest:"Taranto",                  destEn:"Taranto",                  km:"60 km",  time:"~55 min" },
-        { dest:"Lecce",                    destEn:"Lecce",                    km:"80 km",  time:"~1h 10 min" }
-      ]
-    }
-  };
-
-  var ESJ_GUIDA_CUR = "ostuni";
-
-  function renderGuida() {
-    var it = ESJ_LANG === "it";
-    // Tabs
-    var tabsEl = document.getElementById("esj-guida-tabs");
-    tabsEl.innerHTML = "";
-    ESJ_GUIDA.tabs.forEach(function(t) {
-      var btn = document.createElement("button");
-      btn.className = "esj-gtab" + (t.id === ESJ_GUIDA_CUR ? " active" : "");
-      btn.textContent = it ? t.it : t.en;
-      btn.onclick = function() { ESJ_GUIDA_CUR = t.id; renderGuida(); };
-      tabsEl.appendChild(btn);
-    });
-    // Content
-    var body = document.getElementById("esj-guida-body");
-    body.innerHTML = "";
-    var sec = ESJ_GUIDA[ESJ_GUIDA_CUR];
-    var titleEl = document.createElement("div");
-    titleEl.className = "esj-gsec-title";
-    titleEl.textContent = it ? sec.title.it : sec.title.en;
-    body.appendChild(titleEl);
-
-    if (ESJ_GUIDA_CUR === "distanze") {
-      sec.rows.forEach(function(r) {
-        var row = document.createElement("div");
-        row.className = "esj-gdist";
-        row.innerHTML = '<span class="esj-gdist-name">'+(it?r.dest:r.destEn)+'</span>'
-          + '<span class="esj-gdist-km">'+r.km+'</span>'
-          + '<span class="esj-gdist-time">'+r.time+'</span>';
-        body.appendChild(row);
-      });
-    } else {
-      sec.items.forEach(function(item) {
-        var el = document.createElement("div");
-        el.className = "esj-gitem";
-        el.innerHTML = '<div class="esj-gitem-name">'+item.name+'</div>'
-          + '<div class="esj-gitem-desc">'+(it?item.it:item.en)+'</div>'
-          + '<span class="esj-gitem-badge">'+item.badge+'</span>';
-        body.appendChild(el);
-      });
-    }
-  }
 
   // ── QUICK REPLIES ─────────────────────────────────────────────
   function renderQR(container, type) {
@@ -997,6 +1011,20 @@ function esjInit() {
           { it: "Aggiungi un'esperienza",      en: "Add an experience"    },
           { it: "Come si arriva?",             en: "How to get there?"    }
         ]
+      : type === "guida"
+      ? [
+          { it: "Cosa vedere a Ostuni?",        en: "What to see in Ostuni?"   },
+          { it: "Le spiagge pi\u00f9 belle",    en: "Best beaches nearby"      },
+          { it: "Borghi da visitare",           en: "Villages to visit"        },
+          { it: "Dove mangiare tipico?",        en: "Where to eat local food?" }
+        ]
+      : type === "pacchetti"
+      ? [
+          { it: "Puglian Immersion",            en: "Puglian Immersion"         },
+          { it: "Into the Wild",                en: "Into the Wild"             },
+          { it: "Senses Journey",               en: "Senses Journey"            },
+          { it: "Posso personalizzare?",        en: "Can I customise?"          }
+        ]
       : [
           { it: "Liquid Gold \u2014 olio EVO", en: "Liquid Gold \u2014 olive oil" },
           { it: "Stargazing",                  en: "Stargazing"                  },
@@ -1007,7 +1035,12 @@ function esjInit() {
       var btn = document.createElement("button");
       btn.className = "esj-qr";
       btn.textContent = ESJ_LANG === "en" ? b.en : b.it;
-      btn.onclick = function() { type === "camere" ? sendC(btn.textContent) : sendE(btn.textContent); };
+      btn.onclick = function() {
+        if (type === "camere") sendC(btn.textContent);
+        else if (type === "guida") sendG(btn.textContent);
+        else if (type === "pacchetti") sendP(btn.textContent);
+        else sendE(btn.textContent);
+      };
       container.appendChild(btn);
     });
   }
@@ -1052,9 +1085,11 @@ function esjInit() {
   function routeHome(text) {
     var expKw = ["esperienza","esperienze","experience","olio","ulivo","stelle","star","cucina","cook","massaggio","massage","trekking","carrozze","carriages","serenade","tramonto","sunset","ciuchino","avventura","weekend","pacchetto","package"];
     var guidaKw = ["ostuni","spiaggia","spiagge","beach","borgo","borghi","village","ristorante","mangiare","food","distanza","distanze","distance","dove","parcheggio","come arrivare","getting around","dintorni","surroundings"];
+    var paccKw  = ["pacchetto","pacchetti","weekend","esclusivo","esclusivi","immersion","wild","senses","journey","package","soggiorno"];
     var isGuida = guidaKw.some(function(k) { return text.toLowerCase().includes(k); });
     var isExp   = expKw.some(function(k)   { return text.toLowerCase().includes(k); });
-    esjGoView(isGuida ? "guida" : isExp ? "esperienze" : "camere");
+    var isPacc  = paccKw.some(function(k)  { return text.toLowerCase().includes(k); });
+    esjGoView(isPacc ? "pacchetti" : isGuida ? "guida" : isExp ? "esperienze" : "camere");
     setTimeout(function() { isExp ? sendE(text) : sendC(text); }, 500);
   }
 
@@ -1065,6 +1100,8 @@ function esjInit() {
     document.getElementById("esj-lang-en").classList.toggle("active", lang === "en");
     if (recC)    recC.lang    = lang === "it" ? "it-IT" : "en-GB";
     if (recE)    recE.lang    = lang === "it" ? "it-IT" : "en-GB";
+    if (recG)    recG.lang    = lang === "it" ? "it-IT" : "en-GB";
+    if (recP)    recP.lang    = lang === "it" ? "it-IT" : "en-GB";
     if (recHome) recHome.lang = lang === "it" ? "it-IT" : "en-GB";
     updateLabels();
     renderHomeQuick();
@@ -1074,20 +1111,25 @@ function esjInit() {
     var it = ESJ_LANG === "it";
     var s = function(id, txt) { var el = document.getElementById(id); if (el) el.innerHTML = txt; };
     s("esj-sub",      it ? "Assistente di Prenotazione \u00b7 Ostuni, Puglia" : "Booking Assistant \u00b7 Ostuni, Puglia");
-    s("esj-home-msg", it ? "Ciao! Sono Sofia. Posso aiutarti a prenotare una camera, scoprire le esperienze dell\u2019Eremo o orientarti su Ostuni e dintorni." : "Hi! I\u2019m Sofia. I can help you book a room, discover the Eremo experiences, or explore Ostuni and the surroundings.");
+    s("esj-home-msg", it ? "Ciao! Sono Sofia. Prenota una camera, scopri le nostre esperienze, i Weekend Esclusivi o lasciati guidare nella Valle d\u2019Itria." : "Hi! I\u2019m Sofia. Book a room, discover our experiences, Exclusive Weekends or let me guide you through the Itria Valley.");
     s("esj-ct1",      it ? "Prenota una camera" : "Book a room");
     s("esj-cs1",      it ? "Trullo &middot; Lamia &middot; disponibilit&agrave; live" : "Trullo &middot; Lamia &middot; live availability");
     s("esj-ct2",      it ? "Esperienze" : "Experiences");
-    s("esj-cs2",      it ? "8 esperienze &middot; pacchetti weekend" : "8 experiences &middot; weekend packages");
+    s("esj-cs2",      it ? "8 esperienze &middot; su misura" : "8 experiences &middot; bespoke");
     s("esj-ct3",      it ? "Ostuni &amp; Dintorni" : "Getting Around");
     s("esj-cs3",      it ? "Spiagge &middot; Borghi &middot; Gastronomia &middot; Distanze" : "Beaches &middot; Villages &middot; Food &middot; Distances");
     s("esj-cs3b",     it ? "Guida ospiti" : "Guest guide");
+    s("esj-ct4",      it ? "Weekend Esclusivi" : "Exclusive Weekends");
+    s("esj-cs4",      it ? "3 pacchetti curati &middot; camera + esperienze" : "3 curated packages &middot; room + experiences");
+    s("esj-cs4b",     it ? "da &euro;750" : "from &euro;750");
     s("esj-back-c",   it ? "\u2190 Home" : "\u2190 Home");
     s("esj-back-e",   it ? "\u2190 Home" : "\u2190 Home");
     s("esj-back-g",   it ? "\u2190 Home" : "\u2190 Home");
+    s("esj-back-p",   it ? "\u2190 Home" : "\u2190 Home");
     s("esj-lbl-c",    it ? "Prenotazione Camera &middot; Beds24" : "Room Booking &middot; Beds24");
     s("esj-lbl-e",    it ? "Esperienze &middot; Sistema Custom" : "Experiences &middot; Custom System");
     s("esj-lbl-g",    it ? "Ostuni &amp; Dintorni &middot; Guida Ospiti" : "Ostuni &amp; Surroundings &middot; Guest Guide");
+    s("esj-lbl-p",    it ? "Weekend Esclusivi &middot; Pacchetti Curati" : "Exclusive Weekends &middot; Curated Packages");
     var hInp = document.getElementById("esj-home-inp");
     if (hInp) hInp.placeholder = it ? "Scrivi una domanda..." : "Ask a question...";
     var iC = document.getElementById("esj-inp-c");
@@ -1107,6 +1149,8 @@ function esjInit() {
   // Esponi send* globalmente: gli onclick delle card dinamiche sono fuori dallo scope di esjInit
   window.esjSendE = sendE;
   window.esjSendC = sendC;
+  window.esjSendG = sendG;
+  window.esjSendP = sendP;
 
   updateLabels();
   renderHomeQuick();
