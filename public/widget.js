@@ -1,4 +1,4 @@
-// ============================================================
+  // ============================================================
 // Eremo di San Giusto — Sofia Widget v3.0
 // Homepage unificata: camere (Beds24) + esperienze (Bókun)
 // Voce: solo INPUT (microfono) — nessun TTS in output
@@ -12,7 +12,7 @@ var ESJ_MSG_E = []; // conversazione esperienze
 
 // ─── SYSTEM PROMPT ──────────────────────────────────────────
 
-var ESJ_SYSTEM_BASE = "Sei Sofia, l'assistente virtuale dell'Eremo di San Giusto. Parli con un tono caldo, elegante e pugliese nell'anima. Non inventare mai informazioni — usa sempre gli strumenti per verificare disponibilita e prezzi reali.\n\nLA PROPRIETA':\nL'Eremo di San Giusto e' un trullo con lamia situato a 2 km dal centro storico di Ostuni, alle pendici del Monte Morrone, sul Cammino Materano che abbraccia i santuari di Sant'Oronzo e San Biagio. Gode di una vista mozzafiato sugli ulivi millenari e sul Mare Adriatico.\n\nSPAZI E COMFORT:\n- 2 camere da letto matrimoniali con 2 bagni indipendenti\n- In una camera matrimoniale e' disponibile anche un letto singolo per bambini\n- Capienza massima: 5 persone (massimo 4 adulti)\n- Vasca idromassaggio Novellini Natural Air in camera\n- Minipiscina idromassaggio sul terrazzo con vista panoramica\n- Parco agrario privato di 5 ettari con ulivi verso il mare\n- Cucina attrezzata, ampi spazi esterni\n\nSERVIZI INCLUSI: Aria condizionata, TV, Wi-Fi gratuito, bottiglia di vino e snack di benvenuto. Animali domestici ammessi con supplemento 50 euro.\n\nCHECK-IN dalle 15:00 — CHECK-OUT entro le 10:30\n\nESPERIENZE (usa SEMPRE il Bokun ID indicato):\n1. LIQUID GOLD - Degustazione Olio EVO (Bokun ID: 1174685): Frantoio ipogeo, grotta, ulivi, degustazione olio EVO. Standard 35 eur/pp, Privato 50 eur/pp. Max 12 pp. Tutto l'anno.\n2. RITUALI DI BENESSERE - Massaggi (Bokun ID: 1176359): Osteopata certificato. Deep Tissue 80 eur, Rilassante 70 eur, Tonico 70 eur. Min 2 pp. Apr-Ott.\n3. CIUCHINO BIRICHINO - Parco Avventura (Bokun ID: 1127362): Zip line, percorsi treetop. Junior 15 eur, Verde 25, Blu 30, Rosso/Nero 35 eur. Apr-Ott.\n4. ORECCHIETTE COOKING CLASS (Bokun ID: 1169655): Chef locale, cucina outdoor. Standard 35 eur, Privato 50 eur. Max 8 pp.\n5. STARGAZING (Bokun ID: 1174664): Telescopio professionale, guida astrofilo. Standard 35 eur, Privato 45 eur. Ore 22:00-00:00. Apr-Ott. Max 10 pp.\n6. SUNSET SERENADE (Bokun ID: 1176360): Duo fisarmonica e mandolino, vino e tagliere. Standard 60 eur, Coppia 130 eur flat. Max 20 pp. Apr-Ott.\n7. TREKKING MONTE MORRONE (Bokun ID: 1168574): Santuari Sant'Oronzo e San Biagio. Corto 5km 25 eur, Lungo 10km 35 eur. Max 10 pp.\n8. CARRIAGES AND COUNTRYSIDE (Bokun ID: 1176362): Museo carrozze d'epoca, chiesa rupestre. Standard 35 eur, Privato 50 eur. Max 15 pp. Mar-Dom.\n\nPACCHETTI WEEKEND (2 notti, coppia):\n- Puglian Immersion: da 780 eur (bassa) / 980 eur (alta). Cooking Class + Liquid Gold + Carriages + Sunset Serenade + Trekking 5km.\n- Into the Wild: da 750 eur / 950 eur. Liquid Gold + Trekking 10km + Sunset Serenade + Stargazing + Trekking 5km.\n- Senses Journey: da 940 eur / 1140 eur. Cooking Class + Liquid Gold + Massaggio + Sunset Serenade + Stargazing + Trekking 5km.\n\nCANCELLAZIONE: Gratuita 48h prima. 50% rimborso 24-48h. Nessun rimborso entro 24h.\n\nFLUSSO CAMERA: 1) Chiedi date e ospiti 2) Usa check_availability 3) Presenta con prezzo reale 4) Proponi esperienze abbinabili 5) Raccogli nome/cognome/email/telefono 6) Usa create_room_booking con roomId 469679 7) Dai codice conferma.\n\nFLUSSO ESPERIENZA: 1) Identifica esperienza e Bokun ID corretto 2) Chiedi data e partecipanti 3) Usa check_experience_availability 4) Presenta disponibilita e prezzo 5) Raccogli dati ospite 6) Usa create_experience_booking 7) Conferma.\n\nREGOLE ASSOLUTE: Usa SEMPRE i tool. Usa roomId 469679 per camere. Usa SEMPRE il Bokun ID CORRETTO per ogni esperienza. Non inventare mai.";
+var ESJ_SYSTEM_BASE = "Sei Sofia, l'assistente virtuale dell'Eremo di San Giusto. Parli con un tono caldo, elegante e pugliese nell'anima. Non inventare mai informazioni — usa sempre gli strumenti per verificare disponibilita e prezzi reali.\n\nLA PROPRIETA':\nL'Eremo di San Giusto e' un trullo con lamia situato a 2 km dal centro storico di Ostuni, alle pendici del Monte Morrone, sul Cammino Materano che abbraccia i santuari di Sant'Oronzo e San Biagio. Gode di una vista mozzafiato sugli ulivi millenari e sul Mare Adriatico.\n\nSPAZI E COMFORT:\n- 2 camere da letto matrimoniali con 2 bagni indipendenti\n- In una camera matrimoniale e' disponibile anche un letto singolo per bambini\n- Capienza massima: 5 persone (massimo 4 adulti)\n- Vasca idromassaggio Novellini Natural Air in camera\n- Minipiscina idromassaggio sul terrazzo con vista panoramica\n- Parco agrario privato di 5 ettari con ulivi verso il mare\n- Cucina attrezzata, ampi spazi esterni\n\nSERVIZI INCLUSI: Aria condizionata, TV, Wi-Fi gratuito, bottiglia di vino e snack di benvenuto. Animali domestici ammessi con supplemento 50 euro.\n\nCHECK-IN dalle 15:00 — CHECK-OUT entro le 10:30\n\nESPERIENZE (sistema prenotazione interno — usa i tool airtable):\n1. LIQUID GOLD (id: liquid-gold): Frantoio ipogeo, grotta, ulivi, degustazione EVO. Standard 35 eur/pp, Privato 50 eur/pp, Bambino 10 eur. Max 12 pp. Tutto l'anno. Orari: 10:30, 17:00.\n2. RITUALI DI BENESSERE — Massaggi (id: massaggi): Osteopata certificato. Deep tissue 80 eur, Rilassante 70 eur, Tonificante 70 eur. Min 2 pp. Apr-Ott. Orari: 09:00, 10:30, 16:00, 17:30.\n3. CIUCHINO BIRICHINO — Parco avventura (id: ciuchino-birichino): Zip line, treetop. Junior 15, Verde 25, Blu 30, Rosso/Nero 35 eur. Apr-Ott. Orari: 09:30, 15:00.\n4. ORECCHIETTE COOKING CLASS (id: cooking-class): Chef locale, cucina outdoor. Standard 35 eur/pp, Privato 50 eur/pp, Bambino 18 eur. Max 8 pp. Orari: 11:00, 18:30.\n5. STARGAZING (id: stargazing): Telescopio professionale. Standard 35 eur/pp, Privato 45 eur/pp, Bambino 15 eur. Max 10 pp. Apr-Ott. Orario: 22:00.\n6. SUNSET SERENADE (id: sunset-serenade): Duo musicale, vino e tagliere. Standard 60 eur/pp, Coppia 130 eur flat. Max 20 pp. Apr-Ott. Orario variabile al tramonto.\n7. TREKKING MONTE MORRONE (id: trekking): Santuari. Corto 5km 25 eur/pp, Lungo 10km 35 eur/pp, Privato 250 eur flat. Max 10 pp. Orari: 08:00, 17:00.\n8. CARRIAGES AND COUNTRYSIDE (id: carriages): Museo carrozze, chiesa rupestre. Standard 35 eur/pp, Privato 50 eur/pp. Max 15 pp. Mar-Dom. Orari: 10:00, 17:00.\n\nPACCHETTI WEEKEND (2 notti, coppia):\n- Puglian Immersion: da 780 eur (bassa) / 980 eur (alta).\n- Into the Wild: da 750 eur / 950 eur.\n- Senses Journey: da 940 eur / 1140 eur.\n\nCANCELLAZIONE ESPERIENZE: Gratuita fino a 48h prima. 50% rimborso tra 24h e 48h. Nessun rimborso entro 24h.\n\nFLUSSO CAMERA: 1) Chiedi date e ospiti 2) Usa check_availability 3) Presenta con prezzo reale 4) Proponi esperienze abbinabili 5) Raccogli nome/cognome/email/telefono 6) Usa create_room_booking con roomId 469679 7) Dai codice conferma Beds24.\n\nFLUSSO ESPERIENZA (sistema Airtable): 1) Identifica l'esperienza e il suo ID corretto (es. 'liquid-gold') 2) Chiedi data preferita e numero partecipanti 3) Usa check_experience_availability con l'ID corretto e la data YYYY-MM-DD 4) Se disponibile presenta gli slot con orari e posti liberi; se non disponibile proponi le date alternative restituite dal tool 5) Chiedi tipo prezzo (Standard/Privato/ecc.) 6) Raccogli nome, cognome, email, telefono, eventuali note 7) Usa create_experience_booking con tutti i dati 8) Comunica il codice di prenotazione ESG-XXXXXX e conferma email inviata.\n\nREGOLE ASSOLUTE: Usa SEMPRE i tool — mai inventare disponibilita o prezzi. Usa roomId 469679 per le camere. Per le esperienze usa SEMPRE l'ID corretto (liquid-gold, massaggi, ciuchino-birichino, cooking-class, stargazing, sunset-serenade, trekking, carriages). La data va sempre in formato YYYY-MM-DD.";
 
 // ─── TOOLS ──────────────────────────────────────────────────
 
@@ -38,22 +38,28 @@ var ESJ_TOOLS = [
   },
   {
     name: "check_experience_availability",
-    description: "Verifica disponibilita esperienza su Bokun.",
+    description: "Verifica disponibilita di una esperienza su Airtable per una data specifica. Restituisce gli slot disponibili con orari e posti liberi, oppure date alternative se non disponibile.",
     input_schema: { type: "object", properties: {
-      productId: { type: "string", description: "ID prodotto Bokun" },
-      date:      { type: "string", description: "Data YYYY-MM-DD" },
-      guests:    { type: "integer" }
-    }, required: ["productId","date","guests"] }
+      esperienza: { type: "string", description: "ID esperienza: liquid-gold | massaggi | ciuchino-birichino | cooking-class | stargazing | sunset-serenade | trekking | carriages" },
+      data:       { type: "string", description: "Data YYYY-MM-DD" },
+      partecipanti: { type: "integer", description: "Numero partecipanti" }
+    }, required: ["esperienza","data","partecipanti"] }
   },
   {
     name: "create_experience_booking",
-    description: "Prenota esperienza su Bokun.",
+    description: "Crea prenotazione esperienza su Airtable. Da chiamare solo dopo check_experience_availability e dopo aver raccolto tutti i dati ospite.",
     input_schema: { type: "object", properties: {
-      productId: { type: "string" }, date: { type: "string" },
-      guests:    { type: "integer" }, firstName: { type: "string" },
-      lastName:  { type: "string" }, email: { type: "string" },
-      phone:     { type: "string" }
-    }, required: ["productId","date","guests","firstName","lastName","email"] }
+      esperienza:   { type: "string", description: "ID esperienza (es. liquid-gold)" },
+      data:         { type: "string", description: "Data YYYY-MM-DD" },
+      orario:       { type: "string", description: "Orario slot scelto (es. 10:30)" },
+      partecipanti: { type: "integer", description: "Numero partecipanti" },
+      firstName:    { type: "string" },
+      lastName:     { type: "string" },
+      email:        { type: "string" },
+      phone:        { type: "string" },
+      tipoPrezzo:   { type: "string", description: "Standard | Privato | Coppia | Bambino | Junior | Verde | Blu | Rosso/Nero | Rilassante | Tonificante | Deep tissue | Corto 5km | Lungo 10km" },
+      noteOspite:   { type: "string", description: "Note, allergie o richieste speciali" }
+    }, required: ["esperienza","data","orario","partecipanti","firstName","lastName","email"] }
   }
 ];
 
@@ -492,9 +498,9 @@ function esjInit() {
           } else if (b.name === "create_room_booking") {
             res = await (await fetch(ESJ_PROXY + "/api/booking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b.input) })).json();
           } else if (b.name === "check_experience_availability") {
-            res = await (await fetch(ESJ_PROXY + "/api/experiences", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "availability", ...b.input }) })).json();
+            res = await (await fetch(ESJ_PROXY + "/api/airtable", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "check_availability", ...b.input }) })).json();
           } else if (b.name === "create_experience_booking") {
-            res = await (await fetch(ESJ_PROXY + "/api/experiences", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "book", ...b.input }) })).json();
+            res = await (await fetch(ESJ_PROXY + "/api/airtable", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "create_booking", ...b.input }) })).json();
           }
         } catch(e) { res = { error: e.message }; }
         results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res) });
@@ -700,11 +706,11 @@ function esjInit() {
       typE.classList.add("on"); msgsE.scrollTop = msgsE.scrollHeight;
       ESJ_MSG_E.push({ role: "user", content: text });
       try {
-        var ctx2 = "\n\nCONTESTO: flusso ESPERIENZE custom (no Bokun, no Bókun ID). "
-          + "Sistema prenotazione interno. "
-          + "Se l'utente menziona un'esperienza senza ancora averla vista, descrivila brevemente e proponi di mostrargli la scheda. "
-          + "Se sta prenotando, raccogli: esperienza, data, partecipanti, nome, cognome, email, telefono. "
-          + "Non inventare disponibilità — rispondi che verificherai e confermerai via email.";
+        var ctx2 = "\n\nCONTESTO: flusso ESPERIENZE con sistema Airtable. "
+          + "Per verificare disponibilita usa check_experience_availability con l'ID esperienza corretto (es. liquid-gold) e la data in YYYY-MM-DD. "
+          + "Se disponibile presenta gli slot con orari e posti liberi. Se non disponibile proponi le date alternative restituite dal tool. "
+          + "Per prenotare usa create_experience_booking con tutti i dati: esperienza, data, orario, partecipanti, nome, cognome, email, telefono, tipoPrezzo. "
+          + "Non inventare mai disponibilita — usa sempre i tool Airtable.";
         var r2 = await callProxy(ESJ_MSG_E, ctx2);
         addMsg(msgsE, typE, "assistant", r2);
       } catch(e) {
