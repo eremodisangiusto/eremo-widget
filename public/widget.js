@@ -70,22 +70,41 @@ async function esjStripeRedirect(opts) {
   msgsEl.insertBefore(d, typEl);
   msgsEl.scrollTop = msgsEl.scrollHeight;
 
-  // Click: paga ora — redirect a /checkout su Vercel (stesso dominio, zero CORS)
+  // Click: paga ora — chiama /api/stripe per creare la sessione, poi redirect
   setTimeout(function() {
     var payBtn = document.getElementById("esj-pay-btn");
     if (payBtn) {
-      payBtn.addEventListener("click", function() {
-        var params = new URLSearchParams({
-          type:      opts.type        || "esperienza",
-          tariffa:   opts.tariffa     || "standard",
-          ref:       opts.bookingRef  || "",
-          desc:      encodeURIComponent(opts.descrizione || ""),
-          importo:   String(opts.importo || 0),
-          firstName: opts.firstName   || "",
-          lastName:  opts.lastName    || "",
-          email:     opts.email       || "",
-        });
-        window.location.href = ESJ_PROXY + "/checkout?" + params.toString();
+      payBtn.addEventListener("click", async function() {
+        payBtn.disabled = true;
+        payBtn.textContent = it ? "Reindirizzamento…" : "Redirecting…";
+        try {
+          var stripeResp = await fetch(ESJ_PROXY + "/api/stripe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type:        opts.type       || "esperienza",
+              tariffa:     opts.tariffa    || "standard",
+              payNow:      true,
+              bookingRef:  opts.bookingRef || "",
+              descrizione: opts.descrizione || "",
+              importo:     opts.importo    || 0,
+              firstName:   opts.firstName  || "",
+              lastName:    opts.lastName   || "",
+              email:       opts.email      || "",
+            })
+          }).then(function(r) { return r.json(); });
+          if (stripeResp && stripeResp.url) {
+            window.location.href = stripeResp.url;
+          } else {
+            payBtn.disabled = false;
+            payBtn.textContent = it ? "Errore — riprova" : "Error — try again";
+            console.error("Stripe error:", stripeResp);
+          }
+        } catch(e) {
+          payBtn.disabled = false;
+          payBtn.textContent = it ? "Errore — riprova" : "Error — try again";
+          console.error("Stripe fetch error:", e);
+        }
       });
     }
     var laterBtn = document.getElementById("esj-pay-later-btn");
