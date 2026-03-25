@@ -217,7 +217,6 @@ export default async function handler(req, res) {
           records: [{
             fields: {
               'Booking ref':        bookingRef,
-              'Slot ID':            slot.id,
               'Esperienza':         esperienza,
               'Data':               data,
               'Orario':             orario,
