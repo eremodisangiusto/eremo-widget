@@ -1,14 +1,12 @@
 // ============================================================
 // Eremo di San Giusto — api/checkout.js
-// Endpoint GET/POST che crea la Stripe Checkout Session
+// Endpoint GET che crea la Stripe Checkout Session
 // e redirige direttamente — nessuna chiamata cross-origin
-// Il widget fa window.location.href = ESJ_PROXY + "/api/checkout?..."
 // ============================================================
 
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
-module.exports = async function handler(req, res) {
-  // CORS per sicurezza
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
