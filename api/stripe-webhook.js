@@ -3,7 +3,7 @@
 // Riceve eventi Stripe e aggiorna lo stato delle prenotazioni
 // ============================================================
 
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
 const AIRTABLE_API   = 'https://api.airtable.com/v0';
 const AIRTABLE_BASE  = process.env.AIRTABLE_BASE_ID;
@@ -156,5 +156,5 @@ async function handler(req, res) {
 }
 
 // Disabilita il bodyParser di Next.js — Stripe richiede il body raw
-module.exports = handler;
-module.exports.config = { api: { bodyParser: false } };
+export default handler;
+export const config = { api: { bodyParser: false } };
