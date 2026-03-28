@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Import Review · Eremo di San Giusto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Jost', sans-serif;
+      background: #1a1410;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .card {
+      background: #faf7f2;
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #ece4d8;
+    }
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      color: #2c2218;
+    }
+    .logo span { color: #8a6030; }
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: #2c2218;
+      margin-bottom: 0.5rem;
+    }
+    p { font-size: 0.85rem; color: #5a4a38; line-height: 1.6; }
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      align-items: flex-end;
+    }
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #8a7560;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    input[type="number"] {
+      width: 100px;
+      padding: 0.6rem 0.8rem;
+      border: 1.5px solid #ece4d8;
+      border-radius: 8px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.85rem;
+      color: #2c2218;
+      background: #fff;
+      outline: none;
+    }
+    input[type="number"]:focus { border-color: #c8a97e; }
+    .btn {
+      padding: 0.65rem 1.5rem;
+      background: linear-gradient(135deg, #c8a97e, #9a6e38);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary {
+      padding: 0.55rem 1.2rem;
+      background: transparent;
+      border: 1.5px solid #ece4d8;
+      border-radius: 10px;
+      color: #8a6030;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: #c8a97e; background: #faf7f2; }
+    .status-box {
+      display: none;
+      padding: 1rem 1.2rem;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      line-height: 1.6;
+      margin-top: 1rem;
+    }
+    .status-box.loading { background: #f2ece2; color: #5a4a38; display: block; }
+    .status-box.success { background: #eaf3de; color: #27500a; display: block; }
+    .status-box.error   { background: #fcebeb; color: #791f1f; display: block; }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .result-item {
+      background: #fff;
+      border: 1px solid #ece4d8;
+      border-radius: 10px;
+      padding: 0.8rem;
+      text-align: center;
+    }
+    .result-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      color: #8a6030;
+      font-weight: 600;
+    }
+    .result-label { font-size: 0.72rem; color: #8a7560; margin-top: 2px; }
+    .divider { height: 1px; background: #ece4d8; margin: 1.5rem 0; }
+    .info-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f2ece2;
+      font-size: 0.8rem;
+      color: #5a4a38;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #c8a97e;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid #c8a97e;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div>
+        <div class="logo">🫒 Eremo <span>di San Giusto</span></div>
+      </div>
+    </div>
+
+    <h2>Importa Review da Booking.com</h2>
+    <p>Importa automaticamente le review di Booking.com nella Knowledge Base. Sofia analizzerà ogni review e aggiungerà i tag contestuali.</p>
+
+    <div class="form-row">
+      <div>
+        <label>Numero review</label>
+        <input type="number" id="num-reviews" value="20" min="1" max="100">
+      </div>
+      <button class="btn" id="btn-import" onclick="importReviews()">
+        Importa ora
+      </button>
+      <button class="btn-secondary" onclick="checkStatus()">
+        Verifica connessione
+      </button>
+    </div>
+
+    <div class="status-box" id="status-box">
+      <span class="spinner"></span> Connessione a Beds24 e Booking.com...
+    </div>
+
+    <div id="result-grid" style="display:none" class="result-grid">
+      <div class="result-item">
+        <div class="result-num" id="r-totale">0</div>
+        <div class="result-label">Trovate</div>
+      </div>
+      <div class="result-item">
+        <div class="result-num" id="r-importate" style="color:#3b6d11">0</div>
+        <div class="result-label">Importate</div>
+      </div>
+      <div class="result-item">
+        <div class="result-num" id="r-saltate" style="color:#8a7560">0</div>
+        <div class="result-label">Già presenti</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <label>Come funziona</label>
+      <div style="margin-top: 0.5rem">
+        <div class="info-row"><div class="dot"></div><span>Si connette a Beds24 API V2 e recupera le review di Booking.com</span></div>
+        <div class="info-row"><div class="dot"></div><span>Salta automaticamente le review già importate (nessun duplicato)</span></div>
+        <div class="info-row"><div class="dot"></div><span>Claude AI analizza ogni review e assegna i tag (romantico, famiglie, natura...)</span></div>
+        <div class="info-row"><div class="dot"></div><span>Le review vengono salvate nel Guestbook su Airtable con Pubblicata = ✓</span></div>
+        <div class="info-row"><div class="dot"></div><span>Sofia le userà per rispondere a domande degli ospiti nella sezione Scopri</span></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <p style="font-size:0.75rem;color:#8a7560;text-align:center;">
+      Pannello admin · Eremo di San Giusto · <a href="/widget.html" style="color:#8a6030;">Torna al widget</a>
+    </p>
+  </div>
+
+  <script>
+    const PROXY = 'https://eremo-bookings.vercel.app';
+
+    function setStatus(type, html) {
+      var box = document.getElementById('status-box');
+      box.className = 'status-box ' + type;
+      box.innerHTML = html;
+    }
+
+    async function checkStatus() {
+      setStatus('loading', '<span class="spinner"></span> Verifico connessione Beds24...');
+      try {
+        var resp = await fetch(PROXY + '/api/reviews?action=status');
+        var data = await resp.json();
+        if (data.success) {
+          setStatus('success', '✓ Connessione Beds24 OK — pronto per importare le review.');
+        } else {
+          setStatus('error', '✗ Errore: ' + (data.error || 'connessione fallita'));
+        }
+      } catch(e) {
+        setStatus('error', '✗ Errore di rete: ' + e.message);
+      }
+    }
+
+    async function importReviews() {
+      var num = document.getElementById('num-reviews').value || 20;
+      var btn = document.getElementById('btn-import');
+      btn.disabled = true;
+      document.getElementById('result-grid').style.display = 'none';
+      setStatus('loading', '<span class="spinner"></span> Connessione a Beds24... recupero review da Booking.com...');
+
+      try {
+        var resp = await fetch(PROXY + '/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'import', numReviews: Number(num) })
+        });
+        var data = await resp.json();
+
+        if (data.success) {
+          setStatus('success',
+            '✓ ' + data.message +
+            (data.errori ? '<br><small style="color:#854F0B">Errori su ' + data.errori.length + ' review — vedi console</small>' : '')
+          );
+          document.getElementById('r-totale').textContent   = data.totale    || 0;
+          document.getElementById('r-importate').textContent = data.importate || 0;
+          document.getElementById('r-saltate').textContent  = data.saltate   || 0;
+          document.getElementById('result-grid').style.display = 'grid';
+        } else {
+          setStatus('error', '✗ ' + (data.error || 'Importazione fallita'));
+        }
+      } catch(e) {
+        setStatus('error', '✗ Errore: ' + e.message);
+      }
+      btn.disabled = false;
+    }
+  </script>
+</body>
+</html>
