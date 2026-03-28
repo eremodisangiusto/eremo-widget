@@ -158,20 +158,32 @@ export default async function handler(req, res) {
           const paese      = review.reviewer?.country_code?.toUpperCase() || '';
           const nomeCompleto = paese ? `${nome} (${paese})` : nome;
 
-          // Salva su Airtable
-          await salvaReview({
-            'Nome ospite':          nomeCompleto,
-            'Data soggiorno':       data || null,
-            'Review':               testoReview,
-            'Consigli':             analisi.consigli || '',
-            'Luoghi consigliati':   '',
-            'Voto':                 voto,
-            'Tag':                  analisi.tags || [],
-            'Pubblicata':           true,   // auto-pubblica review da Booking.com
-            'Booking Review ID':    String(reviewId),
-            'Fonte':                'Booking.com',
-            'Punteggio originale':  votoRaw ? `${votoRaw}/10` : '',
-          });
+          // Salva su Airtable con fallback se mancano campi opzionali
+          try {
+            await salvaReview({
+              'Nome ospite':          nomeCompleto,
+              'Data soggiorno':       data || null,
+              'Review':               testoReview,
+              'Consigli':             analisi.consigli || '',
+              'Luoghi consigliati':   '',
+              'Voto':                 voto,
+              'Tag':                  analisi.tags || [],
+              'Pubblicata':           true,
+              'Booking Review ID':    String(reviewId),
+              'Fonte':                'Booking.com',
+              'Punteggio originale':  votoRaw ? `${votoRaw}/10` : '',
+            });
+          } catch(airtableErr) {
+            // Prova versione minimale senza campi extra
+            console.error('[reviews] Errore salvataggio completo, provo versione base:', airtableErr.message);
+            await salvaReview({
+              'Nome ospite':       nomeCompleto,
+              'Data soggiorno':    data || null,
+              'Review':            testoReview,
+              'Voto':              voto,
+              'Pubblicata':        true,
+            });
+          }
 
           importate++;
 
