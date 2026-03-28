@@ -17,15 +17,19 @@ const BEDS24_TOKEN   = process.env.BEDS24_LONG_LIFE_TOKEN;
 
 // ── Beds24 V2: leggi review Booking.com ──────────────────────
 async function getBookingReviews(numReviews = 20) {
-  const resp = await fetch(
-    `https://beds24.com/api/v2/channels/booking/reviews?numReviews=${numReviews}`,
-    { headers: { 'token': BEDS24_TOKEN } }
-  );
+  // propId 221499 = Eremo di San Giusto
+  const url = `https://beds24.com/api/v2/channels/booking/reviews?propId=221499&limit=${numReviews}`;
+  const resp = await fetch(url, { headers: { 'token': BEDS24_TOKEN } });
+  const text = await resp.text();
   if (!resp.ok) {
-    const err = await resp.text();
-    throw new Error(`Beds24 reviews error ${resp.status}: ${err}`);
+    // Prova con nome parametro alternativo
+    const url2 = `https://beds24.com/api/v2/channels/booking/reviews?propId=221499`;
+    const resp2 = await fetch(url2, { headers: { 'token': BEDS24_TOKEN } });
+    const text2 = await resp2.text();
+    if (!resp2.ok) throw new Error(`Beds24 reviews error ${resp2.status}: ${text2}`);
+    return JSON.parse(text2);
   }
-  return await resp.json();
+  return JSON.parse(text);
 }
 
 // ── Airtable: controlla se review già importata ──────────────
@@ -108,9 +112,10 @@ export default async function handler(req, res) {
   // ── ACTION: import — importa review da Booking.com ──────────
   if (!action || action === 'import') {
     try {
-      // 1. Leggi review da Booking.com via Beds24
+      // 1. Leggi review da Booking.com via Beds24 (propId 221499 fisso)
       const rawData = await getBookingReviews(Number(numReviews));
-      const reviews = rawData?.data?.reviews || rawData?.reviews || [];
+      // Beds24 può restituire data.reviews o data direttamente
+      const reviews = rawData?.data?.reviews || rawData?.reviews || rawData?.data || [];
 
       if (reviews.length === 0) {
         return res.status(200).json({
