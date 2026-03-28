@@ -145,44 +145,49 @@ export default async function handler(req, res) {
           if (review.content?.negative) parti.push(`✗ ${review.content.negative}`);
           const testoReview = parti.join('\n') || '(nessun testo)';
 
-          // Voto: Booking usa scala 1-10, convertiamo in 1-5
+          // Voto: Booking usa scala 1-10, convertiamo in 1-5 (min 1, max 5, mai null)
           const votoRaw    = review.scoring?.review_score;
-          const voto       = votoRaw ? Math.round((votoRaw / 10) * 5) : null;
+          const votoCalc   = votoRaw ? Math.min(5, Math.max(1, Math.round((votoRaw / 10) * 5))) : 3;
 
-          // Data soggiorno
+          // Data soggiorno — solo YYYY-MM-DD
           const dataRaw    = review.created_timestamp || review.created_at;
-          const data       = dataRaw ? dataRaw.split(' ')[0] : null;
+          const data       = dataRaw ? String(dataRaw).split(' ')[0] : null;
 
           // Nome ospite
           const nome       = review.reviewer?.name || 'Ospite Booking.com';
           const paese      = review.reviewer?.country_code?.toUpperCase() || '';
           const nomeCompleto = paese ? `${nome} (${paese})` : nome;
 
-          // Salva su Airtable con fallback se mancano campi opzionali
+          // Salva su Airtable — prima con tutti i campi, poi fallback minimale
+          const fieldsBase = {
+            'Nome ospite':  nomeCompleto,
+            'Review':       testoReview,
+            'Voto':         votoCalc,
+            'Pubblicata':   true,
+          };
+          const fieldsFull = {
+            ...fieldsBase,
+            'Consigli':             analisi.consigli || '',
+            'Luoghi consigliati':   '',
+            'Tag':                  analisi.tags || [],
+            'Booking Review ID':    String(reviewId),
+            'Fonte':                'Booking.com',
+            'Punteggio originale':  votoRaw ? `${votoRaw}/10` : '',
+          };
+          if (data) {
+            fieldsBase['Data soggiorno'] = data;
+            fieldsFull['Data soggiorno'] = data;
+          }
+
           try {
-            await salvaReview({
-              'Nome ospite':          nomeCompleto,
-              'Data soggiorno':       data || null,
-              'Review':               testoReview,
-              'Consigli':             analisi.consigli || '',
-              'Luoghi consigliati':   '',
-              'Voto':                 voto,
-              'Tag':                  analisi.tags || [],
-              'Pubblicata':           true,
-              'Booking Review ID':    String(reviewId),
-              'Fonte':                'Booking.com',
-              'Punteggio originale':  votoRaw ? `${votoRaw}/10` : '',
-            });
+            await salvaReview(fieldsFull);
           } catch(airtableErr) {
-            // Prova versione minimale senza campi extra
-            console.error('[reviews] Errore salvataggio completo, provo versione base:', airtableErr.message);
-            await salvaReview({
-              'Nome ospite':       nomeCompleto,
-              'Data soggiorno':    data || null,
-              'Review':            testoReview,
-              'Voto':              voto,
-              'Pubblicata':        true,
-            });
+            console.error('[reviews] Fallback a campi base per review', reviewId, ':', airtableErr.message);
+            try {
+              await salvaReview(fieldsBase);
+            } catch(baseErr) {
+              throw new Error(`Airtable error: ${baseErr.message}`);
+            }
           }
 
           importate++;
@@ -192,7 +197,7 @@ export default async function handler(req, res) {
 
         } catch (e) {
           errori.push({ id: review.review_id, error: e.message });
-          console.error('[reviews] Errore su review:', review.review_id, e.message);
+          console.error('[reviews] Errore su review:', review.review_id, '|', e.message);
         }
       }
 
