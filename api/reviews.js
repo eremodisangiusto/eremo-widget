@@ -175,7 +175,6 @@ export default async function handler(req, res) {
             'Punteggio originale':  votoRaw ? `${votoRaw}/10` : '',
           };
           if (data) {
-            fieldsBase['Data soggiorno'] = data;
             fieldsFull['Data soggiorno'] = data;
           }
 
