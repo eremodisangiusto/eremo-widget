@@ -16,27 +16,13 @@ const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BEDS24_TOKEN   = process.env.BEDS24_LONG_LIFE_TOKEN;
 
 // ── Beds24 V2: leggi review Booking.com ──────────────────────
-async function getBookingReviews(numReviews = 20) {
-  // Prova tutte le varianti del nome parametro finché una funziona
-  const variants = [
-    `https://beds24.com/api/v2/channels/booking/reviews?propId=221499`,
-    `https://beds24.com/api/v2/channels/booking/reviews?propertyId=221499`,
-    `https://beds24.com/api/v2/channels/booking/reviews?prop_id=221499`,
-    `https://beds24.com/api/v2/channels/booking/reviews?id=221499`,
-    `https://beds24.com/api/v2/channels/booking/reviews`,
-  ];
-
-  const errors = [];
-  for (const url of variants) {
-    const resp = await fetch(url, { headers: { 'token': BEDS24_TOKEN } });
-    const text = await resp.text();
-    if (resp.ok) {
-      console.log('[reviews] Funziona con URL:', url);
-      try { return JSON.parse(text); } catch(e) { throw new Error(`JSON parse error: ${text.substring(0,200)}`); }
-    }
-    errors.push(`${url} → ${resp.status}: ${text.substring(0,100)}`);
-  }
-  throw new Error(`Tutte le varianti fallite:\n${errors.join('\n')}`);
+async function getBookingReviews(fromDate = '2020-01-01') {
+  // Entrambi i parametri sono obbligatori: propertyId e from
+  const url = `https://beds24.com/api/v2/channels/booking/reviews?propertyId=221499&from=${fromDate}`;
+  const resp = await fetch(url, { headers: { 'token': BEDS24_TOKEN } });
+  const text = await resp.text();
+  if (!resp.ok) throw new Error(`Beds24 reviews error ${resp.status}: ${text}`);
+  try { return JSON.parse(text); } catch(e) { throw new Error(`JSON parse error: ${text.substring(0,200)}`); }
 }
 
 // ── Airtable: controlla se review già importata ──────────────
@@ -119,10 +105,12 @@ export default async function handler(req, res) {
   // ── ACTION: import — importa review da Booking.com ──────────
   if (!action || action === 'import') {
     try {
-      // 1. Leggi review da Booking.com via Beds24 (propId 221499 fisso)
-      const rawData = await getBookingReviews(Number(numReviews));
-      // Beds24 può restituire data.reviews o data direttamente
-      const reviews = rawData?.data?.reviews || rawData?.reviews || rawData?.data || [];
+      const fromDate = req.body?.fromDate || req.query?.fromDate || '2020-01-01';
+
+      // 1. Leggi review da Booking.com via Beds24
+      const rawData = await getBookingReviews(fromDate);
+      // Struttura risposta: { success, data: [...reviews] }
+      const reviews = rawData?.data || [];
 
       if (reviews.length === 0) {
         return res.status(200).json({
