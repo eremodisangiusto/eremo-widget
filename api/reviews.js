@@ -17,19 +17,26 @@ const BEDS24_TOKEN   = process.env.BEDS24_LONG_LIFE_TOKEN;
 
 // ── Beds24 V2: leggi review Booking.com ──────────────────────
 async function getBookingReviews(numReviews = 20) {
-  // propId 221499 = Eremo di San Giusto
-  const url = `https://beds24.com/api/v2/channels/booking/reviews?propId=221499&limit=${numReviews}`;
-  const resp = await fetch(url, { headers: { 'token': BEDS24_TOKEN } });
-  const text = await resp.text();
-  if (!resp.ok) {
-    // Prova con nome parametro alternativo
-    const url2 = `https://beds24.com/api/v2/channels/booking/reviews?propId=221499`;
-    const resp2 = await fetch(url2, { headers: { 'token': BEDS24_TOKEN } });
-    const text2 = await resp2.text();
-    if (!resp2.ok) throw new Error(`Beds24 reviews error ${resp2.status}: ${text2}`);
-    return JSON.parse(text2);
+  // Prova tutte le varianti del nome parametro finché una funziona
+  const variants = [
+    `https://beds24.com/api/v2/channels/booking/reviews?propId=221499`,
+    `https://beds24.com/api/v2/channels/booking/reviews?propertyId=221499`,
+    `https://beds24.com/api/v2/channels/booking/reviews?prop_id=221499`,
+    `https://beds24.com/api/v2/channels/booking/reviews?id=221499`,
+    `https://beds24.com/api/v2/channels/booking/reviews`,
+  ];
+
+  const errors = [];
+  for (const url of variants) {
+    const resp = await fetch(url, { headers: { 'token': BEDS24_TOKEN } });
+    const text = await resp.text();
+    if (resp.ok) {
+      console.log('[reviews] Funziona con URL:', url);
+      try { return JSON.parse(text); } catch(e) { throw new Error(`JSON parse error: ${text.substring(0,200)}`); }
+    }
+    errors.push(`${url} → ${resp.status}: ${text.substring(0,100)}`);
   }
-  return JSON.parse(text);
+  throw new Error(`Tutte le varianti fallite:\n${errors.join('\n')}`);
 }
 
 // ── Airtable: controlla se review già importata ──────────────
