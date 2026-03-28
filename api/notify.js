@@ -73,15 +73,15 @@ export default async function handler(req, res) {
       </div>
     `;
 
-  } else if (type === 'experience_confirmed') {
-    subject = `Esperienza confermata ${bookingId} · Eremo di San Giusto`;
+  } else if (type === 'experience_confirmed' || type === 'experience_request') {
+    subject = `Prenotazione esperienza ${bookingId} · Eremo di San Giusto`;
 
     html = `
       <div style="max-width:560px;margin:0 auto;background:#faf7f2;border-radius:12px;overflow:hidden;font-family:'Arial',sans-serif;">
         ${header}
         <div style="padding:32px;">
           <p style="font-size:16px;color:#2c2218;">Caro/a ${firstName},</p>
-          <p style="color:#5a4a38;line-height:1.7;">La tua esperienza è <strong>confermata</strong>. Non vediamo l'ora di accoglierti! 🫒</p>
+          <p style="color:#5a4a38;line-height:1.7;">La tua prenotazione è stata ricevuta e il tuo posto è <strong>riservato</strong>. Ti aspettiamo all'Eremo! 🫒</p>
           <div style="background:#fff;border-radius:10px;border:1px solid #ece4d8;padding:20px;margin:20px 0;">
             <div style="font-size:12px;color:#8a7560;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;">Dettagli prenotazione</div>
             <div style="font-size:14px;color:#2c2218;"><strong>Codice:</strong> ${bookingId}</div>
