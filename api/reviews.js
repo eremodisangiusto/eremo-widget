@@ -4,36 +4,22 @@
 // Analizza con Claude AI → salva su Airtable Guestbook
 //
 // Env vars richieste:
-//   BEDS24_REFRESH_TOKEN  = il refresh token V2
-//   AIRTABLE_KB_BASE_ID   = app... (base "Eremo KB")
-//   AIRTABLE_TOKEN        = pat6xQf9...
-//   ANTHROPIC_API_KEY     = sk-ant-...
+//   BEDS24_LONG_LIFE_TOKEN = il long life token V2
+//   AIRTABLE_KB_BASE_ID    = app... (base "Eremo KB")
+//   AIRTABLE_TOKEN         = pat6xQf9...
+//   ANTHROPIC_API_KEY      = sk-ant-...
 // ============================================================
 
 const AIRTABLE_API   = 'https://api.airtable.com/v0';
 const AIRTABLE_KB    = process.env.AIRTABLE_KB_BASE_ID;
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
-const BEDS24_REFRESH = process.env.BEDS24_REFRESH_TOKEN;
-
-// ── Beds24 V2: ottieni access token dal refresh token ────────
-async function getBeds24Token() {
-  const resp = await fetch('https://beds24.com/api/v2/authentication/token', {
-    method: 'GET',
-    headers: { 'refreshToken': BEDS24_REFRESH },
-  });
-  if (!resp.ok) {
-    const err = await resp.text();
-    throw new Error(`Beds24 auth error: ${err}`);
-  }
-  const data = await resp.json();
-  return data.token;
-}
+const BEDS24_TOKEN   = process.env.BEDS24_LONG_LIFE_TOKEN;
 
 // ── Beds24 V2: leggi review Booking.com ──────────────────────
-async function getBookingReviews(token, numReviews = 20) {
+async function getBookingReviews(numReviews = 20) {
   const resp = await fetch(
     `https://beds24.com/api/v2/channels/booking/reviews?numReviews=${numReviews}`,
-    { headers: { 'token': token } }
+    { headers: { 'token': BEDS24_TOKEN } }
   );
   if (!resp.ok) {
     const err = await resp.text();
@@ -122,11 +108,8 @@ export default async function handler(req, res) {
   // ── ACTION: import — importa review da Booking.com ──────────
   if (!action || action === 'import') {
     try {
-      // 1. Ottieni access token Beds24
-      const token = await getBeds24Token();
-
-      // 2. Leggi review da Booking.com via Beds24
-      const rawData = await getBookingReviews(token, Number(numReviews));
+      // 1. Leggi review da Booking.com via Beds24
+      const rawData = await getBookingReviews(Number(numReviews));
       const reviews = rawData?.data?.reviews || rawData?.reviews || [];
 
       if (reviews.length === 0) {
@@ -219,8 +202,11 @@ export default async function handler(req, res) {
   // ── ACTION: status — verifica connessione Beds24 ─────────────
   if (action === 'status') {
     try {
-      const token = await getBeds24Token();
-      return res.status(200).json({ success: true, message: 'Connessione Beds24 OK', tokenOk: !!token });
+      const resp = await fetch('https://beds24.com/api/v2/authentication/token', {
+        headers: { 'token': BEDS24_TOKEN }
+      });
+      const ok = resp.ok || resp.status === 200;
+      return res.status(200).json({ success: true, message: 'Connessione Beds24 OK', tokenOk: !!BEDS24_TOKEN });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
