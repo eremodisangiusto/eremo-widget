@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/payment-success", "destination": "/payment-success.html" },
-    { "source": "/payment-cancel",  "destination": "/payment-cancel.html"  }
+    { "source": "/payment-success",  "destination": "/payment-success.html"  },
+    { "source": "/payment-cancel",   "destination": "/payment-cancel.html"   },
+    { "source": "/admin-reviews",    "destination": "/admin-reviews.html"    }
   ]
 }
