@@ -243,24 +243,16 @@ export default async function handler(req, res) {
 
       // 6. Email automatica via Resend (non bloccante)
       try {
-        const notifyUrl = process.env.VERCEL_URL
-          ? `https://${process.env.VERCEL_URL}/api/notify`
-          : 'https://eremo-bookings.vercel.app/api/notify';
-
-        await fetch(notifyUrl, {
+        await fetch('https://eremo-bookings.vercel.app/api/notify', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            type:       'experience_request',
-            experience: esperienza,
-            date:       data,
-            guests:     numPax,
+            type:      'experience_request',
+            bookingId: bookingRef,
             firstName,
             lastName,
             email,
-            phone:      phone || '',
-            notes:      `Tipo: ${tipo} | Totale: €${totale} | Ref: ${bookingRef}${noteOspite ? '\n' + noteOspite : ''}`,
-            bookingId:  bookingRef,
+            notes: `Esperienza: ${esperienza} | Data: ${data} | Orario: ${orario} | Partecipanti: ${numPax} | Tipo: ${tipo} | Totale: €${totale}${noteOspite ? ' | Note: ' + noteOspite : ''}`,
           }),
         });
       } catch (emailErr) {
