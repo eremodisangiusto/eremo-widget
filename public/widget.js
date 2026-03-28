@@ -11,6 +11,7 @@ var ESJ_MSG_C = []; // conversazione camere
 var ESJ_MSG_E = []; // conversazione esperienze
 var ESJ_MSG_G = []; // conversazione guida / ostuni & dintorni
 var ESJ_MSG_P = []; // conversazione weekend esclusivi / pacchetti
+var ESJ_MSG_S = []; // conversazione scopri / knowledge base
 
 // Stripe publishable key (pubblica — sicura lato browser)
 var ESJ_STRIPE_PK = "pk_live_51QYYzwA99LxG9Z4B4Cf2hGGrgw6OuawEnNc9nOhMQySLIB7lWlc9MOEahl4qYMJMLNPx8tZag43S44M0B1eE27KL000MDKaAKd";
@@ -167,6 +168,47 @@ var ESJ_TOOLS = [
       tipoPrezzo:   { type: "string", description: "Standard | Privato | Coppia | Bambino | Junior | Verde | Blu | Rosso/Nero | Rilassante | Tonificante | Deep tissue | Corto 5km | Lungo 10km" },
       noteOspite:   { type: "string", description: "Note, allergie o richieste speciali" }
     }, required: ["esperienza","data","orario","partecipanti","firstName","lastName","email"] }
+  },
+  {
+    name: "get_meteo",
+    description: "Ottieni il meteo attuale e le previsioni per i prossimi 4 giorni ad Ostuni / Eremo di San Giusto. Usare quando l'utente chiede cosa fare oggi, se è una buona giornata per uscire, o per contestualizzare i consigli.",
+    input_schema: { type: "object", properties: {} }
+  },
+  {
+    name: "cerca_consigli",
+    description: "Cerca luoghi consigliati (ristoranti, musei, spiagge, mercati, bar) dalla Knowledge Base degli ospiti e dei gestori, contestualizzati con il meteo attuale. Restituisce anche il link Google Maps per le indicazioni stradali.",
+    input_schema: { type: "object", properties: {
+      categoria: { type: "string", description: "Ristorante | Museo | Spiaggia | Mercato | Esperienza | Bar — ometti per tutte le categorie" },
+      limit:     { type: "integer", description: "Numero massimo di risultati (default 4)" }
+    }, required: [] }
+  },
+  {
+    name: "save_guestbook",
+    description: "Salva la review e i consigli di un ospite nel Guestbook su Airtable. Chiamare dopo aver raccolto tutti i dati dell'ospite.",
+    input_schema: { type: "object", properties: {
+      nome:              { type: "string", description: "Nome dell'ospite" },
+      dataSoggiorno:     { type: "string", description: "Data del soggiorno YYYY-MM-DD" },
+      review:            { type: "string", description: "Testo della review sull'Eremo" },
+      consigli:          { type: "string", description: "Consigli generali per altri ospiti" },
+      luoghiConsigliati: { type: "string", description: "Ristoranti, posti, esperienze consigliate" },
+      voto:              { type: "integer", description: "Voto da 1 a 5" },
+      tags:              { type: "array", items: { type: "string" }, description: "Tag: romantico, famiglie, natura, culturale, gourmet, economico, caldo, pioggia..." }
+    }, required: ["nome","review"] }
+  },
+  {
+    name: "save_luogo",
+    description: "Aggiunge un nuovo luogo (ristorante, museo, spiaggia, ecc.) alla Knowledge Base su Airtable. Usare quando un ospite vuole condividere un posto.",
+    input_schema: { type: "object", properties: {
+      nome:        { type: "string" },
+      categoria:   { type: "string", description: "Ristorante | Museo | Spiaggia | Mercato | Esperienza | Bar" },
+      descrizione: { type: "string" },
+      indirizzo:   { type: "string", description: "Indirizzo completo per generare link Maps" },
+      distanza:    { type: "number", description: "Distanza in km dall'Eremo" },
+      tags:        { type: "array", items: { type: "string" } },
+      orari:       { type: "string" },
+      prezzo:      { type: "string", description: "€ | €€ | €€€" },
+      aggiuntoDa:  { type: "string", description: "ospite | gestore" }
+    }, required: ["nome","categoria"] }
   }
 ];
 
@@ -570,6 +612,18 @@ function esjInit() {
     +         '<span class="esj-card-badge" style="background:rgba(83,74,183,0.12);color:#3C3489;" id="esj-cs4b">da &euro;750</span>'
     +       '</div>'
     +     '</button>'
+    +     '<button class="esj-main-card esj-home-cards-full" onclick="esjGoView(\'scopri\')">'
+    +       '<div style="display:flex;align-items:center;gap:0.8rem">'
+    +         '<div class="esj-card-icon" style="background:rgba(13,110,84,0.12);width:34px;height:34px;flex-shrink:0">'
+    +           '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#0F6E56" stroke-width="1.5"/><path d="M16.24 7.76L14.12 14.12L7.76 16.24L9.88 9.88L16.24 7.76Z" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    +         '</div>'
+    +         '<div style="flex:1">'
+    +           '<div class="esj-card-title" id="esj-ct5">Scopri & Guestbook</div>'
+    +           '<div class="esj-card-sub" id="esj-cs5">Meteo &middot; Ristoranti &middot; Posti &middot; Review ospiti</div>'
+    +         '</div>'
+    +         '<span class="esj-card-badge" style="background:rgba(13,110,84,0.12);color:#085041;" id="esj-cs5b">Knowledge Base</span>'
+    +       '</div>'
+    +     '</button>'
     +   '</div>'
     +   '<div class="esj-home-quick" id="esj-home-quick"></div>'
     +   '<div class="esj-home-bar">'
@@ -591,6 +645,9 @@ function esjInit() {
     // PACCHETTI CHAT
     + chatView("esj-pacchetti","esj-back-p","esj-lbl-p","esj-msgs-p","esj-typing-p","esj-qr-p","esj-inp-p","esj-mic-p","esj-snd-p")
 
+    // SCOPRI CHAT
+    + chatView("esj-scopri","esj-back-s","esj-lbl-s","esj-msgs-s","esj-typing-s","esj-qr-s","esj-inp-s","esj-mic-s","esj-snd-s")
+
     + '<div class="esj-brand">Powered by Claude AI</div>';
 
   document.body.appendChild(fab);
@@ -601,29 +658,35 @@ function esjInit() {
   var msgsE   = document.getElementById("esj-msgs-e");
   var msgsG   = document.getElementById("esj-msgs-g");
   var msgsP   = document.getElementById("esj-msgs-p");
+  var msgsS   = document.getElementById("esj-msgs-s");
   var typC    = document.getElementById("esj-typing-c");
   var typE    = document.getElementById("esj-typing-e");
   var typG    = document.getElementById("esj-typing-g");
   var typP    = document.getElementById("esj-typing-p");
+  var typS    = document.getElementById("esj-typing-s");
   var inpC    = document.getElementById("esj-inp-c");
   var inpE    = document.getElementById("esj-inp-e");
   var inpG    = document.getElementById("esj-inp-g");
   var inpP    = document.getElementById("esj-inp-p");
+  var inpS    = document.getElementById("esj-inp-s");
   var sndC    = document.getElementById("esj-snd-c");
   var sndE    = document.getElementById("esj-snd-e");
   var sndG    = document.getElementById("esj-snd-g");
   var sndP    = document.getElementById("esj-snd-p");
+  var sndS    = document.getElementById("esj-snd-s");
   var micC    = document.getElementById("esj-mic-c");
   var micE    = document.getElementById("esj-mic-e");
   var micG    = document.getElementById("esj-mic-g");
   var micP    = document.getElementById("esj-mic-p");
+  var micS    = document.getElementById("esj-mic-s");
   var micHome = document.getElementById("esj-home-mic");
   var homeInp = document.getElementById("esj-home-inp");
   var qrC     = document.getElementById("esj-qr-c");
   var qrE     = document.getElementById("esj-qr-e");
   var qrG     = document.getElementById("esj-qr-g");
   var qrP     = document.getElementById("esj-qr-p");
-  var loadC   = false, loadE = false, loadG = false, loadP = false;
+  var qrS     = document.getElementById("esj-qr-s");
+  var loadC   = false, loadE = false, loadG = false, loadP = false, loadS = false;
 
   // ── FORMAT ────────────────────────────────────────────────────
   function fmt(t) {
@@ -1063,7 +1126,76 @@ function esjInit() {
     loadP = false; sndP.disabled = false; inpP.focus();
   }
 
-  // ── INPUT SETUP ───────────────────────────────────────────────
+  // ── SYSTEM PROMPT SCOPRI ──────────────────────────────────────
+  var ESJ_SYSTEM_SCOPRI = "Sei Sofia, l'assistente virtuale dell'Eremo di San Giusto. In questa sezione sei la guida locale intelligente — combini il meteo attuale con la Knowledge Base degli ospiti e dei gestori per dare consigli contestuali su dove andare, cosa visitare, dove mangiare.\n\nUSA I TOOL:\n- Usa SEMPRE cerca_consigli all'apertura o quando ti chiedono cosa fare\n- Usa get_meteo per aggiornare le previsioni se chiesto esplicitamente\n- Usa save_guestbook quando un ospite vuole lasciare una review\n- Usa save_luogo quando un ospite consiglia un posto non ancora in KB\n\nCOME PRESENTARE I LUOGHI:\nPer ogni luogo che consigli includi:\n- Nome e breve descrizione\n- Distanza dall'Eremo\n- Perché lo consigli oggi (meteo, stagione, mood)\n- Link Google Maps se disponibile (presentalo come 'Come arrivare ↗')\n- Prezzo indicativo se disponibile\n\nFORMATTO METEO:\nSe il meteo lo permetti, includi una riga iniziale tipo:\n'Oggi ad Ostuni: 24°C, cielo sereno ☀️ — giornata perfetta per...'\n\nGUESTBOOK:\nSe l'ospite vuole lasciare una review:\n1) Chiedi nome, data soggiorno (se diversa da oggi)\n2) Chiedi una review sull'Eremo\n3) Chiedi se ha consigli su posti o ristoranti da aggiungere\n4) Chiedi un voto da 1 a 5\n5) Usa save_guestbook con tutti i dati\n6) Ringrazia calorosamente e spiega che la review aiuterà altri ospiti\n\nPer aggiungere un luogo nuovo:\n1) Raccogli: nome, categoria, descrizione, indirizzo, distanza indicativa, prezzo\n2) Usa save_luogo con aggiuntoDa='ospite'\n3) Spiega che il luogo sarà verificato dai gestori prima di essere pubblicato\n\nREGOLE: Non inventare luoghi o prezzi. Usa sempre i tool per dati reali. Sii entusiasta e personale — parla come un amico del posto.";
+
+  // ── PROXY CALL SCOPRI (con tool KB) ─────────────────────────────
+  async function callProxyScopri(msgArr) {
+    var lang  = ESJ_LANG === "en" ? "\n\nIMPORTANT: Reply in English." : "";
+    var today = new Date().toISOString().split("T")[0];
+    var sys   = ESJ_SYSTEM_SCOPRI + lang + "\n\nOGGI E' IL " + today + ".";
+    var cleanMsgs = sanitizeHistory(msgArr);
+    var body  = { model: "claude-sonnet-4-20250514", max_tokens: 1024, system: sys, tools: ESJ_TOOLS, messages: cleanMsgs };
+
+    var resp = await fetch(ESJ_PROXY + "/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    var data = await resp.json();
+
+    while (data.stop_reason === "tool_use") {
+      if (!data.content || !Array.isArray(data.content)) break;
+      var toolUseBlocks = data.content.filter(function(x) { return x.type === "tool_use"; });
+      if (toolUseBlocks.length === 0) break;
+
+      msgArr.push({ role: "assistant", content: data.content });
+      var results = [];
+      for (var i = 0; i < data.content.length; i++) {
+        var b = data.content[i];
+        if (b.type !== "tool_use") continue;
+        var res = { error: "Tool non riconosciuto: " + b.name };
+        try {
+          if (b.name === "get_meteo" || b.name === "cerca_consigli" || b.name === "save_guestbook" || b.name === "save_luogo") {
+            res = await (await fetch(ESJ_PROXY + "/api/kb", {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: b.name, ...b.input })
+            })).json();
+          }
+        } catch(e) { res = { error: e.message }; }
+        results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(res) });
+      }
+      if (results.length !== toolUseBlocks.length) break;
+      msgArr.push({ role: "user", content: results });
+      data = await (await fetch(ESJ_PROXY + "/api/chat", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1024, system: sys, tools: ESJ_TOOLS, messages: msgArr })
+      })).json();
+      if (data.type === "error" || !data.content) break;
+    }
+
+    var txt = "";
+    for (var j = 0; j < (data.content || []).length; j++) {
+      if (data.content[j].type === "text") txt = data.content[j].text;
+    }
+    if (txt) msgArr.push({ role: "assistant", content: txt });
+    return txt;
+  }
+
+  // ── SEND SCOPRI ───────────────────────────────────────────────
+  async function sendS(text) {
+    if (!text.trim() || loadS) return;
+    loadS = true; sndS.disabled = true;
+    qrS.style.display = "none";
+    addMsg(msgsS, typS, "user", text);
+    inpS.value = ""; inpS.style.height = "auto";
+    typS.classList.add("on"); msgsS.scrollTop = msgsS.scrollHeight;
+    ESJ_MSG_S.push({ role: "user", content: text });
+    try {
+      var r = await callProxyScopri(ESJ_MSG_S);
+      addMsg(msgsS, typS, "assistant", r || (ESJ_LANG === "en" ? "Sorry, please try again." : "Mi dispiace, riprova tra un momento."));
+      renderQR(qrS, "scopri");
+    } catch(e) {
+      addMsg(msgsS, typS, "assistant", ESJ_LANG === "en" ? "Sorry, please try again." : "Mi dispiace, riprova tra un momento.");
+    }
+    loadS = false; sndS.disabled = false; inpS.focus();
+  }
   function setupInput(inp, snd, fn) {
     inp.addEventListener("input", function() {
       snd.disabled = !inp.value.trim();
@@ -1079,6 +1211,7 @@ function esjInit() {
   setupInput(inpE, sndE, sendE);
   setupInput(inpG, sndG, sendG);
   setupInput(inpP, sndP, sendP);
+  setupInput(inpS, sndS, sendS);
 
   // ── VOICE SETUP (solo INPUT — zero TTS output) ────────────────
   function setupVoice(micEl, onResult) {
@@ -1110,6 +1243,7 @@ function esjInit() {
   var recE    = setupVoice(micE,    function(t) { inpE.value = t; sendE(t); });
   var recG    = setupVoice(micG,    function(t) { inpG.value = t; sendG(t); });
   var recP    = setupVoice(micP,    function(t) { inpP.value = t; sendP(t); });
+  var recS    = setupVoice(micS,    function(t) { inpS.value = t; sendS(t); });
   var recHome = setupVoice(micHome, function(t) { homeInp.value = t; routeHome(t); });
 
   // ── VIEW SWITCH ───────────────────────────────────────────────
@@ -1119,6 +1253,7 @@ function esjInit() {
     document.getElementById("esj-esperienze").style.display = "none";
     document.getElementById("esj-guida").style.display      = "none";
     document.getElementById("esj-pacchetti").style.display  = "none";
+    document.getElementById("esj-scopri").style.display     = "none";
 
     if (view === "home") {
       document.getElementById("esj-home").style.display = "flex";
@@ -1155,7 +1290,20 @@ function esjInit() {
             .then(function(r) { addMsg(msgsG, typG, "assistant", r); renderQR(qrG, "guida"); });
         }, 300);
       }
-    } else if (view === "pacchetti") {
+    } else if (view === "scopri") {
+      document.getElementById("esj-scopri").style.display = "flex";
+      if (ESJ_MSG_S.length === 0) {
+        setTimeout(function() {
+          typS.classList.add("on"); msgsS.scrollTop = msgsS.scrollHeight;
+          var intro = ESJ_LANG === "it"
+            ? "Presentati come Sofia e offri di aiutare l'ospite con consigli su dove andare oggi basandoti sul meteo attuale. Usa subito il tool cerca_consigli per capire le condizioni e proporre 2-3 suggerimenti contestuali. Poi chiedi se vogliono lasciare una review o un consiglio nel guestbook."
+            : "Introduce yourself as Sofia and offer to help the guest discover what to do today based on the current weather. Use cerca_consigli immediately to check conditions and suggest 2-3 contextual recommendations. Then ask if they would like to leave a review or tip in the guestbook.";
+          ESJ_MSG_S.push({ role: "user", content: intro });
+          callProxyScopri(ESJ_MSG_S)
+            .then(function(r) { addMsg(msgsS, typS, "assistant", r); renderQR(qrS, "scopri"); });
+        }, 300);
+      }
+    }
       document.getElementById("esj-pacchetti").style.display = "flex";
       if (ESJ_MSG_P.length === 0) {
         setTimeout(function() {
@@ -1197,6 +1345,13 @@ function esjInit() {
           { it: "Senses Journey",               en: "Senses Journey"            },
           { it: "Posso personalizzare?",        en: "Can I customise?"          }
         ]
+      : type === "scopri"
+      ? [
+          { it: "Cosa fare oggi?",              en: "What to do today?"         },
+          { it: "Dove mangiare stasera?",       en: "Where to eat tonight?"     },
+          { it: "C'\u00e8 una spiaggia bella vicino?", en: "Any nice beach nearby?" },
+          { it: "Voglio lasciare una review",   en: "I want to leave a review"  }
+        ]
       : [
           { it: "Liquid Gold \u2014 olio EVO", en: "Liquid Gold \u2014 olive oil" },
           { it: "Stargazing",                  en: "Stargazing"                  },
@@ -1211,6 +1366,7 @@ function esjInit() {
         if (type === "camere") sendC(btn.textContent);
         else if (type === "guida") sendG(btn.textContent);
         else if (type === "pacchetti") sendP(btn.textContent);
+        else if (type === "scopri") sendS(btn.textContent);
         else sendE(btn.textContent);
       };
       container.appendChild(btn);
@@ -1257,11 +1413,13 @@ function esjInit() {
   function routeHome(text) {
     var expKw = ["esperienza","esperienze","experience","olio","ulivo","stelle","star","cucina","cook","massaggio","massage","trekking","carrozze","carriages","serenade","tramonto","sunset","ciuchino","avventura","weekend","pacchetto","package"];
     var guidaKw = ["ostuni","spiaggia","spiagge","beach","borgo","borghi","village","ristorante","mangiare","food","distanza","distanze","distance","dove","parcheggio","come arrivare","getting around","dintorni","surroundings"];
-    var paccKw  = ["pacchetto","pacchetti","weekend","esclusivo","esclusivi","immersion","wild","senses","journey","package","soggiorno"];
-    var isGuida = guidaKw.some(function(k) { return text.toLowerCase().includes(k); });
-    var isExp   = expKw.some(function(k)   { return text.toLowerCase().includes(k); });
-    var isPacc  = paccKw.some(function(k)  { return text.toLowerCase().includes(k); });
-    esjGoView(isPacc ? "pacchetti" : isGuida ? "guida" : isExp ? "esperienze" : "camere");
+    var scopriKw = ["review","guestbook","consiglio","consigli","meteo","tempo","pioggia","sole","ristorante","dove mangiare","spiaggia","museo","cosa fare","today","weather","restaurant","beach"];
+    var paccKw   = ["pacchetto","pacchetti","weekend","esclusivo","esclusivi","immersion","wild","senses","journey","package","soggiorno"];
+    var isGuida  = guidaKw.some(function(k)  { return text.toLowerCase().includes(k); });
+    var isExp    = expKw.some(function(k)    { return text.toLowerCase().includes(k); });
+    var isPacc   = paccKw.some(function(k)   { return text.toLowerCase().includes(k); });
+    var isScopri = scopriKw.some(function(k) { return text.toLowerCase().includes(k); });
+    esjGoView(isPacc ? "pacchetti" : isScopri ? "scopri" : isGuida ? "guida" : isExp ? "esperienze" : "camere");
     setTimeout(function() { isExp ? sendE(text) : sendC(text); }, 500);
   }
 
@@ -1274,6 +1432,7 @@ function esjInit() {
     if (recE)    recE.lang    = lang === "it" ? "it-IT" : "en-GB";
     if (recG)    recG.lang    = lang === "it" ? "it-IT" : "en-GB";
     if (recP)    recP.lang    = lang === "it" ? "it-IT" : "en-GB";
+    if (recS)    recS.lang    = lang === "it" ? "it-IT" : "en-GB";
     if (recHome) recHome.lang = lang === "it" ? "it-IT" : "en-GB";
     updateLabels();
     renderHomeQuick();
@@ -1291,7 +1450,11 @@ function esjInit() {
     s("esj-ct3",      it ? "Ostuni &amp; Dintorni" : "Getting Around");
     s("esj-cs3",      it ? "Spiagge &middot; Borghi &middot; Gastronomia &middot; Distanze" : "Beaches &middot; Villages &middot; Food &middot; Distances");
     s("esj-cs3b",     it ? "Guida ospiti" : "Guest guide");
-    s("esj-ct4",      it ? "Weekend Esclusivi" : "Exclusive Weekends");
+    s("esj-ct5",      it ? "Scopri &amp; Guestbook" : "Explore &amp; Guestbook");
+    s("esj-cs5",      it ? "Meteo &middot; Ristoranti &middot; Posti &middot; Review ospiti" : "Weather &middot; Restaurants &middot; Places &middot; Guest reviews");
+    s("esj-cs5b",     it ? "Knowledge Base" : "Knowledge Base");
+    s("esj-back-s",   it ? "\u2190 Home" : "\u2190 Home");
+    s("esj-lbl-s",    it ? "Scopri &amp; Guestbook &middot; Consigli Ospiti" : "Explore &amp; Guestbook &middot; Guest Tips");
     s("esj-cs4",      it ? "3 pacchetti curati &middot; camera + esperienze" : "3 curated packages &middot; room + experiences");
     s("esj-cs4b",     it ? "da &euro;750" : "from &euro;750");
     s("esj-back-c",   it ? "\u2190 Home" : "\u2190 Home");
@@ -1323,10 +1486,10 @@ function esjInit() {
   window.esjSendC = sendC;
   window.esjSendG = sendG;
   window.esjSendP = sendP;
+  window.esjSendS = sendS;
 
   updateLabels();
   renderHomeQuick();
-}
 
 // ── BOOT ──────────────────────────────────────────────────────
 if (document.readyState === "loading") {
