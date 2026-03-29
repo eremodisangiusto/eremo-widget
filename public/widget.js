@@ -1492,8 +1492,14 @@ function esjInit() {
   renderHomeQuick();
 
 // ── BOOT ──────────────────────────────────────────────────────
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", esjInit);
-} else {
+// Piccolo delay per Webador che modifica il DOM dopo il caricamento
+function esjBoot() {
+  if (document.getElementById('esj-fab')) return; // già inizializzato
   esjInit();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", function() { setTimeout(esjBoot, 500); });
+} else {
+  setTimeout(esjBoot, 500);
 }
