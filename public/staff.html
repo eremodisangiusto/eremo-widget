@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff · Eremo di San Giusto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Jost',sans-serif;background:#1a1410;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+    .shell{width:100%;max-width:480px;display:flex;flex-direction:column;gap:0}
+
+    /* LOGIN */
+    #login-view{background:#faf7f2;border-radius:20px;overflow:hidden}
+    .card-header{background:linear-gradient(135deg,#3a2e22,#2c2218);padding:1.2rem 1.4rem}
+    .logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#c8a97e}
+    .logo-sub{font-size:0.68rem;color:rgba(200,169,126,0.65);letter-spacing:0.12em;text-transform:uppercase;margin-top:2px}
+    .card-body{padding:1.6rem}
+    .label{font-size:0.72rem;font-weight:500;color:#8a7560;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;display:block}
+    .pin-wrap{display:flex;gap:10px;justify-content:center;margin:1.2rem 0}
+    .pin-dot{width:52px;height:64px;background:#fff;border:1.5px solid #ece4d8;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:#2c2218;font-weight:500;transition:border-color 0.2s}
+    .pin-dot.filled{border-color:#c8a97e}
+    .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:1rem 0}
+    .key{background:#fff;border:1.5px solid #ece4d8;border-radius:12px;padding:14px;font-size:1.1rem;font-weight:500;color:#2c2218;cursor:pointer;transition:all 0.15s;text-align:center}
+    .key:hover{background:#faf7f2;border-color:#c8a97e}
+    .key:active{transform:scale(0.96)}
+    .key.del{color:#8a7560;font-size:0.85rem}
+    .key.empty{background:transparent;border-color:transparent;cursor:default}
+    .btn-login{width:100%;padding:14px;background:linear-gradient(135deg,#c8a97e,#9a6e38);border:none;border-radius:12px;color:#fff;font-family:'Jost',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;transition:opacity 0.2s;margin-top:8px}
+    .btn-login:hover{opacity:0.9}
+    .btn-login:disabled{opacity:0.4;cursor:not-allowed}
+    .error-msg{color:#a32d2d;font-size:0.8rem;text-align:center;margin-top:8px;min-height:20px}
+
+    /* CHAT */
+    #chat-view{display:none;background:#faf7f2;border-radius:20px;overflow:hidden;height:85vh;max-height:700px;flex-direction:column}
+    .chat-header{background:linear-gradient(135deg,#3a2e22,#2c2218);padding:0.9rem 1.1rem;display:flex;align-items:center;gap:0.75rem;flex-shrink:0}
+    .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1rem;color:#fff;font-weight:600;flex-shrink:0}
+    .av-pulizie{background:#1D9E75}
+    .av-accoglienza{background:#185FA5}
+    .av-guida{background:#BA7517}
+    .av-gestore{background:#534AB7}
+    .staff-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#f4ede3}
+    .staff-role{font-size:0.65rem;color:#c8a97e;letter-spacing:0.1em;text-transform:uppercase}
+    .btn-logout{background:transparent;border:1px solid rgba(200,169,126,0.3);border-radius:8px;color:#c8a97e;font-size:0.7rem;padding:4px 10px;cursor:pointer;margin-left:auto;font-family:'Jost',sans-serif}
+    .btn-logout:hover{border-color:#c8a97e}
+
+    /* Quick actions */
+    .quick-bar{display:flex;gap:6px;padding:8px 10px;background:#f2ece2;border-bottom:1px solid #ece4d8;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+    .quick-bar::-webkit-scrollbar{display:none}
+    .qbtn{white-space:nowrap;font-size:0.7rem;padding:5px 12px;border:1.5px solid #ece4d8;border-radius:20px;color:#8a6030;background:#fff;cursor:pointer;font-family:'Jost',sans-serif;transition:all 0.2s;flex-shrink:0}
+    .qbtn:hover{border-color:#c8a97e;background:#faf7f2}
+
+    /* Messages */
+    .msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.7rem;background:#faf7f2}
+    .msgs::-webkit-scrollbar{width:3px}
+    .msgs::-webkit-scrollbar-thumb{background:#ece4d8;border-radius:2px}
+    .msg{max-width:88%;animation:fadeIn 0.25s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .msg.user{align-self:flex-end}
+    .msg.assistant{align-self:flex-start}
+    .bubble{padding:0.75rem 1rem;border-radius:14px;font-size:0.82rem;line-height:1.7}
+    .msg.user .bubble{background:linear-gradient(135deg,#c8a97e,#9a6e38);color:#fff;border-bottom-right-radius:4px}
+    .msg.assistant .bubble{background:#fff;color:#1e1812;border:1px solid #ece4d8;border-bottom-left-radius:4px}
+    .bubble strong{color:#8a6030}
+    .bubble em{color:#8a6030;font-style:italic}
+    .typing{display:none;align-self:flex-start;padding:0.75rem 1rem;background:#fff;border:1px solid #ece4d8;border-radius:14px;border-bottom-left-radius:4px}
+    .typing.on{display:flex;gap:5px;align-items:center}
+    .typing span{width:6px;height:6px;background:#c8a97e;border-radius:50%;animation:bounce 1.2s infinite}
+    .typing span:nth-child(2){animation-delay:0.2s}
+    .typing span:nth-child(3){animation-delay:0.4s}
+    @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:0.45}40%{transform:translateY(-5px);opacity:1}}
+
+    /* Input */
+    .inp-area{padding:0.75rem;border-top:1px solid #ece4d8;display:flex;gap:8px;align-items:flex-end;background:#f2ece2;flex-shrink:0}
+    .inp{flex:1;background:#fff;border:1.5px solid #ece4d8;border-radius:10px;padding:0.65rem 0.9rem;font-family:'Jost',sans-serif;font-size:0.82rem;color:#1e1812;resize:none;min-height:40px;max-height:90px;outline:none;transition:border-color 0.2s;line-height:1.5}
+    .inp:focus{border-color:#c8a97e}
+    .inp::placeholder{color:#8a7560}
+    .snd{width:38px;height:38px;background:linear-gradient(135deg,#c8a97e,#9a6e38);border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s}
+    .snd:hover{transform:scale(1.06)}
+    .snd:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+    .snd svg{width:15px;height:15px;fill:#fff}
+
+    /* Timbratura badge */
+    .timbra-bar{display:flex;gap:8px;padding:8px 10px;background:#eaf3de;border-bottom:1px solid #c0dd97;flex-shrink:0}
+    .timbra-bar.uscita{background:#fcebeb;border-color:#f7c1c1}
+    .tbtn{flex:1;padding:8px;border:none;border-radius:8px;font-family:'Jost',sans-serif;font-size:0.78rem;font-weight:500;cursor:pointer;transition:opacity 0.2s}
+    .tbtn.entrata{background:#3b6d11;color:#fff}
+    .tbtn.uscita{background:#a32d2d;color:#fff}
+    .tbtn:hover{opacity:0.85}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- LOGIN -->
+  <div id="login-view">
+    <div class="card-header">
+      <div class="logo">🫒 Eremo di San Giusto</div>
+      <div class="logo-sub">Sofia · Backoffice Staff</div>
+    </div>
+    <div class="card-body">
+      <span class="label">Inserisci il tuo PIN personale</span>
+      <div class="pin-wrap" id="pin-dots">
+        <div class="pin-dot" id="d0"></div>
+        <div class="pin-dot" id="d1"></div>
+        <div class="pin-dot" id="d2"></div>
+        <div class="pin-dot" id="d3"></div>
+      </div>
+      <div class="numpad">
+        <button class="key" onclick="addDigit('1')">1</button>
+        <button class="key" onclick="addDigit('2')">2</button>
+        <button class="key" onclick="addDigit('3')">3</button>
+        <button class="key" onclick="addDigit('4')">4</button>
+        <button class="key" onclick="addDigit('5')">5</button>
+        <button class="key" onclick="addDigit('6')">6</button>
+        <button class="key" onclick="addDigit('7')">7</button>
+        <button class="key" onclick="addDigit('8')">8</button>
+        <button class="key" onclick="addDigit('9')">9</button>
+        <button class="key empty"></button>
+        <button class="key" onclick="addDigit('0')">0</button>
+        <button class="key del" onclick="delDigit()">⌫</button>
+      </div>
+      <button class="btn-login" id="btn-login" onclick="doLogin()" disabled>Accedi</button>
+      <div class="error-msg" id="login-error"></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat-view">
+    <div class="chat-header">
+      <div class="avatar" id="staff-avatar">S</div>
+      <div>
+        <div class="staff-name" id="staff-name">Sofia</div>
+        <div class="staff-role" id="staff-role">Backoffice</div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Esci</button>
+    </div>
+    <div id="timbra-bar" class="timbra-bar" style="display:none">
+      <button class="tbtn entrata" onclick="timbra('entrata')">Sono arrivata/o</button>
+      <button class="tbtn uscita" onclick="timbra('uscita')">Sto uscendo</button>
+    </div>
+    <div class="quick-bar" id="quick-bar"></div>
+    <div class="msgs" id="msgs">
+      <div class="typing" id="typing"><span></span><span></span><span></span></div>
+    </div>
+    <div class="inp-area">
+      <textarea class="inp" id="inp" rows="1" placeholder="Scrivi a Sofia..."></textarea>
+      <button class="snd" id="snd" disabled onclick="send()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PROXY = 'https://eremo-bookings.vercel.app';
+let pin = '';
+let staffInfo = null;
+let history = [];
+let loading = false;
+
+// ── PIN INPUT ─────────────────────────────────────────────────
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    const d = document.getElementById('d' + i);
+    d.textContent = i < pin.length ? '●' : '';
+    d.classList.toggle('filled', i < pin.length);
+  }
+  document.getElementById('btn-login').disabled = pin.length < 4;
+  document.getElementById('login-error').textContent = '';
+}
+
+function addDigit(d) {
+  if (pin.length < 4) { pin += d; updateDots(); }
+  if (pin.length === 4) doLogin();
+}
+
+function delDigit() { pin = pin.slice(0, -1); updateDots(); }
+
+// ── LOGIN ─────────────────────────────────────────────────────
+async function doLogin() {
+  if (pin.length < 4) return;
+  document.getElementById('btn-login').disabled = true;
+  document.getElementById('login-error').textContent = '';
+  try {
+    const resp = await fetch(PROXY + '/api/staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'login', pin })
+    });
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.error || 'PIN non valido');
+    staffInfo = data.staff;
+    initChat();
+  } catch(e) {
+    document.getElementById('login-error').textContent = e.message;
+    document.getElementById('btn-login').disabled = false;
+    pin = '';
+    updateDots();
+  }
+}
+
+// ── LOGOUT ────────────────────────────────────────────────────
+function doLogout() {
+  staffInfo = null; pin = ''; history = [];
+  document.getElementById('chat-view').style.display = 'none';
+  document.getElementById('login-view').style.display = 'block';
+  updateDots();
+}
+
+// ── INIT CHAT ─────────────────────────────────────────────────
+function initChat() {
+  document.getElementById('login-view').style.display = 'none';
+  const cv = document.getElementById('chat-view');
+  cv.style.display = 'flex';
+
+  const avColors = { pulizie: 'av-pulizie', accoglienza: 'av-accoglienza', guida: 'av-guida', gestore: 'av-gestore' };
+  const avLetters = { pulizie: '🧹', accoglienza: '🏡', guida: '⭐', gestore: '👑' };
+  const av = document.getElementById('staff-avatar');
+  av.textContent = avLetters[staffInfo.ruolo] || 'S';
+  av.className = 'avatar ' + (avColors[staffInfo.ruolo] || 'av-gestore');
+
+  document.getElementById('staff-name').textContent = staffInfo.nome.split(' ')[0];
+  document.getElementById('staff-role').textContent = staffInfo.ruolo.charAt(0).toUpperCase() + staffInfo.ruolo.slice(1);
+
+  // Timbratura solo per pulizie
+  if (staffInfo.ruolo === 'pulizie') {
+    document.getElementById('timbra-bar').style.display = 'flex';
+  }
+
+  renderQuickActions();
+  sendWelcome();
+}
+
+// ── QUICK ACTIONS per ruolo ───────────────────────────────────
+function renderQuickActions() {
+  const actions = {
+    pulizie: [
+      { t: 'Pulizie oggi', q: 'Dammi il piano pulizie di oggi: chi parte e chi arriva' },
+      { t: 'Pulizie domani', q: 'Chi parte e chi arriva domani? Cosa devo preparare?' },
+      { t: 'Report settimana', q: 'Mandami il report pulizie della settimana via email' },
+      { t: 'Le mie ore', q: 'Mostrami le mie presenze e le ore lavorate questo mese' },
+    ],
+    accoglienza: [
+      { t: 'Arrivi oggi', q: 'Chi arriva oggi? Dammi tutti i dettagli' },
+      { t: 'Arrivi domani', q: 'Chi arriva domani e a che ora?' },
+      { t: 'Come arrivare', q: 'Dammi le indicazioni stradali per gli ospiti che vengono da Bari e da Brindisi aeroporto' },
+      { t: 'Report arrivi', q: 'Manda il report arrivi settimanale via email' },
+    ],
+    guida: [
+      { t: 'Esperienze oggi', q: 'Quali esperienze ho oggi? Partecipanti e riferimenti' },
+      { t: 'Esperienze settimana', q: 'Tutte le esperienze della prossima settimana' },
+      { t: 'Report email', q: 'Manda il report esperienze settimanale via email' },
+      { t: 'Dettagli ospiti', q: 'Dammi i contatti degli ospiti prenotati questa settimana' },
+    ],
+    gestore: [
+      { t: 'Report oggi', q: 'Dammi il report completo di oggi: arrivi, partenze, esperienze' },
+      { t: 'Report giornaliero', q: 'Manda il report giornaliero completo via email' },
+      { t: 'Pulizie settimana', q: 'Manda il report pulizie settimanale a Lina' },
+      { t: 'Esperienze settimana', q: 'Manda il report esperienze settimanale ad Anna' },
+    ],
+  };
+
+  const qb = document.getElementById('quick-bar');
+  qb.innerHTML = '';
+  (actions[staffInfo.ruolo] || []).forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'qbtn';
+    btn.textContent = a.t;
+    btn.onclick = () => sendMsg(a.q);
+    qb.appendChild(btn);
+  });
+}
+
+// ── WELCOME MESSAGE ───────────────────────────────────────────
+async function sendWelcome() {
+  const greetings = {
+    pulizie:     `Ciao ${staffInfo.nome.split(' ')[0]}! Sono Sofia. Posso dirti subito cosa c'è da fare oggi, gestire la tua timbratura o inviarti il report via email. Come posso aiutarti?`,
+    accoglienza: `Ciao ${staffInfo.nome.split(' ')[0]}! Sono Sofia. Posso mostrarti gli arrivi di oggi e domani, i dettagli degli ospiti e le indicazioni per raggiungerci. Cosa ti serve?`,
+    guida:       `Ciao ${staffInfo.nome.split(' ')[0]}! Sono Sofia. Ecco le esperienze in programma. Vuoi vedere quelle di oggi, della settimana, o ricevere il report via email?`,
+    gestore:     `Ciao Tommaso! Sono Sofia. Ho accesso a tutto: prenotazioni, esperienze, presenze staff e report. Cosa ti serve oggi?`,
+  };
+  const msg = greetings[staffInfo.ruolo] || `Ciao ${staffInfo.nome.split(' ')[0]}! Come posso aiutarti?`;
+  addMsg('assistant', msg);
+}
+
+// ── TIMBRATURA ────────────────────────────────────────────────
+async function timbra(tipo) {
+  const note = tipo === 'uscita' ? (prompt('Note sul lavoro svolto oggi (opzionale):') || '') : '';
+  try {
+    const resp = await fetch(PROXY + '/api/staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'timbra', pin, tipo, note })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      const msg = tipo === 'entrata'
+        ? `✅ Entrata registrata alle ${data.ora}. Buon lavoro ${staffInfo.nome.split(' ')[0]}!`
+        : `✅ Uscita registrata alle ${data.ora}. Hai lavorato ${data.oreTotali} ore oggi. Ottimo lavoro!`;
+      addMsg('assistant', msg);
+      const bar = document.getElementById('timbra-bar');
+      bar.className = tipo === 'entrata' ? 'timbra-bar uscita' : 'timbra-bar';
+    } else {
+      addMsg('assistant', `⚠️ ${data.error}`);
+    }
+  } catch(e) {
+    addMsg('assistant', `Errore timbratura: ${e.message}`);
+  }
+}
+
+// ── SEND ──────────────────────────────────────────────────────
+async function sendMsg(text) {
+  if (!text.trim() || loading) return;
+  loading = true;
+  document.getElementById('snd').disabled = true;
+  document.getElementById('inp').value = '';
+  document.getElementById('inp').style.height = 'auto';
+
+  addMsg('user', text);
+  document.getElementById('typing').classList.add('on');
+  scrollBottom();
+
+  // Controlla se è un comando report email
+  const isReport = /report|manda|invia|email/i.test(text);
+  if (isReport) {
+    await sendReport(text);
+  } else {
+    // Chat normale con Sofia
+    try {
+      const resp = await fetch(PROXY + '/api/staff', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'chat', pin, domanda: text })
+      });
+      const data = await resp.json();
+      document.getElementById('typing').classList.remove('on');
+      if (data.success) {
+        addMsg('assistant', data.risposta);
+      } else {
+        addMsg('assistant', 'Mi dispiace, riprova tra un momento.');
+      }
+    } catch(e) {
+      document.getElementById('typing').classList.remove('on');
+      addMsg('assistant', 'Errore di connessione. Riprova.');
+    }
+  }
+
+  loading = false;
+  document.getElementById('snd').disabled = false;
+  document.getElementById('inp').focus();
+}
+
+// ── REPORT EMAIL ──────────────────────────────────────────────
+async function sendReport(text) {
+  let tipo = 'giornaliero';
+  let giorni = 7;
+  if (/pulizie/i.test(text))      tipo = 'pulizie';
+  else if (/arrivi|accoglienza/i.test(text)) tipo = 'accoglienza';
+  else if (/esperien/i.test(text)) tipo = 'esperienze';
+  if (/oggi|giornaliero/i.test(text)) giorni = 1;
+
+  try {
+    const resp = await fetch(PROXY + '/api/staff-notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo, giorni })
+    });
+    const data = await resp.json();
+    document.getElementById('typing').classList.remove('on');
+    if (data.success) {
+      const dest = data.destinatari ? data.destinatari.join(', ') : 'team';
+      addMsg('assistant', `✅ Report "${tipo}" inviato via email a ${dest}.`);
+    } else {
+      addMsg('assistant', `⚠️ Errore invio report: ${data.error}`);
+    }
+  } catch(e) {
+    document.getElementById('typing').classList.remove('on');
+    addMsg('assistant', `Errore invio report: ${e.message}`);
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function send() { sendMsg(document.getElementById('inp').value.trim()); }
+
+function addMsg(role, text) {
+  const typing = document.getElementById('typing');
+  typing.classList.remove('on');
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  d.innerHTML = '<div class="bubble">' + fmt(text) + '</div>';
+  document.getElementById('msgs').insertBefore(d, typing);
+  scrollBottom();
+}
+
+function fmt(t) {
+  return t
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
+}
+
+function scrollBottom() {
+  const m = document.getElementById('msgs');
+  m.scrollTop = m.scrollHeight;
+}
+
+// Input setup
+const inp = document.getElementById('inp');
+const snd = document.getElementById('snd');
+inp.addEventListener('input', function() {
+  snd.disabled = !inp.value.trim();
+  inp.style.height = 'auto';
+  inp.style.height = Math.min(inp.scrollHeight, 90) + 'px';
+});
+inp.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!snd.disabled) send(); }
+});
+</script>
+</body>
+</html>
