@@ -163,8 +163,8 @@ async function reportPulizie(giorni = 1) {
   const daFmt = oggi.toISOString().split('T')[0];
 
   const [arrivi, partenze, staff] = await Promise.all([
-    getBeds24({ arrivalFrom: da, arrivalTo: a, status: 1, includeInfoItems: true }),
-    getBeds24({ departureFrom: da, departureTo: a, status: 1, includeInfoItems: true }),
+    getBeds24({ arrivalFrom: da, arrivalTo: a,  includeInfoItems: true }),
+    getBeds24({ departureFrom: da, departureTo: a,  includeInfoItems: true }),
     getStaffByRuolo('pulizie'),
   ]);
 
@@ -201,7 +201,7 @@ async function reportAccoglienza(giorni = 1) {
   const daFmt = oggi.toISOString().split('T')[0];
 
   const [arrivi, staff] = await Promise.all([
-    getBeds24({ arrivalFrom: da, arrivalTo: a, status: 1, includeInfoItems: true }),
+    getBeds24({ arrivalFrom: da, arrivalTo: a,  includeInfoItems: true }),
     getStaffByRuolo('accoglienza'),
   ]);
 
@@ -276,8 +276,8 @@ async function reportGiornaliero() {
   const a1B24   = toB24Date(a1.toISOString().split('T')[0]);
 
   const [arriviOggi, partenzaOggi, esperienze7] = await Promise.all([
-    getBeds24({ arrivalFrom: daB24, arrivalTo: a1B24, status: 1, includeInfoItems: true }),
-    getBeds24({ departureFrom: daB24, departureTo: a1B24, status: 1 }),
+    getBeds24({ arrivalFrom: daB24, arrivalTo: a1B24,  includeInfoItems: true }),
+    getBeds24({ departureFrom: daB24, departureTo: a1B24 }),
     getEsperienze(oggi, a7),
   ]);
 
