@@ -322,29 +322,27 @@ async function sendMsg(text) {
   document.getElementById('typing').classList.add('on');
   scrollBottom();
 
-  // Controlla se è un comando report email
-  const isReport = /report|manda|invia|email/i.test(text);
-  if (isReport) {
-    await sendReport(text);
-  } else {
-    // Chat normale con Sofia
-    try {
-      const resp = await fetch(PROXY + '/api/staff', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'chat', pin, domanda: text })
-      });
-      const data = await resp.json();
-      document.getElementById('typing').classList.remove('on');
-      if (data.success) {
-        addMsg('assistant', data.risposta);
-      } else {
-        addMsg('assistant', 'Mi dispiace, riprova tra un momento.');
+  // Tutto passa dalla chat Sofia — nessun bypass diretto
+  try {
+    const resp = await fetch(PROXY + '/api/staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'chat', pin, domanda: text })
+    });
+    const data = await resp.json();
+    document.getElementById('typing').classList.remove('on');
+    if (data.success) {
+      addMsg('assistant', data.risposta);
+      // Se Sofia ha preparato un report, mostra pulsante conferma email
+      if (data.reportPronto) {
+        showEmailConfirm(data.reportPronto);
       }
-    } catch(e) {
-      document.getElementById('typing').classList.remove('on');
-      addMsg('assistant', 'Errore di connessione. Riprova.');
+    } else {
+      addMsg('assistant', 'Mi dispiace, riprova tra un momento.');
     }
+  } catch(e) {
+    document.getElementById('typing').classList.remove('on');
+    addMsg('assistant', 'Errore di connessione. Riprova.');
   }
 
   loading = false;
@@ -352,14 +350,51 @@ async function sendMsg(text) {
   document.getElementById('inp').focus();
 }
 
-// ── REPORT EMAIL ──────────────────────────────────────────────
+// ── CONFERMA EMAIL ────────────────────────────────────────────
+function showEmailConfirm(reportInfo) {
+  const typing = document.getElementById('typing');
+  const d = document.createElement('div');
+  d.className = 'msg assistant';
+  d.innerHTML = `<div class="bubble" style="display:flex;flex-direction:column;gap:8px;">
+    <span>Vuoi che invii questo report anche via email?</span>
+    <div style="display:flex;gap:8px;">
+      <button onclick="doSendReport('${reportInfo.tipo}',${reportInfo.giorni},this)" style="flex:1;padding:8px;background:#3b6d11;color:#fff;border:none;border-radius:8px;font-family:'Jost',sans-serif;font-size:0.78rem;cursor:pointer;">✉️ Sì, invia email</button>
+      <button onclick="this.closest('.msg').remove()" style="flex:1;padding:8px;background:transparent;border:1.5px solid #ece4d8;border-radius:8px;font-family:'Jost',sans-serif;font-size:0.78rem;cursor:pointer;color:#5a4a38;">No grazie</button>
+    </div>
+  </div>`;
+  document.getElementById('msgs').insertBefore(d, typing);
+  scrollBottom();
+}
+
+// ── INVIA REPORT EMAIL ────────────────────────────────────────
+async function doSendReport(tipo, giorni, btn) {
+  btn.closest('.msg').querySelector('div[style*="gap"]').innerHTML = '<span style="color:#5a4a38;font-size:0.78rem;">Invio in corso...</span>';
+  try {
+    const resp = await fetch(PROXY + '/api/staff-notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo, giorni })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      const dest = data.destinatari ? data.destinatari.join(', ') : 'team';
+      btn.closest('.msg').querySelector('.bubble').innerHTML = `✅ Report inviato via email a <strong>${dest}</strong>.`;
+    } else {
+      btn.closest('.msg').querySelector('.bubble').innerHTML = `⚠️ Errore: ${data.error}`;
+    }
+  } catch(e) {
+    btn.closest('.msg').querySelector('.bubble').innerHTML = `⚠️ Errore: ${e.message}`;
+  }
+}
+
+// ── REPORT EMAIL (legacy — ora non più usato direttamente) ────
 async function sendReport(text) {
   let tipo = 'giornaliero';
   let giorni = 7;
-  if (/pulizie/i.test(text))      tipo = 'pulizie';
+  if (/pulizie/i.test(text))               tipo = 'pulizie';
   else if (/arrivi|accoglienza/i.test(text)) tipo = 'accoglienza';
-  else if (/esperien/i.test(text)) tipo = 'esperienze';
-  if (/oggi|giornaliero/i.test(text)) giorni = 1;
+  else if (/esperien/i.test(text))           tipo = 'esperienze';
+  if (/oggi|giornaliero/i.test(text))        giorni = 1;
 
   try {
     const resp = await fetch(PROXY + '/api/staff-notify', {
@@ -377,8 +412,7 @@ async function sendReport(text) {
     }
   } catch(e) {
     document.getElementById('typing').classList.remove('on');
-    addMsg('assistant', `Errore invio report: ${e.message}`);
-  }
+    addMsg('assistant', `Errore invio report: ${e.message}`);  }
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
