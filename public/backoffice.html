@@ -356,7 +356,6 @@ function renderDashboard(d) {
       <div class="kpi blue"><div class="kpi-num">${d.esperienze7.length}</div><div class="kpi-lbl">Esperienze 7gg</div></div>
       <div class="kpi amber"><div class="kpi-num">${d.occupazione}%</div><div class="kpi-lbl">Occupazione</div></div>
     </div>
-    ${d._debugOccupazione ? `<div style="font-size:0.62rem;color:#8a7560;margin-top:4px;padding:4px 8px;background:#f2ece2;border-radius:6px;">Debug: totCamere=${d._debugOccupazione.totCamere ?? '?'} occupate=${d._debugOccupazione.camereOccupate ?? '?'} roomIds=${JSON.stringify(d._debugOccupazione.roomIds ?? [])} errore=${d._debugOccupazione.error || 'nessuno'}</div>` : ''}
   </div>`;
 
   // Meteo + Staff
