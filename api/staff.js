@@ -60,9 +60,9 @@ async function getBeds24Bookings(params = {}) {
   return JSON.parse(text);
 }
 
-// ── Helper: formatta data in YYYYMMDD ────────────────────────
+// ── Helper: formatta data in YYYY-MM-DD (formato Beds24 V2) ──
 function toB24Date(dateStr) {
-  return dateStr.replace(/-/g, '');
+  return dateStr; // già in YYYY-MM-DD da toISOString()
 }
 
 // ── Autentica PIN da Airtable Staff ─────────────────────────
