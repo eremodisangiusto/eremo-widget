@@ -388,6 +388,95 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'tipo_data non valido' });
     }
 
+    // ── DASHBOARD: cruscotto gestore ─────────────────────────
+    if (action === 'dashboard') {
+      if (!pin) return res.status(400).json({ error: 'pin obbligatorio' });
+      const staff = await autenticaPIN(pin);
+      if (!staff || staff.ruolo !== 'gestore') return res.status(403).json({ error: 'Accesso riservato al gestore' });
+
+      const oggi = new Date().toISOString().split('T')[0];
+      const domani = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+      const fra7 = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+      const inizioMese = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+
+      // Tutte le query in parallelo
+      const [
+        arriviOggi, arriviDomani, partenzeOggi,
+        esperienze7, prenotazioniMese,
+        staffAttivo, reviewRecenti, meteo,
+      ] = await Promise.all([
+        getBeds24Bookings({ arrivalFrom: oggi,   arrivalTo: oggi   }),
+        getBeds24Bookings({ arrivalFrom: domani, arrivalTo: domani }),
+        getBeds24Bookings({ departureFrom: oggi, departureTo: oggi }),
+        queryEsperienze(7),
+        atExp('GET', 'Prenotazioni', {
+          query: `filterByFormula=${encodeURIComponent(`DATESTR({Data})>="${inizioMese}"`)}&fields[]=Totale €&fields[]=Stato prenotazione`
+        }),
+        atKB('GET', 'Staff', { query: `filterByFormula=${encodeURIComponent('{Attivo}=TRUE()')}&fields[]=Nome&fields[]=Ruolo` }),
+        atKB('GET', 'Guestbook', { query: `filterByFormula=${encodeURIComponent('{Pubblicata}=TRUE()')}&sort[0][field]=Data invio&sort[0][direction]=desc&maxRecords=5&fields[]=Nome ospite&fields[]=Voto&fields[]=Review` }),
+        fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=40.7285&lon=17.5810&appid=${process.env.OPENWEATHER_API_KEY}&units=metric&lang=it&cnt=8`).then(r => r.ok ? r.json() : null).catch(() => null),
+      ]);
+
+      // Calcola occupazione (camere occupate oggi / totale camere = 2)
+      const totCamere = 2;
+      const camereOccupate = await getBeds24Bookings({ arrivalFrom: new Date(Date.now() - 30*86400000).toISOString().split('T')[0], arrivalTo: domani });
+      const occupate = (camereOccupate.data || []).filter(b => b.arrival <= oggi && b.departure > oggi).length;
+      const occupazione = Math.round((Math.min(occupate, totCamere) / totCamere) * 100);
+
+      // Incassi mese
+      const incassiMese = (prenotazioniMese.records || []).reduce((s, r) => s + (r.fields['Totale €'] || 0), 0);
+
+      // Meteo
+      let meteoData = null;
+      if (meteo && meteo.list) {
+        const oggi_item = meteo.list[0];
+        const previsioni = [];
+        const visti = new Set();
+        for (const item of meteo.list) {
+          const d = item.dt_txt.split(' ')[0];
+          if (d !== oggi && !visti.has(d)) {
+            visti.add(d);
+            previsioni.push({ data: d, temp: Math.round(item.main.temp), desc: item.weather[0].description, codice: item.weather[0].id });
+            if (previsioni.length >= 3) break;
+          }
+        }
+        meteoData = {
+          temp:      Math.round(oggi_item.main.temp),
+          desc:      oggi_item.weather[0].description,
+          codice:    oggi_item.weather[0].id,
+          vento:     Math.round(oggi_item.wind.speed * 3.6),
+          previsioni,
+        };
+      }
+
+      const fmt = b => ({
+        id:       b.id,
+        nome:     `${b.firstName || b.guestFirstName || ''} ${b.lastName || b.guestLastName || ''}`.trim() || 'Ospite',
+        ospiti:   (b.numAdult || 1) + (b.numChild || 0),
+        checkin:  b.arrival,
+        checkout: b.departure,
+        telefono: b.phone || b.guestPhone || b.mobile || b.guestMobile || '',
+        orario:   b.arrivalTime || b.infoItems?.find(i => i.code === 'ETA')?.text || '',
+      });
+
+      return res.status(200).json({
+        success: true,
+        dashboard: {
+          data: oggi,
+          arriviOggi:    (arriviOggi.data   || []).map(fmt),
+          arriviDomani:  (arriviDomani.data  || []).map(fmt),
+          partenzeOggi:  (partenzeOggi.data  || []).map(fmt),
+          esperienze7,
+          occupazione,
+          incassiMese:   Math.round(incassiMese),
+          nPrenotazioniMese: (prenotazioniMese.records || []).length,
+          staff:         (staffAttivo.records || []).map(r => ({ nome: r.fields['Nome'], ruolo: r.fields['Ruolo'] })),
+          reviewRecenti: (reviewRecenti.records || []).map(r => ({ nome: r.fields['Nome ospite'], voto: r.fields['Voto'], testo: (r.fields['Review'] || '').substring(0, 80) })),
+          meteo:         meteoData,
+        }
+      });
+    }
+
     return res.status(400).json({ error: `Azione non valida: ${action}` });
 
   } catch (err) {
