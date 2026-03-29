@@ -418,20 +418,28 @@ export default async function handler(req, res) {
       ]);
 
       // Calcola occupazione — prenotazioni attive oggi (arrivo <= oggi < partenza)
-      // Beds24 V2: filter=stayovers restituisce chi è in casa oggi
       const totCamere = 2;
       let occupate = 0;
+      let debugOccupazione = {};
       try {
         const stayovers = await getBeds24Bookings({ filter: 'stayovers' });
-        // Conta anche chi arriva oggi
         const arriviOggiCount = (arriviOggi.data || []).length;
-        occupate = (stayovers.data || []).length + arriviOggiCount;
+        const stayoversCount = (stayovers.data || []).length;
+        occupate = stayoversCount + arriviOggiCount;
+        debugOccupazione = {
+          stayovers: stayoversCount,
+          arriviOggi: arriviOggiCount,
+          totale: occupate,
+          stayoversData: (stayovers.data || []).map(b => ({ id: b.id, arrival: b.arrival, departure: b.departure, roomId: b.roomId })),
+        };
+        console.log('[dashboard] occupazione debug:', JSON.stringify(debugOccupazione));
       } catch(e) {
-        // Fallback manuale: cerca prenotazioni con arrivo nei 30gg passati e partenza dopo oggi
         const past30 = new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
-        const fallback = await getBeds24Bookings({ arrivalFrom: past30, arrivalTo: oggi, departureFrom: domani });
-        occupate = (fallback.data || []).filter(b => b.arrival <= oggi && b.departure > oggi).length
-                 + (arriviOggi.data || []).length;
+        const fallback = await getBeds24Bookings({ arrivalFrom: past30, arrivalTo: oggi });
+        const inCasa = (fallback.data || []).filter(b => b.arrival <= oggi && b.departure > oggi);
+        occupate = inCasa.length;
+        debugOccupazione = { fallback: true, inCasa: inCasa.length, error: e.message };
+        console.log('[dashboard] occupazione fallback:', JSON.stringify(debugOccupazione));
       }
       const occupazione = Math.round((Math.min(occupate, totCamere) / totCamere) * 100);
 
@@ -485,6 +493,7 @@ export default async function handler(req, res) {
           staff:         (staffAttivo.records || []).map(r => ({ nome: r.fields['Nome'], ruolo: r.fields['Ruolo'] })),
           reviewRecenti: (reviewRecenti.records || []).map(r => ({ nome: r.fields['Nome ospite'], voto: r.fields['Voto'], testo: (r.fields['Review'] || '').substring(0, 80) })),
           meteo:         meteoData,
+          _debugOccupazione: debugOccupazione,
         }
       });
     }
