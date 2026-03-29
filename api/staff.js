@@ -89,8 +89,8 @@ async function queryPulizie(giorni = 7) {
   const a   = toB24Date(fine.toISOString().split('T')[0]);
 
   const [arrivi, partenze] = await Promise.all([
-    getBeds24Bookings({ arrivalFrom: da, arrivalTo: a, status: 1, includeInfoItems: true }),
-    getBeds24Bookings({ departureFrom: da, departureTo: a, status: 1, includeInfoItems: true }),
+    getBeds24Bookings({ arrivalFrom: da, arrivalTo: a,  includeInfoItems: true }),
+    getBeds24Bookings({ departureFrom: da, departureTo: a,  includeInfoItems: true }),
   ]);
 
   const formatBooking = (b) => ({
@@ -118,7 +118,7 @@ async function queryAccoglienza(giorni = 3) {
   const da = toB24Date(oggi.toISOString().split('T')[0]);
   const a  = toB24Date(fine.toISOString().split('T')[0]);
 
-  const result = await getBeds24Bookings({ arrivalFrom: da, arrivalTo: a, status: 1, includeInfoItems: true });
+  const result = await getBeds24Bookings({ arrivalFrom: da, arrivalTo: a,  includeInfoItems: true });
 
   return (result.data || []).map(b => ({
     id:           b.id,
