@@ -498,7 +498,6 @@ export default async function handler(req, res) {
           staff:         (staffAttivo.records || []).map(r => ({ nome: r.fields['Nome'], ruolo: r.fields['Ruolo'] })),
           reviewRecenti: (reviewRecenti.records || []).map(r => ({ nome: r.fields['Nome ospite'], voto: r.fields['Voto'], testo: (r.fields['Review'] || '').substring(0, 80) })),
           meteo:         meteoData,
-          _debugOccupazione: debugOccupazione,
         }
       });
     }
