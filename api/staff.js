@@ -246,28 +246,33 @@ async function queryPresenze(nome, giorni = 30) {
 
 // ── CLAUDE: sintetizza risposta profilata ────────────────────
 async function claudeRisposta(staffInfo, domanda, dati) {
+  const isReportRequest = /report|manda|invia|email/i.test(domanda);
+
   const ruoloPrompt = {
     pulizie: `Sei Sofia, assistente backoffice dell'Eremo di San Giusto per il personale pulizie.
 Parla con ${staffInfo.nome} in modo diretto e pratico.
 Hai accesso a: prenotazioni (arrivi/partenze), registro presenze (timbratura), report.
 Formato risposte: usa elenchi chiari con date e orari ben evidenziati.
-Per la timbratura: quando ${staffInfo.nome} dice "sono arrivata/o" → registra entrata. Quando dice "sto uscendo/ho finito" → registra uscita e mostra le ore fatte.
-Per i report pulizie: indica chiaramente quali camere vanno pulite, quando, e quante persone arrivano/partono.`,
+Per la timbratura: quando ${staffInfo.nome} dice "sono arrivata/o" → conferma registrazione entrata. Quando dice "sto uscendo/ho finito" → conferma uscita e mostra le ore fatte.
+IMPORTANTE PER REPORT: Quando ti chiedono un report, mostra SEMPRE prima il contenuto completo in chat (arrivi, partenze, cosa pulire e quando), poi concludi con "Vuoi che invii questo report anche via email?". NON inviare email automaticamente.`,
 
     accoglienza: `Sei Sofia, assistente backoffice dell'Eremo di San Giusto per il personale di accoglienza.
 Parla con ${staffInfo.nome} in modo professionale e cordiale.
 Hai accesso a: prenotazioni in arrivo con dettagli ospiti, orari check-in, note speciali, numero telefono ospiti.
 Formato risposte: mostra nome ospite, data/ora arrivo, numero ospiti, telefono, eventuali note o richieste speciali.
-Per le indicazioni stradali: l'Eremo è a Monte Morrone, 2km da Ostuni centro, coordinate 40.7285, 17.5810.`,
+Per le indicazioni stradali: l'Eremo è a Monte Morrone, 2km da Ostuni centro, coordinate 40.7285, 17.5810. Da Bari: A14 uscita Fasano, poi SP14 verso Ostuni (1h10min). Da Brindisi aeroporto: SS16 verso Ostuni (35min).
+IMPORTANTE PER REPORT: Mostra SEMPRE prima il contenuto completo in chat, poi chiedi se vuole inviarlo via email.`,
 
     guida: `Sei Sofia, assistente backoffice dell'Eremo di San Giusto per le guide esperienze.
 Parla con ${staffInfo.nome} in modo diretto e informativo.
 Hai accesso a: prenotazioni esperienze con partecipanti, riferimenti ospiti, note speciali, orari.
-Formato risposte: raggruppa per giorno ed esperienza. Mostra chiaramente: esperienza, data, orario, N partecipanti, nome ospite, telefono, note.`,
+Formato risposte: raggruppa per giorno ed esperienza. Mostra chiaramente: esperienza, data, orario, N partecipanti, nome ospite, telefono, note.
+IMPORTANTE PER REPORT: Mostra SEMPRE prima il contenuto completo in chat, poi chiedi se vuole inviarlo via email.`,
 
     gestore: `Sei Sofia, assistente backoffice completo dell'Eremo di San Giusto per il gestore Tommaso.
 Hai accesso a tutte le informazioni: prenotazioni, esperienze, presenze staff, report.
-Formato risposte: completo e dettagliato con tutti i dati disponibili.`,
+Formato risposte: completo e dettagliato con tutti i dati disponibili.
+IMPORTANTE PER REPORT: Mostra SEMPRE prima il contenuto completo in chat, poi chiedi se vuole inviarlo via email.`,
   };
 
   const systemPrompt = (ruoloPrompt[staffInfo.ruolo] || ruoloPrompt.gestore)
@@ -315,28 +320,35 @@ export default async function handler(req, res) {
       if (!staff) return res.status(401).json({ error: 'PIN non valido' });
 
       let dati = {};
-
-      // Carica dati in base al ruolo
       if (staff.ruolo === 'pulizie') {
         dati = await queryPulizie(7);
-        // Aggiungi presenze recenti
-        const presenze = await queryPresenze(staff.nome, 7);
-        dati.presenze = presenze;
+        dati.presenze = await queryPresenze(staff.nome, 7);
       } else if (staff.ruolo === 'accoglienza') {
-        dati.arrivi = await queryAccoglienza(3);
+        dati.arrivi = await queryAccoglienza(7);
       } else if (staff.ruolo === 'guida') {
         dati.esperienze = await queryEsperienze(7);
       } else if (staff.ruolo === 'gestore') {
         const [pulizie, accoglienza, esperienze] = await Promise.all([
-          queryPulizie(7),
-          queryAccoglienza(3),
-          queryEsperienze(7),
+          queryPulizie(7), queryAccoglienza(7), queryEsperienze(7),
         ]);
         dati = { pulizie, accoglienza, esperienze };
       }
 
       const risposta = await claudeRisposta(staff, domanda, dati);
-      return res.status(200).json({ success: true, risposta, staff: { nome: staff.nome, ruolo: staff.ruolo } });
+
+      // Determina se è una richiesta di report per mostrare il pulsante email
+      let reportPronto = null;
+      const isReport = /report|manda|invia|email/i.test(domanda);
+      if (isReport) {
+        let tipo = 'giornaliero', giorni = 7;
+        if (/pulizie/i.test(domanda))                tipo = 'pulizie';
+        else if (/arrivi|accoglienza/i.test(domanda)) tipo = 'accoglienza';
+        else if (/esperien/i.test(domanda))            tipo = 'esperienze';
+        if (/oggi/i.test(domanda))                     giorni = 1;
+        reportPronto = { tipo, giorni };
+      }
+
+      return res.status(200).json({ success: true, risposta, reportPronto, staff: { nome: staff.nome, ruolo: staff.ruolo } });
     }
 
     // ── TIMBRATURA: entrata/uscita ───────────────────────────
