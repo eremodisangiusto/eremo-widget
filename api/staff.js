@@ -417,35 +417,38 @@ export default async function handler(req, res) {
         fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=40.7285&lon=17.5810&appid=${process.env.OPENWEATHER_API_KEY}&units=metric&lang=it&cnt=8`).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
 
-      // Calcola occupazione — chi è in casa oggi (arrivo <= oggi, partenza > oggi)
-      const totCamere = 2;
+      // Occupazione generica: camere occupate oggi / totale camere struttura
       let occupate = 0;
       let debugOccupazione = {};
       try {
-        // Beds24 V2: cerca prenotazioni arrivate nei 30gg passati che non sono ancora partite
-        const past30 = new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
-        const inCasaQuery = await getBeds24Bookings({
-          arrivalFrom:   past30,
-          arrivalTo:     oggi,
-          departureFrom: domani,   // partenza da domani in poi = ancora in casa oggi
+        // 1. Totale camere dalla struttura (Beds24 API V2)
+        const propResp = await fetch('https://beds24.com/api/v2/properties?includeAllRooms=true', {
+          headers: { 'token': BEDS24_TOKEN }
         });
-        // Aggiungi anche chi arriva oggi (non ancora "stayover" ma occupa la camera)
-        const inCasaCount = (inCasaQuery.data || []).length;
-        const arriviOggiCount = (arriviOggi.data || []).length;
-        // Evita doppio conteggio: se arrivalFrom=past30 e arrivalTo=oggi, gli arrivi di oggi sono già inclusi
-        occupate = inCasaCount;
-        debugOccupazione = {
-          inCasa: inCasaCount,
-          arriviOggi: arriviOggiCount,
-          totale: occupate,
-          dettaglio: (inCasaQuery.data || []).map(b => ({ id: b.id, arrival: b.arrival, departure: b.departure })),
-        };
-        console.log('[dashboard] occupazione:', JSON.stringify(debugOccupazione));
+        const propData = await propResp.json();
+        const totCamere = (propData.data || []).reduce((sum, p) => sum + (p.roomTypes?.length || 0), 0) || 1;
+
+        // 2. Prenotazioni attive oggi: arrivate nei 90gg passati e partenza da domani in poi
+        const past90 = new Date(Date.now() - 90*86400000).toISOString().split('T')[0];
+        const inCasaQuery = await getBeds24Bookings({
+          arrivalFrom:   past90,
+          arrivalTo:     oggi,
+          departureFrom: domani,
+        });
+
+        // Conta roomId distinte occupate oggi
+        const roomIds = new Set((inCasaQuery.data || []).map(b => b.roomId).filter(Boolean));
+        // Aggiungi anche chi arriva oggi con roomId distinte
+        (arriviOggi.data || []).forEach(b => { if (b.roomId) roomIds.add(b.roomId); });
+
+        occupate = roomIds.size;
+        debugOccupazione = { totCamere, camereOccupate: occupate, roomIds: [...roomIds] };
       } catch(e) {
-        console.error('[dashboard] occupazione error:', e.message);
         debugOccupazione = { error: e.message };
       }
-      const occupazione = Math.round((Math.min(occupate, totCamere) / totCamere) * 100);
+      const occupazione = debugOccupazione.totCamere
+        ? Math.min(100, Math.round((occupate / debugOccupazione.totCamere) * 100))
+        : (occupate > 0 ? 100 : 0);
 
       // Incassi mese
       const incassiMese = (prenotazioniMese.records || []).reduce((s, r) => s + (r.fields['Totale €'] || 0), 0);
