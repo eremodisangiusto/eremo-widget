@@ -572,6 +572,9 @@ function esjInit() {
     +   '<div class="esj-lang-wrap">'
     +     '<button class="esj-lang active" id="esj-lang-it" onclick="esjSetLang(\'it\')">&#127470;&#127481;</button>'
     +     '<button class="esj-lang" id="esj-lang-en" onclick="esjSetLang(\'en\')">&#127468;&#127463;</button>'
+    +     '<a href="https://eremo-bookings.vercel.app/staff" target="_blank" title="Staff backoffice" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;border:1px solid transparent;opacity:0.25;transition:opacity 0.2s;text-decoration:none;margin-left:2px;" onmouseover="this.style.opacity=\'1\';this.style.borderColor=\'rgba(200,169,126,0.35)\'" onmouseout="this.style.opacity=\'0.25\';this.style.borderColor=\'transparent\'">'
+    +       '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#c8a97e" stroke-width="1.5"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#c8a97e" stroke-width="1.5" stroke-linecap="round"/></svg>'
+    +     '</a>'
     +   '</div>'
     + '</div>'
 
