@@ -48,14 +48,21 @@ async function atExp(method, table, { id, query, body } = {}) {
   return data;
 }
 
-// ── Helper: ottieni token Beds24 ─────────────────────────────
+// ── Helper: Beds24 API V2 bookings ──────────────────────────
+// Date format: YYYYMMDD (no dashes) — propertyId non serve, il token identifica la property
 async function getBeds24Bookings(params = {}) {
-  const qs = new URLSearchParams({ propertyId: '221499', ...params }).toString();
+  const qs = new URLSearchParams({ ...params }).toString();
   const resp = await fetch(`https://beds24.com/api/v2/bookings?${qs}`, {
     headers: { 'token': BEDS24_TOKEN }
   });
-  if (!resp.ok) throw new Error(`Beds24 ${resp.status}`);
-  return await resp.json();
+  const text = await resp.text();
+  if (!resp.ok) throw new Error(`Beds24 ${resp.status}: ${text.substring(0, 200)}`);
+  return JSON.parse(text);
+}
+
+// ── Helper: formatta data in YYYYMMDD ────────────────────────
+function toB24Date(dateStr) {
+  return dateStr.replace(/-/g, '');
 }
 
 // ── Autentica PIN da Airtable Staff ─────────────────────────
@@ -78,26 +85,26 @@ async function queryPulizie(giorni = 7) {
   const oggi = new Date();
   const fine = new Date(oggi);
   fine.setDate(fine.getDate() + giorni);
-  const da   = oggi.toISOString().split('T')[0];
-  const a    = fine.toISOString().split('T')[0];
+  const da  = toB24Date(oggi.toISOString().split('T')[0]);
+  const a   = toB24Date(fine.toISOString().split('T')[0]);
 
   const [arrivi, partenze] = await Promise.all([
-    getBeds24Bookings({ arrivalFrom: da.replace(/-/g,''), arrivalTo: a.replace(/-/g,''), status: '1' }),
-    getBeds24Bookings({ departureFrom: da.replace(/-/g,''), departureTo: a.replace(/-/g,''), status: '1' }),
+    getBeds24Bookings({ arrivalFrom: da, arrivalTo: a, status: 1, includeInfoItems: true }),
+    getBeds24Bookings({ departureFrom: da, departureTo: a, status: 1, includeInfoItems: true }),
   ]);
 
   const formatBooking = (b) => ({
     id:        b.id,
     checkin:   b.arrival,
     checkout:  b.departure,
-    ospiti:    b.numAdult + (b.numChild || 0),
-    nome:      `${b.guestFirstName || ''} ${b.guestLastName || ''}`.trim(),
-    stanza:    b.roomId,
-    note:      b.infoItems?.find(i => i.code === 'GUESTMESSAGE')?.text || '',
+    ospiti:    (b.numAdult || 1) + (b.numChild || 0),
+    nome:      `${b.guestFirstName || ''} ${b.guestLastName || ''}`.trim() || 'Ospite',
+    stanza:    b.roomId || '',
+    note:      b.guestNotes || '',
   });
 
   return {
-    periodo: { da, a },
+    periodo: { da: oggi.toISOString().split('T')[0], a: fine.toISOString().split('T')[0] },
     arrivi:   (arrivi.data   || []).map(formatBooking),
     partenze: (partenze.data || []).map(formatBooking),
   };
@@ -108,23 +115,23 @@ async function queryAccoglienza(giorni = 3) {
   const oggi = new Date();
   const fine = new Date(oggi);
   fine.setDate(fine.getDate() + giorni);
-  const da = oggi.toISOString().split('T')[0].replace(/-/g,'');
-  const a  = fine.toISOString().split('T')[0].replace(/-/g,'');
+  const da = toB24Date(oggi.toISOString().split('T')[0]);
+  const a  = toB24Date(fine.toISOString().split('T')[0]);
 
-  const result = await getBeds24Bookings({ arrivalFrom: da, arrivalTo: a, status: '1' });
+  const result = await getBeds24Bookings({ arrivalFrom: da, arrivalTo: a, status: 1, includeInfoItems: true });
 
   return (result.data || []).map(b => ({
-    id:        b.id,
-    checkin:   b.arrival,
-    checkout:  b.departure,
-    ospiti:    b.numAdult + (b.numChild || 0),
-    nome:      `${b.guestFirstName || ''} ${b.guestLastName || ''}`.trim(),
-    email:     b.guestEmail    || '',
-    telefono:  b.guestPhone    || b.guestMobile || '',
-    paese:     b.guestCountry  || '',
-    note:      b.infoItems?.find(i => i.code === 'GUESTMESSAGE')?.text || '',
+    id:           b.id,
+    checkin:      b.arrival,
+    checkout:     b.departure,
+    ospiti:       (b.numAdult || 1) + (b.numChild || 0),
+    nome:         `${b.guestFirstName || ''} ${b.guestLastName || ''}`.trim() || 'Ospite',
+    email:        b.guestEmail    || '',
+    telefono:     b.guestPhone    || b.guestMobile || '',
+    paese:        b.guestCountry  || '',
+    note:         b.guestNotes    || '',
     orarioArrivo: b.infoItems?.find(i => i.code === 'ETA')?.text || 'non specificato',
-    stanza:    b.roomId,
+    stanza:       b.roomId || '',
   }));
 }
 
