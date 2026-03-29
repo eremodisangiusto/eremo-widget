@@ -100,13 +100,17 @@ async function sendEmail({ to, subject, html }) {
 }
 
 // ── Fetch Beds24 prenotazioni ────────────────────────────────
+// Date format: YYYYMMDD — propertyId non serve in V2, il token identifica la property
+function toB24Date(dateStr) { return dateStr.replace(/-/g, ''); }
+
 async function getBeds24(params) {
-  const qs = new URLSearchParams({ propertyId: '221499', ...params }).toString();
+  const qs = new URLSearchParams({ ...params }).toString();
   const resp = await fetch(`https://beds24.com/api/v2/bookings?${qs}`, {
     headers: { 'token': BEDS24_TOKEN }
   });
-  if (!resp.ok) throw new Error(`Beds24 ${resp.status}`);
-  const d = await resp.json();
+  const text = await resp.text();
+  if (!resp.ok) throw new Error(`Beds24 ${resp.status}: ${text.substring(0,200)}`);
+  const d = JSON.parse(text);
   return d.data || [];
 }
 
@@ -154,13 +158,13 @@ async function reportPulizie(giorni = 1) {
   const oggi = new Date();
   const fine = new Date(oggi);
   fine.setDate(fine.getDate() + giorni);
-  const da = oggi.toISOString().split('T')[0].replace(/-/g,'');
-  const a  = fine.toISOString().split('T')[0].replace(/-/g,'');
+  const da    = toB24Date(oggi.toISOString().split('T')[0]);
+  const a     = toB24Date(fine.toISOString().split('T')[0]);
   const daFmt = oggi.toISOString().split('T')[0];
 
   const [arrivi, partenze, staff] = await Promise.all([
-    getBeds24({ arrivalFrom: da, arrivalTo: a, status: '1' }),
-    getBeds24({ departureFrom: da, departureTo: a, status: '1' }),
+    getBeds24({ arrivalFrom: da, arrivalTo: a, status: 1, includeInfoItems: true }),
+    getBeds24({ departureFrom: da, departureTo: a, status: 1, includeInfoItems: true }),
     getStaffByRuolo('pulizie'),
   ]);
 
@@ -192,12 +196,12 @@ async function reportAccoglienza(giorni = 1) {
   const oggi = new Date();
   const fine = new Date(oggi);
   fine.setDate(fine.getDate() + giorni);
-  const da = oggi.toISOString().split('T')[0].replace(/-/g,'');
-  const a  = fine.toISOString().split('T')[0].replace(/-/g,'');
+  const da    = toB24Date(oggi.toISOString().split('T')[0]);
+  const a     = toB24Date(fine.toISOString().split('T')[0]);
   const daFmt = oggi.toISOString().split('T')[0];
 
   const [arrivi, staff] = await Promise.all([
-    getBeds24({ arrivalFrom: da, arrivalTo: a, status: '1' }),
+    getBeds24({ arrivalFrom: da, arrivalTo: a, status: 1, includeInfoItems: true }),
     getStaffByRuolo('accoglienza'),
   ]);
 
@@ -264,18 +268,16 @@ async function reportEsperienze(giorni = 7) {
 
 // ── REPORT: GIORNALIERO COMPLETO (gestore) ───────────────────
 async function reportGiornaliero() {
-  const oggi = new Date().toISOString().split('T')[0];
-  const fine7 = new Date();
-  fine7.setDate(fine7.getDate() + 7);
-  const a7 = fine7.toISOString().split('T')[0];
-  const da = oggi.replace(/-/g,'');
-  const a1 = new Date();
-  a1.setDate(a1.getDate() + 1);
-  const a1str = a1.toISOString().split('T')[0].replace(/-/g,'');
+  const oggi    = new Date().toISOString().split('T')[0];
+  const fine7   = new Date(); fine7.setDate(fine7.getDate() + 7);
+  const a7      = fine7.toISOString().split('T')[0];
+  const daB24   = toB24Date(oggi);
+  const a1      = new Date(); a1.setDate(a1.getDate() + 1);
+  const a1B24   = toB24Date(a1.toISOString().split('T')[0]);
 
   const [arriviOggi, partenzaOggi, esperienze7] = await Promise.all([
-    getBeds24({ arrivalFrom: da, arrivalTo: a1str, status: '1' }),
-    getBeds24({ departureFrom: da, departureTo: a1str, status: '1' }),
+    getBeds24({ arrivalFrom: daB24, arrivalTo: a1B24, status: 1, includeInfoItems: true }),
+    getBeds24({ departureFrom: daB24, departureTo: a1B24, status: 1 }),
     getEsperienze(oggi, a7),
   ]);
 
