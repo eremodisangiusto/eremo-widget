@@ -418,17 +418,18 @@ export default async function handler(req, res) {
       ]);
 
       // Occupazione generica: camere occupate oggi / totale camere struttura
-      let occupate = 0;
+      let occupazione = 0;
       let debugOccupazione = {};
       try {
-        // 1. Totale camere dalla struttura (Beds24 API V2)
+        // 1. Totale camere della proprietà specifica (filtra per propertyId 221499)
         const propResp = await fetch('https://beds24.com/api/v2/properties?includeAllRooms=true', {
           headers: { 'token': BEDS24_TOKEN }
         });
         const propData = await propResp.json();
-        const totCamere = (propData.data || []).reduce((sum, p) => sum + (p.roomTypes?.length || 0), 0) || 1;
+        const myProp = (propData.data || []).find(p => p.id === 221499) || (propData.data || [])[0];
+        const totCamere = myProp?.roomTypes?.length || 2;
 
-        // 2. Prenotazioni attive oggi: arrivate nei 90gg passati e partenza da domani in poi
+        // 2. Prenotazioni attive oggi con roomId distinte
         const past90 = new Date(Date.now() - 90*86400000).toISOString().split('T')[0];
         const inCasaQuery = await getBeds24Bookings({
           arrivalFrom:   past90,
@@ -436,19 +437,16 @@ export default async function handler(req, res) {
           departureFrom: domani,
         });
 
-        // Conta roomId distinte occupate oggi
-        const roomIds = new Set((inCasaQuery.data || []).map(b => b.roomId).filter(Boolean));
-        // Aggiungi anche chi arriva oggi con roomId distinte
-        (arriviOggi.data || []).forEach(b => { if (b.roomId) roomIds.add(b.roomId); });
+        const roomIdsOccupate = new Set();
+        (inCasaQuery.data || []).forEach(b => { if (b.roomId) roomIdsOccupate.add(b.roomId); });
+        (arriviOggi.data || []).forEach(b => { if (b.roomId) roomIdsOccupate.add(b.roomId); });
 
-        occupate = roomIds.size;
-        debugOccupazione = { totCamere, camereOccupate: occupate, roomIds: [...roomIds] };
+        const camereOccupate = roomIdsOccupate.size;
+        occupazione = Math.min(100, Math.round((camereOccupate / totCamere) * 100));
+        debugOccupazione = { totCamere, camereOccupate, roomIds: [...roomIdsOccupate] };
       } catch(e) {
         debugOccupazione = { error: e.message };
       }
-      const occupazione = debugOccupazione.totCamere
-        ? Math.min(100, Math.round((occupate / debugOccupazione.totCamere) * 100))
-        : (occupate > 0 ? 100 : 0);
 
       // Incassi mese
       const incassiMese = (prenotazioniMese.records || []).reduce((s, r) => s + (r.fields['Totale €'] || 0), 0);
