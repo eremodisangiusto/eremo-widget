@@ -1303,7 +1303,7 @@ function esjInit() {
             .then(function(r) { addMsg(msgsS, typS, "assistant", r); renderQR(qrS, "scopri"); });
         }, 300);
       }
-    }
+    } else if (view === "pacchetti") {
       document.getElementById("esj-pacchetti").style.display = "flex";
       if (ESJ_MSG_P.length === 0) {
         setTimeout(function() {
@@ -1490,6 +1490,8 @@ function esjInit() {
 
   updateLabels();
   renderHomeQuick();
+
+} // fine esjInit
 
 // ── BOOT ──────────────────────────────────────────────────────
 // Piccolo delay per Webador che modifica il DOM dopo il caricamento
