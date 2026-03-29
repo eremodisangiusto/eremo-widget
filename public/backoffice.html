@@ -87,6 +87,39 @@
     .tbtn.entrata{background:#3b6d11;color:#fff}
     .tbtn.uscita{background:#a32d2d;color:#fff}
     .tbtn:hover{opacity:0.85}
+    /* DASHBOARD */
+    #dash-view{display:none;background:#faf7f2;border-radius:20px;overflow:hidden;flex-direction:column}
+    .dash-header{background:linear-gradient(135deg,#3a2e22,#2c2218);padding:0.9rem 1.1rem;display:flex;align-items:center;gap:0.75rem;flex-shrink:0}
+    .dash-body{padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:82vh}
+    .dash-body::-webkit-scrollbar{width:3px}
+    .dash-body::-webkit-scrollbar-thumb{background:#ece4d8;border-radius:2px}
+    .sec-title{font-size:0.62rem;font-weight:500;color:#8a7560;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+    .kpi{background:#fff;border:0.5px solid #ece4d8;border-radius:10px;padding:8px 6px;text-align:center}
+    .kpi-num{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;line-height:1}
+    .kpi-lbl{font-size:0.58rem;color:#8a7560;margin-top:2px}
+    .kpi.green .kpi-num{color:#3b6d11}
+    .kpi.red .kpi-num{color:#a32d2d}
+    .kpi.blue .kpi-num{color:#185fa5}
+    .kpi.amber .kpi-num{color:#854f0b}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .dcard{background:#fff;border:0.5px solid #ece4d8;border-radius:10px;padding:10px}
+    .dcard-title{font-size:0.68rem;font-weight:500;color:#2c2218;margin-bottom:6px}
+    .ditem{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid #f5f0e8;font-size:0.72rem;color:#2c2218}
+    .ditem:last-child{border-bottom:none}
+    .dbadge{font-size:0.58rem;padding:2px 7px;border-radius:20px;font-weight:500;white-space:nowrap}
+    .dbadge.green{background:#eaf3de;color:#3b6d11}
+    .dbadge.red{background:#fcebeb;color:#a32d2d}
+    .dbadge.blue{background:#e6f1fb;color:#185fa5}
+    .dbadge.amber{background:#faeeda;color:#854f0b}
+    .dbadge.gray{background:#f1efe8;color:#5f5e5a}
+    .staff-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-right:4px}
+    .staff-dot.on{background:#3b6d11}
+    .staff-dot.off{background:#b4b2a9}
+    .stars{color:#c8a97e;font-size:0.65rem}
+    .dash-chat-btn{width:100%;padding:10px;background:linear-gradient(135deg,#534AB7,#3C3489);border:none;border-radius:10px;color:#fff;font-family:'Jost',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer}
+    .dash-chat-btn:hover{opacity:0.9}
+    .loading-dash{text-align:center;padding:2rem;font-size:0.82rem;color:#8a7560}
   </style>
 </head>
 <body>
@@ -125,7 +158,45 @@
     </div>
   </div>
 
-  <!-- CHAT -->
+  <!-- DASHBOARD GESTORE -->
+  <div id="dash-view">
+    <div class="dash-header">
+      <div class="avatar av-gestore">👑</div>
+      <div>
+        <div class="staff-name" id="dash-name">Tommaso</div>
+        <div class="staff-role">Gestore · Eremo di San Giusto</div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Esci</button>
+    </div>
+    <div class="dash-body" id="dash-body">
+      <div class="loading-dash">Caricamento cruscotto...</div>
+    </div>
+  </div>
+
+  <!-- CHAT GESTORE (da dashboard) -->
+  <div id="dash-chat-view">
+    <div class="chat-header">
+      <button class="btn-logout" style="margin-right:auto;border:none;background:transparent;color:#c8a97e;font-size:0.8rem;cursor:pointer;padding:0;" onclick="backToDash()">← Cruscotto</button>
+      <div class="avatar av-gestore" style="margin-left:8px">👑</div>
+      <div style="flex:1;margin-left:8px">
+        <div class="staff-name" id="dash-chat-name">Sofia</div>
+        <div class="staff-role">Assistente gestore</div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Esci</button>
+    </div>
+    <div class="quick-bar" id="dash-quick-bar"></div>
+    <div class="msgs" id="dash-msgs">
+      <div class="typing" id="dash-typing"><span></span><span></span><span></span></div>
+    </div>
+    <div class="inp-area">
+      <textarea class="inp" id="dash-inp" rows="1" placeholder="Chiedi a Sofia..."></textarea>
+      <button class="snd" id="dash-snd" disabled onclick="dashSend()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- CHAT STAFF -->
   <div id="chat-view">
     <div class="chat-header">
       <div class="avatar" id="staff-avatar">S</div>
@@ -204,7 +275,10 @@ async function doLogin() {
 // ── LOGOUT ────────────────────────────────────────────────────
 function doLogout() {
   staffInfo = null; pin = ''; history = [];
-  document.getElementById('chat-view').style.display = 'none';
+  ['chat-view','dash-view','dash-chat-view'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
   document.getElementById('login-view').style.display = 'block';
   updateDots();
 }
@@ -212,25 +286,280 @@ function doLogout() {
 // ── INIT CHAT ─────────────────────────────────────────────────
 function initChat() {
   document.getElementById('login-view').style.display = 'none';
+
+  // GESTORE → cruscotto
+  if (staffInfo.ruolo === 'gestore') {
+    document.getElementById('dash-name').textContent = staffInfo.nome.split(' ')[0];
+    document.getElementById('dash-view').style.display = 'flex';
+    loadDashboard();
+    return;
+  }
+
+  // STAFF → chat
   const cv = document.getElementById('chat-view');
   cv.style.display = 'flex';
-
   const avColors = { pulizie: 'av-pulizie', accoglienza: 'av-accoglienza', guida: 'av-guida', gestore: 'av-gestore' };
   const avLetters = { pulizie: '🧹', accoglienza: '🏡', guida: '⭐', gestore: '👑' };
   const av = document.getElementById('staff-avatar');
   av.textContent = avLetters[staffInfo.ruolo] || 'S';
   av.className = 'avatar ' + (avColors[staffInfo.ruolo] || 'av-gestore');
-
   document.getElementById('staff-name').textContent = staffInfo.nome.split(' ')[0];
   document.getElementById('staff-role').textContent = staffInfo.ruolo.charAt(0).toUpperCase() + staffInfo.ruolo.slice(1);
-
-  // Timbratura solo per pulizie
-  if (staffInfo.ruolo === 'pulizie') {
-    document.getElementById('timbra-bar').style.display = 'flex';
-  }
-
+  if (staffInfo.ruolo === 'pulizie') document.getElementById('timbra-bar').style.display = 'flex';
   renderQuickActions();
   sendWelcome();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function loadDashboard() {
+  document.getElementById('dash-body').innerHTML = '<div class="loading-dash">⏳ Caricamento dati in corso...</div>';
+  try {
+    const resp = await fetch(PROXY + '/api/staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'dashboard', pin })
+    });
+    const data = await resp.json();
+    if (data.success) renderDashboard(data.dashboard);
+    else document.getElementById('dash-body').innerHTML = `<div class="loading-dash">⚠️ ${data.error}</div>`;
+  } catch(e) {
+    document.getElementById('dash-body').innerHTML = `<div class="loading-dash">⚠️ Errore: ${e.message}</div>`;
+  }
+}
+
+function meteoEmoji(codice) {
+  if (!codice) return '🌡';
+  if (codice >= 200 && codice < 300) return '⛈';
+  if (codice >= 300 && codice < 600) return '🌧';
+  if (codice >= 600 && codice < 700) return '❄️';
+  if (codice >= 700 && codice < 800) return '🌫';
+  if (codice === 800) return '☀️';
+  return '⛅';
+}
+
+function starStr(v) {
+  const n = Math.round(v || 0);
+  return '★'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n));
+}
+
+function renderDashboard(d) {
+  const oggi = new Date().toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+
+  let html = '';
+
+  // KPI
+  html += `<div>
+    <div class="sec-title">Oggi · ${oggi}</div>
+    <div class="kpi-grid">
+      <div class="kpi green"><div class="kpi-num">${d.arriviOggi.length}</div><div class="kpi-lbl">Arrivi oggi</div></div>
+      <div class="kpi red"><div class="kpi-num">${d.partenzeOggi.length}</div><div class="kpi-lbl">Partenze</div></div>
+      <div class="kpi blue"><div class="kpi-num">${d.esperienze7.length}</div><div class="kpi-lbl">Esperienze 7gg</div></div>
+      <div class="kpi amber"><div class="kpi-num">${d.occupazione}%</div><div class="kpi-lbl">Occupazione</div></div>
+    </div>
+  </div>`;
+
+  // Meteo + Staff
+  html += `<div class="row2">`;
+
+  // Meteo
+  if (d.meteo) {
+    html += `<div class="dcard">
+      <div class="dcard-title">${meteoEmoji(d.meteo.codice)} Meteo Ostuni</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#2c2218;font-weight:600">${d.meteo.temp}°</span>
+        <span style="font-size:0.7rem;color:#8a7560;line-height:1.3">${d.meteo.desc}<br>Vento ${d.meteo.vento}km/h</span>
+      </div>
+      <div style="font-size:0.62rem;color:#8a7560">
+        ${(d.meteo.previsioni || []).map(p => `${new Date(p.data).toLocaleDateString('it-IT',{weekday:'short'})}: ${p.temp}° ${meteoEmoji(p.codice)}`).join(' &nbsp;·&nbsp; ')}
+      </div>
+    </div>`;
+  } else {
+    html += `<div class="dcard"><div class="dcard-title">🌡 Meteo</div><div style="font-size:0.72rem;color:#8a7560">Configura OPENWEATHER_API_KEY</div></div>`;
+  }
+
+  // Staff
+  const ruoloLabel = { pulizie:'🧹', accoglienza:'🏡', guida:'⭐', gestore:'👑' };
+  html += `<div class="dcard">
+    <div class="dcard-title">👥 Staff attivo</div>
+    ${d.staff.map(s => `<div class="ditem"><span style="display:flex;align-items:center"><span class="staff-dot on"></span>${s.nome.split(' ')[0]}</span><span>${ruoloLabel[s.ruolo]||''}</span></div>`).join('')}
+  </div>`;
+  html += `</div>`;
+
+  // Arrivi oggi
+  if (d.arriviOggi.length > 0) {
+    html += `<div class="dcard">
+      <div class="dcard-title">🟢 Arrivi oggi</div>
+      ${d.arriviOggi.map(b => `
+        <div class="ditem">
+          <span>${b.nome} · ${b.ospiti} pp</span>
+          <span><span class="dbadge ${b.orario ? 'green' : 'amber'}">${b.orario || 'ora n/d'}</span></span>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // Arrivi domani
+  if (d.arriviDomani.length > 0) {
+    html += `<div class="dcard">
+      <div class="dcard-title">📅 Arrivi domani</div>
+      ${d.arriviDomani.map(b => `
+        <div class="ditem">
+          <span>${b.nome} · ${b.ospiti} pp</span>
+          <span><span class="dbadge blue">${b.orario || 'ora n/d'}</span></span>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // Esperienze settimana
+  if (d.esperienze7.length > 0) {
+    html += `<div class="dcard">
+      <div class="dcard-title">⭐ Esperienze · prossimi 7 giorni</div>
+      ${d.esperienze7.slice(0,5).map(e => `
+        <div class="ditem">
+          <span style="flex:1">${e.esperienza} · ${new Date(e.data).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</span>
+          <span><span class="dbadge blue">${e.partecipanti}pp · ${e.orario}</span></span>
+        </div>`).join('')}
+      ${d.esperienze7.length > 5 ? `<div style="font-size:0.65rem;color:#8a7560;padding-top:4px">+${d.esperienze7.length-5} altre</div>` : ''}
+    </div>`;
+  }
+
+  // Incassi + Review
+  html += `<div class="row2">
+    <div class="dcard">
+      <div class="dcard-title">💶 Incassi mese</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#8a6030;font-weight:600">€${d.incassiMese.toLocaleString('it-IT')}</div>
+      <div style="font-size:0.62rem;color:#8a7560;margin-top:2px">${d.nPrenotazioniMese} prenotazioni esperienze</div>
+    </div>
+    <div class="dcard">
+      <div class="dcard-title">💬 Review recenti</div>
+      ${d.reviewRecenti.slice(0,3).map(r => `<div class="ditem"><span style="flex:1">${(r.nome||'Ospite').split(' ')[0]}</span><span class="stars">${starStr(r.voto)}</span></div>`).join('')}
+      ${d.reviewRecenti.length === 0 ? '<div style="font-size:0.72rem;color:#8a7560">Nessuna review</div>' : ''}
+    </div>
+  </div>`;
+
+  // Pulsante chat Sofia
+  html += `<button class="dash-chat-btn" onclick="openDashChat()">
+    💬 Chiedi a Sofia un dettaglio
+  </button>
+  <button class="dash-chat-btn" style="background:transparent;border:1.5px solid #ece4d8;color:#8a6030;margin-top:0" onclick="loadDashboard()">
+    🔄 Aggiorna cruscotto
+  </button>`;
+
+  document.getElementById('dash-body').innerHTML = html;
+}
+
+// ── CHAT GESTORE DA DASHBOARD ─────────────────────────────────
+let dashMsgs = [];
+let dashLoading = false;
+
+function openDashChat() {
+  document.getElementById('dash-view').style.display = 'none';
+  const dcv = document.getElementById('dash-chat-view');
+  dcv.style.display = 'flex';
+  dcv.style.flexDirection = 'column';
+  dcv.style.height = '85vh';
+  dcv.style.maxHeight = '700px';
+  dcv.style.background = '#faf7f2';
+  dcv.style.borderRadius = '20px';
+  dcv.style.overflow = 'hidden';
+  document.getElementById('dash-chat-name').textContent = staffInfo.nome.split(' ')[0];
+
+  // Quick actions gestore
+  const qb = document.getElementById('dash-quick-bar');
+  qb.innerHTML = '';
+  const acts = [
+    { t: 'Report oggi', q: 'Dammi il report completo di oggi' },
+    { t: 'Partenze settimana', q: 'Chi parte questa settimana?' },
+    { t: 'Incassi mese', q: 'Riepilogo incassi del mese dalle esperienze' },
+    { t: 'Staff presenze', q: 'Mostrami le presenze del personale questo mese' },
+  ];
+  acts.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'qbtn';
+    btn.textContent = a.t;
+    btn.onclick = () => dashSendMsg(a.q);
+    qb.appendChild(btn);
+  });
+
+  if (dashMsgs.length === 0) {
+    addDashMsg('assistant', `Ciao ${staffInfo.nome.split(' ')[0]}! Sono qui per aiutarti. Hai già visto il cruscotto — vuoi approfondire qualcosa?`);
+  }
+
+  const inp = document.getElementById('dash-inp');
+  const snd = document.getElementById('dash-snd');
+  inp.addEventListener('input', function() {
+    snd.disabled = !inp.value.trim();
+    inp.style.height = 'auto';
+    inp.style.height = Math.min(inp.scrollHeight, 90) + 'px';
+  });
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!snd.disabled) dashSend(); }
+  });
+}
+
+function backToDash() {
+  document.getElementById('dash-chat-view').style.display = 'none';
+  document.getElementById('dash-view').style.display = 'flex';
+}
+
+function dashSend() {
+  dashSendMsg(document.getElementById('dash-inp').value.trim());
+}
+
+async function dashSendMsg(text) {
+  if (!text.trim() || dashLoading) return;
+  dashLoading = true;
+  document.getElementById('dash-snd').disabled = true;
+  document.getElementById('dash-inp').value = '';
+  document.getElementById('dash-inp').style.height = 'auto';
+  addDashMsg('user', text);
+  document.getElementById('dash-typing').classList.add('on');
+  document.getElementById('dash-msgs').scrollTop = 9999;
+
+  try {
+    const resp = await fetch(PROXY + '/api/staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'chat', pin, domanda: text })
+    });
+    const data = await resp.json();
+    document.getElementById('dash-typing').classList.remove('on');
+    if (data.success) {
+      addDashMsg('assistant', data.risposta);
+      if (data.reportPronto) showDashEmailConfirm(data.reportPronto);
+    } else {
+      addDashMsg('assistant', 'Mi dispiace, riprova.');
+    }
+  } catch(e) {
+    document.getElementById('dash-typing').classList.remove('on');
+    addDashMsg('assistant', 'Errore di connessione.');
+  }
+  dashLoading = false;
+  document.getElementById('dash-snd').disabled = false;
+}
+
+function addDashMsg(role, text) {
+  document.getElementById('dash-typing').classList.remove('on');
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  d.innerHTML = '<div class="bubble">' + fmt(text) + '</div>';
+  const msgs = document.getElementById('dash-msgs');
+  msgs.insertBefore(d, document.getElementById('dash-typing'));
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showDashEmailConfirm(reportInfo) {
+  const d = document.createElement('div');
+  d.className = 'msg assistant';
+  d.innerHTML = `<div class="bubble" style="display:flex;flex-direction:column;gap:8px;">
+    <span>Vuoi che invii questo report via email?</span>
+    <div style="display:flex;gap:8px;">
+      <button onclick="doSendReport('${reportInfo.tipo}',${reportInfo.giorni},this)" style="flex:1;padding:8px;background:#3b6d11;color:#fff;border:none;border-radius:8px;font-family:'Jost',sans-serif;font-size:0.78rem;cursor:pointer;">✉️ Sì, invia</button>
+      <button onclick="this.closest('.msg').remove()" style="flex:1;padding:8px;background:transparent;border:1.5px solid #ece4d8;border-radius:8px;font-family:'Jost',sans-serif;font-size:0.78rem;cursor:pointer;color:#5a4a38;">No</button>
+    </div>
+  </div>`;
+  const msgs = document.getElementById('dash-msgs');
+  msgs.insertBefore(d, document.getElementById('dash-typing'));
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
 // ── QUICK ACTIONS per ruolo ───────────────────────────────────
