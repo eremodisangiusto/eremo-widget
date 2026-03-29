@@ -101,7 +101,7 @@ async function sendEmail({ to, subject, html }) {
 
 // ── Fetch Beds24 prenotazioni ────────────────────────────────
 // Date format: YYYYMMDD — propertyId non serve in V2, il token identifica la property
-function toB24Date(dateStr) { return dateStr.replace(/-/g, ''); }
+function toB24Date(dateStr) { return dateStr; } // già YYYY-MM-DD
 
 async function getBeds24(params) {
   const qs = new URLSearchParams({ ...params }).toString();
