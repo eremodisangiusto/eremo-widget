@@ -417,10 +417,22 @@ export default async function handler(req, res) {
         fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=40.7285&lon=17.5810&appid=${process.env.OPENWEATHER_API_KEY}&units=metric&lang=it&cnt=8`).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
 
-      // Calcola occupazione (camere occupate oggi / totale camere = 2)
+      // Calcola occupazione — prenotazioni attive oggi (arrivo <= oggi < partenza)
+      // Beds24 V2: filter=stayovers restituisce chi è in casa oggi
       const totCamere = 2;
-      const camereOccupate = await getBeds24Bookings({ arrivalFrom: new Date(Date.now() - 30*86400000).toISOString().split('T')[0], arrivalTo: domani });
-      const occupate = (camereOccupate.data || []).filter(b => b.arrival <= oggi && b.departure > oggi).length;
+      let occupate = 0;
+      try {
+        const stayovers = await getBeds24Bookings({ filter: 'stayovers' });
+        // Conta anche chi arriva oggi
+        const arriviOggiCount = (arriviOggi.data || []).length;
+        occupate = (stayovers.data || []).length + arriviOggiCount;
+      } catch(e) {
+        // Fallback manuale: cerca prenotazioni con arrivo nei 30gg passati e partenza dopo oggi
+        const past30 = new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
+        const fallback = await getBeds24Bookings({ arrivalFrom: past30, arrivalTo: oggi, departureFrom: domani });
+        occupate = (fallback.data || []).filter(b => b.arrival <= oggi && b.departure > oggi).length
+                 + (arriviOggi.data || []).length;
+      }
       const occupazione = Math.round((Math.min(occupate, totCamere) / totCamere) * 100);
 
       // Incassi mese
