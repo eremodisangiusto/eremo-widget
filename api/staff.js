@@ -417,29 +417,33 @@ export default async function handler(req, res) {
         fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=40.7285&lon=17.5810&appid=${process.env.OPENWEATHER_API_KEY}&units=metric&lang=it&cnt=8`).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
 
-      // Calcola occupazione — prenotazioni attive oggi (arrivo <= oggi < partenza)
+      // Calcola occupazione — chi è in casa oggi (arrivo <= oggi, partenza > oggi)
       const totCamere = 2;
       let occupate = 0;
       let debugOccupazione = {};
       try {
-        const stayovers = await getBeds24Bookings({ filter: 'stayovers' });
+        // Beds24 V2: cerca prenotazioni arrivate nei 30gg passati che non sono ancora partite
+        const past30 = new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
+        const inCasaQuery = await getBeds24Bookings({
+          arrivalFrom:   past30,
+          arrivalTo:     oggi,
+          departureFrom: domani,   // partenza da domani in poi = ancora in casa oggi
+        });
+        // Aggiungi anche chi arriva oggi (non ancora "stayover" ma occupa la camera)
+        const inCasaCount = (inCasaQuery.data || []).length;
         const arriviOggiCount = (arriviOggi.data || []).length;
-        const stayoversCount = (stayovers.data || []).length;
-        occupate = stayoversCount + arriviOggiCount;
+        // Evita doppio conteggio: se arrivalFrom=past30 e arrivalTo=oggi, gli arrivi di oggi sono già inclusi
+        occupate = inCasaCount;
         debugOccupazione = {
-          stayovers: stayoversCount,
+          inCasa: inCasaCount,
           arriviOggi: arriviOggiCount,
           totale: occupate,
-          stayoversData: (stayovers.data || []).map(b => ({ id: b.id, arrival: b.arrival, departure: b.departure, roomId: b.roomId })),
+          dettaglio: (inCasaQuery.data || []).map(b => ({ id: b.id, arrival: b.arrival, departure: b.departure })),
         };
-        console.log('[dashboard] occupazione debug:', JSON.stringify(debugOccupazione));
+        console.log('[dashboard] occupazione:', JSON.stringify(debugOccupazione));
       } catch(e) {
-        const past30 = new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
-        const fallback = await getBeds24Bookings({ arrivalFrom: past30, arrivalTo: oggi });
-        const inCasa = (fallback.data || []).filter(b => b.arrival <= oggi && b.departure > oggi);
-        occupate = inCasa.length;
-        debugOccupazione = { fallback: true, inCasa: inCasa.length, error: e.message };
-        console.log('[dashboard] occupazione fallback:', JSON.stringify(debugOccupazione));
+        console.error('[dashboard] occupazione error:', e.message);
+        debugOccupazione = { error: e.message };
       }
       const occupazione = Math.round((Math.min(occupate, totCamere) / totCamere) * 100);
 
