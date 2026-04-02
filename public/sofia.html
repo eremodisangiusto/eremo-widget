@@ -476,6 +476,9 @@ function goView(view) {
       wid.style.opacity = '1';
       wid.style.transform = 'none';
       wid.style.pointerEvents = 'all';
+      // Nasconde l'header interno del widget — già presente nell'header di sofia.html
+      var widHeader = wid.querySelector('.esj-header');
+      if (widHeader) widHeader.style.display = 'none';
       document.getElementById('app').appendChild(wid);
     }
     // Nascondi FAB
