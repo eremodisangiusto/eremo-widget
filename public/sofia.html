@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Sofia · Eremo di San Giusto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #faf7f2;
+      --bg2:     #f2ece2;
+      --bg3:     #ece4d8;
+      --hdr:     #2c2218;
+      --hdr2:    #3a2e22;
+      --gold:    #b8894a;
+      --gold2:   #8a6030;
+      --txt:     #1e1812;
+      --txt2:    #5a4a38;
+      --txt3:    #8a7560;
+      --border:  rgba(160,120,70,0.2);
+    }
+
+    html, body {
+      height: 100%;
+      height: -webkit-fill-available;
+      overflow: hidden;
+      background: var(--hdr);
+    }
+
+    #app {
+      height: 100vh;
+      height: -webkit-fill-available;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── HEADER ─────────────────────────────────── */
+    .header {
+      background: linear-gradient(160deg, var(--hdr2), var(--hdr));
+      padding: env(safe-area-inset-top, 0) 0 0;
+      flex-shrink: 0;
+    }
+    .header-inner {
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .avatar {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #c8a97e, #8a5e2e);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; color: #fff; font-weight: 600;
+      flex-shrink: 0;
+    }
+    .header-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem; color: #f4ede3; font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+    .header-sub {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.65rem; color: #c8a97e;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      margin-top: 1px;
+    }
+    .dot {
+      width: 7px; height: 7px;
+      background: #4caf6e; border-radius: 50%;
+      animation: pulse 2s infinite; flex-shrink: 0;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    .lang-wrap { display: flex; gap: 4px; margin-left: auto; }
+    .lang-btn {
+      background: transparent; border: 1px solid transparent;
+      border-radius: 6px; cursor: pointer;
+      font-size: 1.1rem; padding: 3px 5px;
+      opacity: 0.4; transition: all 0.2s;
+    }
+    .lang-btn.active { opacity: 1; border-color: rgba(200,169,126,0.4); background: rgba(200,169,126,0.1); }
+
+    /* ── HOME VIEW ──────────────────────────────── */
+    #home-view {
+      flex: 1; overflow-y: auto; padding: 1rem;
+      display: flex; flex-direction: column; gap: 0.8rem;
+      background: var(--bg);
+      -webkit-overflow-scrolling: touch;
+    }
+    #home-view::-webkit-scrollbar { display: none; }
+
+    .greeting {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem; color: var(--txt);
+      line-height: 1.7;
+      padding: 0.9rem 1rem;
+      background: #fff;
+      border: 1px solid var(--bg3);
+      border-radius: 14px;
+    }
+
+    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+    .card-full  { grid-column: 1 / -1; }
+
+    .card {
+      background: #fff;
+      border: 1.5px solid var(--bg3);
+      border-radius: 14px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+      text-align: left; width: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .card:active { transform: scale(0.97); }
+    .card:hover  { border-color: var(--gold); background: #fffbf5; }
+
+    .card-icon {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 0.6rem;
+    }
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem; color: var(--txt);
+      font-weight: 600; margin-bottom: 0.2rem;
+    }
+    .card-sub {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.68rem; color: var(--txt2); line-height: 1.4;
+      margin-bottom: 0.45rem;
+    }
+    .card-badge {
+      display: inline-block;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.62rem; padding: 2px 8px;
+      border-radius: 20px; font-weight: 500;
+    }
+    .card-row { display: flex; align-items: center; gap: 0.7rem; }
+    .card-row .card-icon { margin-bottom: 0; flex-shrink: 0; }
+
+    .home-bar {
+      display: flex; gap: 0.5rem; align-items: center;
+      background: #fff; border: 1.5px solid var(--bg3);
+      border-radius: 12px; padding: 0.55rem 0.8rem;
+      transition: border-color 0.2s;
+    }
+    .home-bar:focus-within { border-color: var(--gold); }
+    .home-inp {
+      flex: 1; background: transparent; border: none; outline: none;
+      font-family: 'Jost', sans-serif; font-size: 0.82rem; color: var(--txt);
+    }
+    .home-inp::placeholder { color: var(--txt3); }
+    .home-send {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, #c8a97e, #9a6e38);
+      border: none; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .home-send svg { width: 13px; height: 13px; fill: #fff; }
+
+    /* ── CHAT VIEW ──────────────────────────────── */
+    .chat-view {
+      display: none; flex: 1; flex-direction: column;
+      min-height: 0; background: var(--bg);
+    }
+    .back-bar {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.74rem; color: var(--txt2);
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--bg3);
+      background: var(--bg2); cursor: pointer;
+      flex-shrink: 0;
+    }
+    .back-bar svg { width: 12px; height: 12px; fill: currentColor; }
+    .view-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.65rem; color: var(--gold2);
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.4rem 1rem;
+      background: var(--bg); border-bottom: 1px solid var(--bg3);
+      flex-shrink: 0;
+    }
+    .msgs {
+      flex: 1; overflow-y: auto; padding: 0.9rem 1rem;
+      display: flex; flex-direction: column; gap: 0.7rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .msgs::-webkit-scrollbar { width: 3px; }
+    .msgs::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 2px; }
+
+    .msg { max-width: 88%; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+    .msg.user     { align-self: flex-end; }
+    .msg.assistant{ align-self: flex-start; }
+    .bubble {
+      padding: 0.75rem 1rem; border-radius: 14px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.83rem; line-height: 1.7;
+    }
+    .msg.user .bubble {
+      background: linear-gradient(135deg, #c8a97e, #9a6e38);
+      color: #fff; border-bottom-right-radius: 4px;
+    }
+    .msg.assistant .bubble {
+      background: #fff; color: var(--txt);
+      border: 1px solid var(--bg3); border-bottom-left-radius: 4px;
+    }
+    .bubble strong { color: var(--gold2); }
+
+    .typing {
+      display: none; align-self: flex-start;
+      padding: 0.75rem 1rem; background: #fff;
+      border: 1px solid var(--bg3); border-radius: 14px;
+      border-bottom-left-radius: 4px;
+    }
+    .typing.on { display: flex; gap: 5px; align-items: center; }
+    .typing span {
+      width: 6px; height: 6px; background: var(--gold);
+      border-radius: 50%; animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,80%,100%{transform:translateY(0);opacity:.45} 40%{transform:translateY(-5px);opacity:1} }
+
+    .qr-wrap {
+      padding: 0.45rem 0.8rem; display: flex; flex-wrap: wrap; gap: 0.35rem;
+      border-top: 1px solid var(--bg3); background: var(--bg2); flex-shrink: 0;
+    }
+    .qr {
+      font-family: 'Jost', sans-serif; font-size: 0.7rem;
+      padding: 0.38rem 0.85rem; border: 1.5px solid var(--bg3);
+      border-radius: 20px; color: var(--gold2); background: #fff;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .qr:active { background: #fffbf5; border-color: var(--gold); }
+
+    .inp-area {
+      padding: 0.7rem 0.85rem;
+      padding-bottom: max(0.7rem, env(safe-area-inset-bottom, 0.7rem));
+      border-top: 1px solid var(--bg3);
+      display: flex; gap: 0.5rem; align-items: flex-end;
+      background: var(--bg2); flex-shrink: 0;
+    }
+    .inp {
+      flex: 1; background: #fff; border: 1.5px solid var(--bg3);
+      border-radius: 11px; padding: 0.65rem 0.9rem;
+      color: var(--txt); font-family: 'Jost', sans-serif;
+      font-size: 0.82rem; resize: none;
+      min-height: 40px; max-height: 90px; outline: none;
+      transition: border-color 0.2s; line-height: 1.45;
+    }
+    .inp:focus { border-color: var(--gold); }
+    .inp::placeholder { color: var(--txt3); }
+    .snd {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #c8a97e, #9a6e38);
+      border: none; border-radius: 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .snd:active { transform: scale(0.94); }
+    .snd:disabled { opacity: 0.35; cursor: not-allowed; }
+    .snd svg { width: 15px; height: 15px; fill: #fff; }
+
+    .brand {
+      text-align: center; padding: 0.3rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.58rem; color: var(--txt3);
+      letter-spacing: 0.08em; flex-shrink: 0;
+      background: var(--bg2); border-top: 1px solid var(--bg3);
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="avatar">S</div>
+      <div>
+        <div class="header-name">Sofia · Eremo di San Giusto</div>
+        <div class="header-sub" id="hdr-sub">Assistente · Ostuni, Puglia</div>
+      </div>
+      <div class="dot"></div>
+      <div class="lang-wrap">
+        <button class="lang-btn active" id="btn-it" onclick="setLang('it')">🇮🇹</button>
+        <button class="lang-btn"        id="btn-en" onclick="setLang('en')">🇬🇧</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="home-view">
+    <div class="greeting" id="greeting"></div>
+    <div class="cards-grid">
+
+      <!-- Camere -->
+      <button class="card" onclick="goView('camere')">
+        <div class="card-icon" style="background:rgba(24,95,165,0.12)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 9h18M9 3v6M15 3v6M5 21h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" stroke="#378ADD" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="card-title" id="ct1">Prenota</div>
+        <div class="card-sub" id="cs1">Disponibilità live</div>
+        <span class="card-badge" style="background:rgba(24,95,165,0.12);color:#185FA5">Beds24</span>
+      </button>
+
+      <!-- Esperienze -->
+      <button class="card" onclick="goView('esperienze')">
+        <div class="card-icon" style="background:rgba(29,158,117,0.12)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="card-title" id="ct2">Esperienze</div>
+        <div class="card-sub" id="cs2">8 attività</div>
+        <span class="card-badge" style="background:rgba(29,158,117,0.12);color:#0F6E56" id="cs2b">da €15</span>
+      </button>
+
+      <!-- Ostuni & Dintorni -->
+      <button class="card card-full" onclick="goView('guida')">
+        <div class="card-row">
+          <div class="card-icon" style="background:rgba(186,117,23,0.1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#BA7517" opacity="0.8"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="card-title" id="ct3">Ostuni & Dintorni</div>
+            <div class="card-sub" id="cs3">Spiagge · Borghi · Gastronomia</div>
+          </div>
+          <span class="card-badge" style="background:rgba(186,117,23,0.1);color:#854F0B" id="cs3b">Guida</span>
+        </div>
+      </button>
+
+      <!-- Weekend -->
+      <button class="card card-full" onclick="goView('pacchetti')">
+        <div class="card-row">
+          <div class="card-icon" style="background:rgba(83,74,183,0.1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="card-title" id="ct4">Weekend Esclusivi</div>
+            <div class="card-sub" id="cs4">3 pacchetti · camera + esperienze</div>
+          </div>
+          <span class="card-badge" style="background:rgba(83,74,183,0.1);color:#3C3489" id="cs4b">da €750</span>
+        </div>
+      </button>
+
+      <!-- Scopri -->
+      <button class="card card-full" onclick="goView('scopri')">
+        <div class="card-row">
+          <div class="card-icon" style="background:rgba(13,110,84,0.1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#0F6E56" stroke-width="1.5"/><path d="M16.24 7.76L14.12 14.12L7.76 16.24L9.88 9.88L16.24 7.76Z" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="card-title" id="ct5">Scopri & Guestbook</div>
+            <div class="card-sub" id="cs5">Meteo · Consigli · Review ospiti</div>
+          </div>
+          <span class="card-badge" style="background:rgba(13,110,84,0.1);color:#085041">KB</span>
+        </div>
+      </button>
+
+    </div>
+
+    <!-- Input home -->
+    <div class="home-bar">
+      <input class="home-inp" id="home-inp" type="text" id="home-input" onkeydown="if(event.key==='Enter')homeSend()" placeholder="Scrivi una domanda...">
+      <button class="home-send" onclick="homeSend()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- CHAT VIEWS (generate da JS) -->
+  <div id="chat-container" style="display:none;flex:1;flex-direction:column;min-height:0"></div>
+
+  <div class="brand">Powered by Claude AI · Eremo di San Giusto</div>
+
+</div>
+
+<script src="https://eremo-bookings.vercel.app/widget.js"></script>
+<script>
+// Override esjGoView per aprire le chat nel contesto fullscreen
+var PROXY = 'https://eremo-bookings.vercel.app';
+var LANG  = 'it';
+var currentView = 'home';
+
+// Labels per lingua
+var LABELS = {
+  it: {
+    sub:'Assistente di Prenotazione · Ostuni, Puglia',
+    greeting:'Ciao! Sono Sofia, la tua assistente all\'Eremo di San Giusto. Scegli cosa vuoi fare o scrivimi direttamente.',
+    ct1:'Prenota', cs1:'Disponibilità live',
+    ct2:'Esperienze', cs2:'8 attività',
+    ct3:'Ostuni & Dintorni', cs3:'Spiagge · Borghi · Gastronomia', cs3b:'Guida',
+    ct4:'Weekend Esclusivi', cs4:'3 pacchetti · camera + esperienze', cs4b:'da €750',
+    ct5:'Scopri & Guestbook', cs5:'Meteo · Consigli · Review ospiti',
+    homePh:'Scrivi una domanda...',
+  },
+  en: {
+    sub:'Booking Assistant · Ostuni, Puglia',
+    greeting:'Hi! I\'m Sofia, your assistant at Eremo di San Giusto. Choose what you\'d like to do or just write to me.',
+    ct1:'Book a room', cs1:'Live availability',
+    ct2:'Experiences', cs2:'8 activities',
+    ct3:'Ostuni & Around', cs3:'Beaches · Villages · Food', cs3b:'Guide',
+    ct4:'Exclusive Weekends', cs4:'3 packages · room + experiences', cs4b:'from €750',
+    ct5:'Explore & Guestbook', cs5:'Weather · Tips · Guest reviews',
+    homePh:'Ask a question...',
+  }
+};
+
+function setLang(l) {
+  LANG = l;
+  document.getElementById('btn-it').classList.toggle('active', l==='it');
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  updateLabels();
+  // Aggiorna lingua nel widget Sofia
+  if (window.esjSetLang) window.esjSetLang(l);
+}
+
+function updateLabels() {
+  var lb = LABELS[LANG];
+  var s = function(id, v) { var el = document.getElementById(id); if(el) el.textContent = v; };
+  s('hdr-sub', lb.sub);
+  s('greeting', lb.greeting);
+  s('ct1', lb.ct1); s('cs1', lb.cs1);
+  s('ct2', lb.ct2); s('cs2', lb.cs2);
+  s('ct3', lb.ct3); s('cs3', lb.cs3); s('cs3b', lb.cs3b);
+  s('ct4', lb.ct4); s('cs4', lb.cs4); s('cs4b', lb.cs4b);
+  s('ct5', lb.ct5); s('cs5', lb.cs5);
+  var inp = document.getElementById('home-inp');
+  if (inp) inp.placeholder = lb.homePh;
+}
+
+function goView(view) {
+  // Usa il widget Sofia per la chat
+  if (window.esjGoView) {
+    // Mostra il widget container e nasconde home
+    document.getElementById('home-view').style.display = 'none';
+    // Apri il widget Sofia
+    if (!ESJ_OPEN) {
+      ESJ_OPEN = true;
+      var wid = document.getElementById('esj-widget');
+      var fab = document.getElementById('esj-fab');
+      if (wid) { wid.style.opacity = '1'; wid.style.transform = 'none'; wid.style.pointerEvents = 'all'; wid.classList.add('open'); }
+      if (fab) fab.classList.add('open');
+    }
+    window.esjGoView(view);
+    // Nascondi il widget nel suo contenitore e mostralo fullscreen
+    var wid = document.getElementById('esj-widget');
+    if (wid) {
+      wid.style.position = 'static';
+      wid.style.width = '100%';
+      wid.style.height = '100%';
+      wid.style.maxWidth = 'none';
+      wid.style.maxHeight = 'none';
+      wid.style.bottom = 'auto';
+      wid.style.right = 'auto';
+      wid.style.borderRadius = '0';
+      wid.style.boxShadow = 'none';
+      wid.style.opacity = '1';
+      wid.style.transform = 'none';
+      wid.style.pointerEvents = 'all';
+      document.getElementById('app').appendChild(wid);
+    }
+    // Nascondi FAB
+    var fab = document.getElementById('esj-fab');
+    if (fab) fab.style.display = 'none';
+  }
+}
+
+// Override back button nel widget per tornare alla home
+var origGoView = null;
+function initSofiaOverride() {
+  if (!window.esjGoView) { setTimeout(initSofiaOverride, 200); return; }
+  origGoView = window.esjGoView;
+  window.esjGoView = function(view) {
+    if (view === 'home') {
+      // Torna alla home fullscreen
+      document.getElementById('home-view').style.display = 'flex';
+      var wid = document.getElementById('esj-widget');
+      if (wid) wid.style.display = 'none';
+    } else {
+      origGoView(view);
+      var wid = document.getElementById('esj-widget');
+      if (wid) {
+        wid.style.display = 'flex';
+        document.getElementById('home-view').style.display = 'none';
+      }
+    }
+  };
+}
+
+function homeSend() {
+  var v = document.getElementById('home-inp').value.trim();
+  if (!v) return;
+  document.getElementById('home-inp').value = '';
+  // Router semplice per la home
+  var expKw = ['esperienza','esperienze','olio','stelle','star','cucina','massaggio','trekking','carrozze','serenade','ciuchino','weekend','pacchetto'];
+  var guidaKw = ['ostuni','spiaggia','beach','borgo','ristorante','mangiare','distanza','parcheggio','come arrivare'];
+  var scopriKw = ['review','meteo','consiglio','cosa fare','dove mangiare','guestbook'];
+  var paccKw = ['pacchetto','weekend','esclusivo','immersion','wild','senses'];
+  var tl = v.toLowerCase();
+  var dest = paccKw.some(k=>tl.includes(k)) ? 'pacchetti'
+           : scopriKw.some(k=>tl.includes(k)) ? 'scopri'
+           : guidaKw.some(k=>tl.includes(k)) ? 'guida'
+           : expKw.some(k=>tl.includes(k)) ? 'esperienze'
+           : 'camere';
+  goView(dest);
+  setTimeout(function() {
+    if (dest === 'esperienze' && window.esjSendE) window.esjSendE(v);
+    else if (dest === 'guida'    && window.esjSendG) window.esjSendG(v);
+    else if (dest === 'pacchetti'&& window.esjSendP) window.esjSendP(v);
+    else if (dest === 'scopri'   && window.esjSendS) window.esjSendS(v);
+    else if (window.esjSendC) window.esjSendC(v);
+  }, 600);
+}
+
+// Init
+updateLabels();
+initSofiaOverride();
+</script>
+</body>
+</html>
