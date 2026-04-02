@@ -534,6 +534,24 @@ function homeSend() {
   }, 600);
 }
 
+// Nascondi sempre il FAB su questa pagina (non serve il pulsante flottante)
+function hideFab() {
+  var fab = document.getElementById('esj-fab');
+  if (fab) { fab.style.display = 'none'; return true; }
+  return false;
+}
+
+// Observer per nascondere il FAB non appena viene creato dal widget
+var fabObserver = new MutationObserver(function() {
+  if (hideFab()) fabObserver.disconnect();
+});
+fabObserver.observe(document.body, { childList: true, subtree: true });
+
+// Anche con un intervallo di sicurezza
+var fabInterval = setInterval(function() {
+  if (hideFab()) clearInterval(fabInterval);
+}, 100);
+
 // Init
 updateLabels();
 initSofiaOverride();
