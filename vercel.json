@@ -3,6 +3,21 @@
     { "source": "/payment-success",  "destination": "/payment-success.html"  },
     { "source": "/payment-cancel",   "destination": "/payment-cancel.html"   },
     { "source": "/admin-reviews",    "destination": "/admin-reviews.html"    },
-    { "source": "/staff",            "destination": "/backoffice.html"       }
+    { "source": "/staff",            "destination": "/backoffice.html"       },
+    { "source": "/sofia",            "destination": "/sofia.html"            }
+  ],
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "staff.eremodisangiusto.it" }],
+      "destination": "/staff",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "sofia.eremodisangiusto.it" }],
+      "destination": "/sofia",
+      "permanent": false
+    }
   ]
 }
